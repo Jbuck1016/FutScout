@@ -9,69 +9,140 @@
 <link rel="stylesheet" href="theme.css?v=pr1">
 <script src="site-tools.js?v=pr1"></script>
 <style>
-/* Canvas, surfaces, lines, text, green and red come from theme.css, which
-   carries this page's token names as aliases onto the shared palette, --f-disp
-   included. What is left is this page's own accent family and its blue. */
-:root{
-  /* Light amber a step darker, so the section headings and the inline key
-     figures clear AA on the shared surfaces. var(--gold) was 3.97:1 on a card;
-     var(--gold) is 5.03:1. Same hue family, tints rebased, dark mode untouched. */
-  --amber-dim:rgba(138,94,26,.09);
-  
-}
-html.dark{
-  --panel:var(--panel);--line:var(--rule);
-  --dim:var(--muted);
-  --amber-dim:rgba(226,184,119,.10);--green:var(--p80);--blue:var(--blue);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--text);font-family:var(--f-body)}
-body{max-width:920px;margin:0 auto;padding:0 22px 80px;-webkit-font-smoothing:antialiased}
-.top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:26px 0 8px;border-bottom:1px solid var(--line);margin-bottom:26px}
-.mark{width:9px;height:22px;background:var(--amber);border-radius:2px;align-self:center}
-h1{font:800 22px/1.1 var(--f-disp);letter-spacing:-.02em}
-.sub{font:500 11px/1.5 var(--f-mono);color:var(--dim);width:100%;margin-top:4px}
-.nav{margin-left:auto;display:flex;gap:8px;align-self:center}
-.nav a,.nav button{font:600 11px/1 var(--f-body);color:var(--dim);text-decoration:none;background:none;border:1px solid var(--line2);padding:7px 11px;border-radius:var(--radius);cursor:pointer}
-.nav a:hover,.nav button:hover{color:var(--text)}
-h2{font:800 9px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin:34px 0 4px;display:flex;gap:9px;align-items:baseline}
-h2 .n{font-family:var(--f-mono);color:var(--dim2)}
-h3{font:700 15px/1.2 var(--f-disp);letter-spacing:-.01em;margin:0 0 10px}
-p{font:400 13.5px/1.65 var(--f-body);color:var(--text);margin:9px 0}
-p.lede{font-size:14.5px;color:var(--text)}
-.dim{color:var(--dim)}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:17px 19px;margin:12px 0}
-.methods{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
-@media(max-width:680px){.methods{grid-template-columns:1fr}}
-@media(max-width:680px){body{padding:0 14px 60px}.nav{margin-left:0;flex-wrap:wrap}table{display:block;max-width:100%;overflow-x:auto;white-space:nowrap}}
-.m{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:var(--radius);padding:13px 14px}
-.m b{font:700 12px/1.3 var(--f-body)}
-.m span{display:block;font:500 11px/1.5 var(--f-body);color:var(--dim);margin-top:5px}
-table{width:100%;border-collapse:collapse;margin:12px 0;font:500 12.5px/1.4 var(--f-body)}
-th{text-align:left;font:700 8.5px/1 var(--f-body);letter-spacing:.11em;text-transform:uppercase;color:var(--dim2);padding:9px 10px;border-bottom:1px solid var(--line2)}
-td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-.tick{color:var(--green);font-weight:700}
-.warn{color:var(--amber);font-weight:700}
-.pill{display:inline-block;font:700 10px/1 var(--f-mono);padding:3px 7px;border-radius:var(--radius);background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-line)}
-.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font:500 11px/1.7 var(--f-mono);color:var(--dim2)}
-ul{margin:8px 0 8px 2px;padding:0;list-style:none}
-li{font:400 13px/1.6 var(--f-body);padding-left:18px;position:relative;margin:5px 0}
-li:before{content:'—';position:absolute;left:0;color:var(--amber)}
-.kfig{font-family:var(--f-mono);font-weight:700;color:var(--amber)}
-@media print{.nav{display:none}body{max-width:100%}.card,.m{break-inside:avoid}h2{break-after:avoid}}
+/* Learn reading layout. Tokens come from theme.css, chrome from shell.css and
+   the fs- components from components.css; this page declares no palette.
+   Every rule is scoped to .wrap so nothing here can restyle the shell.
 
-.tierbadge{font:700 8.5px/1 var(--f-mono,monospace);letter-spacing:.1em;text-transform:uppercase;
-  border-radius:var(--radius);padding:4px 7px;margin-left:9px;vertical-align:middle}
-.tierbadge.t2{color:var(--blue,var(--blue));border:1px solid rgba(90,169,255,.4)}
-.tierbadge.t4{color:var(--red,var(--accent-text));border:1px solid rgba(255,95,86,.4)}
-.callout{border:1px solid var(--line2);border-left:3px solid var(--dim2);background:var(--panel2);
-  border-radius:var(--radius);padding:12px 15px;margin:14px 0;font-size:13.5px}
-.callout.warn{border-left-color:var(--amber);background:var(--amber-dim)}
-.callout b{color:var(--text)}
-.unavail{color:var(--red,var(--accent-text));font-weight:600}
-.snap{border:1px solid var(--line2);border-left:3px solid var(--amber);background:var(--amber-dim);border-radius:var(--radius);padding:9px 13px;margin:10px 0 12px;font:500 12px/1.65 var(--f-mono);color:var(--dim)}
-.snap b{color:var(--text);font-weight:700}
+   .doc is a two-track grid: running text sits in the first track, a
+   65-character measure; wide tables and figures span both tracks and scroll
+   inside their own box. */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 13px/1.45 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding:var(--s6) var(--s6) 60px;display:grid;
+  grid-template-columns:230px minmax(0,1fr);gap:var(--s5) 32px;align-items:start}
+.wrap.one{grid-template-columns:minmax(0,1fr);max-width:920px}
+.wrap a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:2px}
+.wrap a:hover{text-decoration-color:var(--ink)}
+
+/* strapline across the top of the page */
+.sys{grid-column:1/-1;padding-bottom:var(--s4);border-bottom:1px solid var(--ink)}
+.sys-line{max-width:90ch;font:400 12px/1.4 var(--body);color:var(--muted)}
+
+/* side navigation */
+.toc{position:sticky;top:var(--s5);max-height:calc(100vh - 28px);overflow:auto;padding:var(--s4);
+  background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.toc h4{margin:0 0 var(--s3);font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc ol,.toc ul{margin:0;padding:0;list-style:none}
+.toc ol{counter-reset:toc}
+.toc ol>li{counter-increment:toc}
+.toc ol>li>a::before{content:counter(toc,decimal-leading-zero);flex:0 0 auto;font:400 10px/1.9 var(--mono);color:var(--muted)}
+.toc a{display:flex;align-items:baseline;gap:var(--s3);min-height:var(--tap);padding:var(--s2) var(--s3);border-left:3px solid transparent;
+  font:400 12px/1.4 var(--body);color:var(--ink);text-decoration:none}
+.toc a:hover{background:var(--panel2)}
+.toc a:focus-visible{outline-offset:-2px}
+.toc .sub a{padding-left:28px;font-size:11px;color:var(--muted)}
+.toc .grp{margin:var(--s4) 0 var(--s1);padding:0 var(--s3);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* the document */
+.doc{min-width:0;font-size:15px;display:grid;grid-template-columns:minmax(0,65ch) minmax(0,1fr);align-content:start}
+.doc>*{grid-column:1;min-width:0;margin-top:0;margin-bottom:var(--s5)}
+.doc>:is(table,.fs-table-scroll):has(th:nth-child(4)),.doc>.wide{grid-column:1/-1}
+.doc h1{margin:0 0 var(--s4);font:600 30px/1.05 var(--display);letter-spacing:-.01em}
+.doc h2{margin:32px 0 var(--s3);padding-top:var(--s5);border-top:1px solid var(--ink);font:600 24px/1.1 var(--display);scroll-margin-top:var(--s4)}
+.doc h2 .n{display:block;margin-bottom:var(--s3);font:500 10px/1 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.doc h3{margin:var(--s6) 0 var(--s2);font:500 20px/1.2 var(--display);scroll-margin-top:var(--s4)}
+.doc h4{margin:var(--s5) 0 var(--s1);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc h5{margin:0 0 var(--s3);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc>h3,.doc>h4{margin-bottom:var(--s2)}
+.doc p{margin-top:0;margin-bottom:var(--s4);font-size:15px;line-height:1.6}
+.doc>p{margin-bottom:var(--s5)}
+.doc .lead{font:500 16px/1.45 var(--display);color:var(--ink)}
+.doc ul,.doc ol{padding-left:20px}
+.doc :is(ul,ol) :is(ul,ol){margin:var(--s2) 0 0}
+.doc li{margin-bottom:var(--s2);font-size:15px;line-height:1.6}
+.doc strong,.doc b{font-weight:600}
+.doc em{font-style:italic}
+.doc code{padding:0 4px;background:var(--panel2);border:1px solid var(--rule);border-radius:var(--radius);font:400 .87em var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.doc pre{padding:var(--s4) var(--s5);background:var(--panel2);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto}
+.doc pre code{padding:0;background:none;border:0;font:400 12px/1.6 var(--mono);overflow-wrap:normal}
+.doc :target{scroll-margin-top:var(--s4)}
+/* the anchor a link landed on: the same 3px accent rule a selected row carries */
+.doc :is(h2,h3,p,dt,dd):target,.doc dt:target+dd{margin-left:-11px;padding-left:var(--s3);border-left:3px solid var(--accent)}
+
+/* tables: mono header labels on an ink rule, digits in mono */
+.doc table{width:100%;border-collapse:collapse;margin:0;font:400 12px/1.4 var(--body)}
+.doc :is(.box,.tier,.card) :is(table,.fs-table-scroll){margin:var(--s3) 0 var(--s4)}
+.doc th{padding:var(--s2) var(--s3);border-bottom:1px solid var(--ink);text-align:left;vertical-align:bottom;
+  font:500 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc td{padding:var(--s2) var(--s3);border-bottom:1px solid var(--rule2);vertical-align:top}
+.doc :is(td,th).num{text-align:right}
+.doc td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.doc table:has(th:nth-child(4)){min-width:520px}
+.lv,.kfig{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* notes */
+.box,.callout,.card,.tier,.snap{padding:var(--s4) var(--s5);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.box.data,.callout{background:var(--panel2)}
+/* a limitation or caution: the gold rule, never the accent */
+.box.warn,.callout.warn,.snap{border-color:var(--gold)}
+.doc :is(.box,.callout,.card,.tier,.snap)>:last-child{margin-bottom:0}
+.doc :is(.box,.callout,.card,.tier,.snap) :is(p,li){font-size:13px;line-height:1.45}
+.unavail{color:var(--p0-text);font-weight:600}
+.foot{grid-column:1/-1;margin-top:var(--s6);padding-top:var(--s4);border-top:1px solid var(--rule);font:400 11px/1.6 var(--mono);color:var(--muted)}
+
+@media (max-width:900px){
+  /* one column, the side navigation above the content */
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .toc{position:static;max-height:none}
+}
+@media (max-width:760px){
+  .wrap{padding:var(--s5) var(--s5) 48px}
+  .toc{max-height:168px}
+  .doc{grid-template-columns:minmax(0,1fr)}
+  .doc>:is(table,.fs-table-scroll):has(th:nth-child(4)),.doc>.wide{grid-column:1}
+  .doc h1{font-size:24px}
+}
+@media print{
+  .fs-shell,.fs-bottom,.fs-toast,.fs-palette,.toc,.noprint{display:none!important}
+  html,body{background:none}
+  .wrap{display:block;max-width:none;padding:0}
+  .doc h2{break-after:avoid}
+  .doc :is(pre,table,.box,.callout,.card,.tier,.snap,.q,details,.m){break-inside:avoid}
+  .wrap a{text-decoration:none}
+}
+
+/* ---- Metrics validation ---- */
+.top{padding-bottom:var(--s4);border-bottom:1px solid var(--ink)}
+.top h1{margin:0;font:600 30px/1.05 var(--display);letter-spacing:-.01em}
+.top .sub{margin-top:var(--s2);font:400 11px/1.4 var(--mono);color:var(--muted)}
+.top .sub b{font-weight:500;color:var(--ink)}
+.doc h2{display:flex;align-items:baseline;flex-wrap:wrap;gap:var(--s2) var(--s3)}
+.doc h2 .n{flex:0 0 100%;margin-bottom:var(--s1)}
+.doc p.lede{font:500 16px/1.45 var(--display)}
+.dim{color:var(--muted)}
+/* the four evidence tiers */
+.methods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4)}
+.m{padding:var(--s4) var(--s5);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.m b{display:block;font:600 13px/1.45 var(--body)}
+.m span{display:block;margin-top:var(--s1);font:400 12px/1.4 var(--body);color:var(--muted)}
+/* A tier is a grade of evidence, not a ranking: it is a tag, with the warning
+   rule only on the tier that must not be claimed as verified. */
+.tierbadge{padding:1px 5px;border:1px solid var(--ink);border-radius:var(--radius);font:500 9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink);white-space:nowrap;align-self:center}
+.tierbadge.t4{border-color:var(--p0);color:var(--p0-text)}
+/* A verdict from the face-validity review is words in ink; it is not a
+   percentile and takes no band colour. */
+.tick{font-weight:600;color:var(--ink)}
+.callout b,.snap b{font-weight:600;color:var(--ink)}
+.doc .snap,.doc p.snap{font:400 12px/1.4 var(--body);color:var(--muted)}
+.doc .card p{margin:0}
+.doc .card p+p{margin-top:var(--s3)}
+.doc ul{padding-left:0;list-style:none}
+.doc ul>li{position:relative;padding-left:18px}
+.doc ul>li::before{content:"\2014";position:absolute;left:0;color:var(--muted)}
+@media (max-width:760px){
+  .methods{grid-template-columns:minmax(0,1fr)}
+  .top h1{font-size:24px}
+}
 </style>
 <script src="gate.js"></script>
 <meta name="robots" content="noindex,nofollow">
@@ -79,15 +150,16 @@ li:before{content:'—';position:absolute;left:0;color:var(--amber)}
 <link rel="stylesheet" href="components.css?v=pr1">
 </head>
 <body><script>window.FutScout&&FutScout.mount()</script>
+<div class="wrap one">
 <div class="top">
   <div><h1>Metrics Validation</h1></div>
   <div class="sub" id="liveSub">loading current figures&hellip;</div>
 </div>
 
-<main id="validationContent">
+<main id="validationContent" class="doc">
 <p class="lede">Claims are graded by the evidence supporting them. Read the <a href="methodology.html">Methodology</a> and <a href="evidence-contracts.html">source contracts</a> alongside each diagnostic. A disagreement needs a source-and-version check, not automatic preference for one page. Static face-validity examples are historical illustrations, not refreshed rankings; unless dated explicitly, their snapshot date was not recorded.</p>
 
-<div class="methods">
+<div class="methods wide">
   <div class="m"><b>Tier 1 · Reconciled against ground truth</b><span>Checked against numbers this platform did not produce. If these fail, something is genuinely broken.</span></div>
   <div class="m"><b>Tier 2 · Calibrated against outcomes</b><span>A modelled quantity checked against what actually happened.</span></div>
   <div class="m"><b>Tier 3 · Benchmarked against a published reference</b><span>Compared to an independent tool's figures. Real evidence, but narrow.</span></div>
@@ -250,8 +322,8 @@ workflow that logs who checked refreshed outputs and when.
 <p class="snap">Part of the fixed validation snapshot described in 04. MLS only, not recomputed on rebuild.</p>
 <p>The similarity engines find nearest neighbours by cosine on z-scored profiles. The test is whether the matches are ones a scout would nod at.</p>
 <div class="card">
-<p style="margin:0 0 6px"><b>Player.</b> Lionel Messi's nearest chain-role match in MLS is <span class="kfig">Son Heung-Min (79%)</span>, followed by the league's creative designated players: Fernández, Hartel, Ojeda, Miranchuk, Mukhtar. Every comp is a playmaking, ball-involved forward, found without any position input. Messi tops out at 79% rather than 95%+ because he is a genuine outlier; homogeneous positions like centre-back match far tighter.</p>
-<p style="margin:6px 0 0"><b>Team.</b> Inter Miami's closest stylistic peers are Real Salt Lake and LAFC, the league's possession-and-penetrate cluster.</p>
+<p><b>Player.</b> Lionel Messi's nearest chain-role match in MLS is <span class="kfig">Son Heung-Min (79%)</span>, followed by the league's creative designated players: Fernández, Hartel, Ojeda, Miranchuk, Mukhtar. Every comp is a playmaking, ball-involved forward, found without any position input. Messi tops out at 79% rather than 95%+ because he is a genuine outlier; homogeneous positions like centre-back match far tighter.</p>
+<p><b>Team.</b> Inter Miami's closest stylistic peers are Real Salt Lake and LAFC, the league's possession-and-penetrate cluster.</p>
 </div>
 
 <h2><span class="n">08</span> What we found wrong, and fixed</h2>
@@ -280,6 +352,7 @@ verified truth.</li>
 <div class="foot">
 data · whoscored · xg calibrated against outcomes · xt grid borrowed, not fitted here · sequences benchmarked vs published reference · <span id="footAsOf">as of …</span><br>
 generated from the live database · figures reproducible from the platform
+</div>
 </div>
 
 <script>
@@ -356,6 +429,12 @@ generated from the live database · figures reproducible from the platform
       document.getElementById('xtSanity').innerHTML='The internal directional check is live: shot-ending possessions average <b>'+Number(d.shot_ending_mean_xt).toFixed(4)+'</b> xT versus <b>'+Number(d.other_mean_xt).toFixed(4)+'</b> for other possessions, a <b>'+Number(d.internal_directional_ratio).toFixed(2)+'×</b> ratio. This is a sanity check on implementation, not validation of the borrowed grid.';
     }).catch(function(){document.getElementById('xtSanity').textContent='Internal xT status unavailable.';});
 })();
+</script>
+<script>
+/* Printing is always on the light palette, whatever the screen theme: the
+   root theme is set to light for the print and put back afterwards. */
+window.addEventListener('beforeprint',function(){var r=document.documentElement;if(!r.hasAttribute('data-print-theme')){r.setAttribute('data-print-theme',r.getAttribute('data-theme')||'');r.setAttribute('data-theme','light')}});
+window.addEventListener('afterprint',function(){var r=document.documentElement;if(r.hasAttribute('data-print-theme')){var t=r.getAttribute('data-print-theme');if(t)r.setAttribute('data-theme',t);else r.removeAttribute('data-theme');r.removeAttribute('data-print-theme')}});
 </script>
 </body>
 </html>

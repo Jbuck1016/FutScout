@@ -9,120 +9,102 @@
 <link rel="stylesheet" href="theme.css?v=pr1">
 <script src="site-tools.js?v=pr1"></script>
 <style>
-/* Light palette and font tokens are in theme.css. This page keeps only its own
-   accent family and blue. */
-:root{
-  --amber-dim:rgba(156,107,30,.10);
-  
-}
-html.dark{
-  --panel:var(--panel);
-  --line2:var(--rule);
-  --dim:var(--muted);
-  --amber-dim:rgba(226,184,119,.10);
-  --red:var(--accent);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{background:var(--bg);color:var(--text);font-family:var(--f-body);display:flex;flex-direction:column;overflow:hidden}
-a{color:inherit;text-decoration:none}
+/* Metric reference. Tokens come from theme.css, chrome from shell.css and the
+   fs- components from components.css. What is left here is the page's own
+   reading layout: a directory rail beside one long document of definitions.
+   Every definition is an <article id="m-<slug of the metric key>"> and every
+   category a <section id="cat-<slug of the category name>">, so other pages can
+   link straight to them. */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 13px/1.45 var(--body)}
+.wrap{display:grid;grid-template-columns:var(--rail-wide) minmax(0,1fr);align-items:start;min-width:0}
 
-.hdr{height:52px;border-bottom:1px solid var(--line);background:var(--panel);
-  display:flex;align-items:center;gap:14px;padding:0 18px;flex-shrink:0}
-.hdr-mark{font:700 12px/1 var(--f-mono);color:var(--amber)}
-.hdr-t{font:800 15px/1 var(--f-disp);letter-spacing:-.02em}
-.hdr-s{font:500 10px/1 var(--f-mono);color:var(--dim2);margin-top:4px}
-.nav{display:flex;gap:2px;margin-left:18px}
-.nav a{font:600 11.5px/1 var(--f-mono);color:var(--dim);padding:7px 11px;border-radius:2px}
-.nav a:hover{color:var(--text);background:var(--panel2)}
-.nav a.on{color:var(--amber);background:var(--amber-dim)}
-.hdr-r{margin-left:auto}
+/* Directory rail: stays beside the document while it scrolls. */
+.side{position:sticky;top:0;align-self:start;max-height:100vh;min-width:0;display:flex;flex-direction:column;
+  background:var(--panel);border-right:1px solid var(--rule)}
+.side-top{padding:var(--s4);display:flex;flex-direction:column;gap:var(--s2)}
+.list{position:relative;flex:1 1 auto;padding-bottom:var(--s6)}
+.gh{position:sticky;top:0;z-index:1;display:flex;align-items:center;min-height:var(--tap);padding:0 var(--s3);
+  background:var(--panel2);border-bottom:1px solid var(--rule);color:var(--muted);text-decoration:none;
+  font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+a.gh:hover{color:var(--ink)}
+.gh:focus-visible,.mi:focus-visible{outline-offset:-2px}
+/* Picking a metric opens its entry in the document beside the list, so each
+   row is a real button. */
+.mi{min-height:var(--tap);align-items:center;flex:0 0 auto}
+.mi-k{font:400 10px/1.2 var(--mono);color:var(--muted);white-space:nowrap;flex:0 0 auto}
 
-.wrap{flex:1;display:flex;overflow:hidden}
-.side{width:290px;border-right:1px solid var(--line);background:var(--panel);
-  display:flex;flex-direction:column;flex-shrink:0}
-.side-top{padding:11px;border-bottom:1px solid var(--line)}
-.q{width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--text);
-  font:500 12px/1 var(--f-mono);padding:9px 10px;border-radius:2px;outline:none}
-.q:focus{border-color:var(--amber-line)}
-.list{flex:1;overflow-y:auto;padding-bottom:20px}
-.gh{font:600 9px/1 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--dim2);
-  padding:12px 13px 7px;border-bottom:1px solid var(--line);background:var(--panel);
-  position:sticky;top:0;z-index:2}
-/* Picking a metric opens its entry in the panel beside the list, so each row is
-   a real button, reset back to how it looked as a div. */
-.mi{padding:8px 13px;cursor:pointer;border-bottom:1px solid var(--line);display:flex;
-  align-items:center;justify-content:space-between;gap:8px;
-  width:100%;border-top:0;border-left:0;border-right:0;background:none;font:inherit;color:inherit;text-align:left}
-.mi:hover{background:var(--panel2)}
-.mi.on{background:var(--amber-dim);box-shadow:inset 2px 0 0 var(--amber)}
-.mi:focus-visible{outline:2px solid var(--amber);outline-offset:-2px}
-.mi-n{font:600 12px/1.25 var(--f-body)}
-.mi-k{font:500 9px/1 var(--f-mono);color:var(--dim2)}
+/* The document */
+.main{min-width:0;padding:var(--s6) 24px 60px}
+.main>h1{margin:0 0 var(--s6)}
+.cat{margin:0 0 32px}
+.cat-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:var(--s2) var(--s4);margin:0 0 0 -13px;padding:0 0 var(--s3) var(--s4);
+  border-left:3px solid transparent;border-bottom:1px solid var(--ink);font:600 24px/1.1 var(--display);scroll-margin-top:var(--s5)}
+.cat-h:focus{outline:none}
+.cat-h.is-target{border-left-color:var(--accent)}
+.def{margin-left:-13px;padding:var(--s5) var(--s4);border-left:3px solid transparent;border-bottom:1px solid var(--rule);scroll-margin-top:var(--s4)}
+.def:focus{outline:none}
+.def.on{border-left-color:var(--accent);background:var(--panel)}
+.def[hidden],.cat[hidden]{display:none}
+.def-in{max-width:65ch;font-size:15px}
+.e-eye{font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.e-t{margin:var(--s2) 0 var(--s1);font:500 20px/1.2 var(--display)}
+.e-k{font:400 11px/1.4 var(--mono);color:var(--muted);overflow-wrap:anywhere}
+.e-k a{color:inherit;text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:2px}
+.e-k a:hover{color:var(--ink);text-decoration-color:var(--ink)}
+.e-d{margin:var(--s4) 0 0;font:400 15px/1.6 var(--body);color:var(--ink)}
+.blk{margin-top:var(--s5)}
+.blk-h{margin:0 0 var(--s2);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.blk-b p{margin:var(--s3) 0 0;font:400 13px/1.45 var(--body)}
+.calc{padding:var(--s3) var(--s4);background:var(--panel2);border:1px solid var(--rule);border-radius:var(--radius);
+  font:400 12px/1.6 var(--mono);color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere}
+.def.on .calc{background:var(--bg)}
+.def-tog{margin-top:var(--s5)}
+.def-more[hidden]{display:none}
 
-.main{flex:1;overflow-y:auto;padding:20px 24px 60px}
-.entry{max-width:900px}
-.e-eye{font:600 9px/1 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--dim2)}
-.e-t{font:800 30px/1.08 var(--f-disp);letter-spacing:-.03em;margin:9px 0 4px}
-.e-k{font:500 11px/1 var(--f-mono);color:var(--amber)}
-.e-d{font:400 14.5px/1.65 var(--f-body);color:var(--text);margin:16px 0 0;max-width:70ch}
+.stat-row{display:flex;gap:var(--s4) var(--s6);flex-wrap:wrap}
+.st{min-width:80px}
+.st-l{font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.st-v{margin-top:var(--s1);font:500 16px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.st-v.is-muted{color:var(--muted)}
 
-.blk{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);margin-top:16px}
-.blk-h{font:600 9px/1 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--dim);
-  padding:11px 14px;border-bottom:1px solid var(--line)}
-.blk-b{padding:14px}
-.calc{font:500 12.5px/1.75 var(--f-mono);color:var(--dim);white-space:pre-wrap}
-
-.scale{display:flex;align-items:flex-end;gap:0;margin:6px 0 4px;height:52px}
-.sc-seg{flex:1;background:var(--amber);opacity:.18;border-radius:1px 1px 0 0;margin-right:2px}
-.sc-lbls{display:flex;justify-content:space-between;font:500 10px/1 var(--f-mono);color:var(--dim2)}
-.stat-row{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px}
-.st{min-width:88px}
-.st-l{font:600 8.5px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim2)}
-.st-v{font:700 17px/1 var(--f-mono);margin-top:6px;letter-spacing:-.02em}
-
-.ex{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:820px){.ex{grid-template-columns:1fr}}
-@media(max-width:1024px){.hdr{height:auto;flex-wrap:wrap}.nav{flex-wrap:wrap;margin-left:0}.hdr-r{margin-left:auto}}
-@media(max-width:680px){
-  .hdr{height:auto;min-height:52px;flex-wrap:wrap;padding:10px 12px;gap:8px}
-  .nav{order:3;width:100%;margin-left:0;flex-wrap:wrap}
-  .hdr-r{margin-left:auto}
-  .wrap{min-height:0;flex-direction:column}
-  .side{width:100%;max-height:35vh;min-height:120px;border-right:0;border-bottom:1px solid var(--line)}
-  .main{min-height:0;padding:18px 14px 48px}
-}
+.ex{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
 /* An example card with a player on it goes to that player's page, so it is a
    real link; the card with no qualifying player stays a plain div. */
-.ex-c{border:1px solid var(--line);border-radius:var(--radius);padding:12px 13px;background:var(--panel2);
-  cursor:pointer;transition:border-color .15s;display:block;color:inherit;text-decoration:none}
-.ex-c:hover{border-color:var(--amber-line)}
-.ex-c:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-.ex-l{font:600 8.5px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim2)}
-.ex-n{font:700 16px/1.15 var(--f-disp);letter-spacing:-.02em;margin:8px 0 3px}
-.ex-m{font:500 10.5px/1.5 var(--f-mono);color:var(--dim)}
-.ex-v{font:700 21px/1 var(--f-mono);color:var(--amber);margin-top:9px;letter-spacing:-.03em}
-.ex-go{font:500 9.5px/1 var(--f-mono);color:var(--dim2);margin-top:8px}
-.ex-c:hover .ex-go{color:var(--amber)}
-.read{font:400 13px/1.7 var(--f-body);color:var(--dim);max-width:70ch}
-.read b{color:var(--text);font-weight:600}
-.warn{border-left:2px solid var(--amber);padding-left:11px;color:var(--dim);
-  font:400 12.5px/1.65 var(--f-body);max-width:70ch}
-.empty{height:100%;display:grid;place-items:center;color:var(--dim2);font:500 12px/1 var(--f-mono)}
-.spin{width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--amber);
-  border-radius:50%;animation:sp .7s linear infinite;margin:40px auto}
-@keyframes sp{to{transform:rotate(360deg)}}
+.ex-c{display:block;min-width:0;padding:var(--s4);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);color:inherit;text-decoration:none}
+.def.on .ex-c{background:var(--bg)}
+a.ex-c:hover{border-color:var(--ink)}
+.ex-l{font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ex-n{margin:var(--s3) 0 var(--s1);font:500 16px/1.2 var(--display);overflow-wrap:anywhere}
+.ex-m{font:400 11px/1.4 var(--body);color:var(--muted)}
+.ex-m.is-none{margin-top:var(--s3)}
+.ex-v{margin-top:var(--s3);font:500 20px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.ex-go{margin-top:var(--s3);font:400 10px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+a.ex-c:hover .ex-go{color:var(--ink)}
+.read{margin-top:var(--s4);font:400 13px/1.6 var(--body);color:var(--muted)}
+.blk-b>.read:first-child{margin-top:0}
+.read b{color:var(--ink);font-weight:600}
+/* A real limitation of the metric: the gold caution rule, never the accent. */
+.warn{padding:var(--s3) var(--s4);border:1px solid var(--gold);border-radius:var(--radius);font:400 13px/1.6 var(--body);color:var(--ink)}
+.state{max-width:65ch}
+.state .fs-skel.title{margin-bottom:var(--s5)}
 
-.tbtn{cursor:pointer;border:1px solid var(--line2);background:var(--panel2);border-radius:var(--radius);
-  width:30px;height:26px;display:grid;place-items:center;color:var(--dim);font-size:13px;
-  margin-left:auto;flex-shrink:0}
-.tbtn:hover{color:var(--amber);border-color:var(--amber-line)}
-
-/* Selects: the open option list is drawn by the browser on a white base, so a
-   translucent surface colour plus light text renders as white on white. Force an
-   opaque background and colour the options explicitly. */
-select{background-color:var(--bg2,var(--panel,var(--panel)));color:var(--text,var(--ink))}
-select option,select optgroup{background-color:var(--bg2,var(--panel,var(--panel)));color:var(--text,var(--ink))}
+@media (max-width:760px){
+  /* One column, the directory above the document, its list capped and scrolling. */
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .side{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--ink)}
+  .list{max-height:168px;padding-bottom:0}
+  .main{padding:var(--s5) var(--s5) 48px}
+  .ex{grid-template-columns:minmax(0,1fr)}
+}
+@media print{
+  .fs-shell,.fs-bottom,.fs-toast,.fs-palette,.side,.def-tog{display:none!important}
+  html,body{background:none}
+  .wrap{display:block}
+  .main{padding:0}
+  .def{break-inside:avoid;background:none}
+  .cat-h{break-after:avoid}
+}
 </style>
 <script src="gate.js"></script>
 <meta name="robots" content="noindex,nofollow">
@@ -134,11 +116,17 @@ select option,select optgroup{background-color:var(--bg2,var(--panel,var(--panel
 <div class="fs-slots" hidden><span id="hs" data-fs-slot="pop">loading…</span></div><script>window.FutScout&&FutScout.adopt()</script>
 
 <div class="wrap">
-  <div class="side">
-    <div class="side-top"><input class="q" id="q" placeholder="filter metrics…" autocomplete="off" spellcheck="false"></div>
-    <div class="list" id="list"></div>
-  </div>
-  <div class="main" id="main"><div class="empty">Choose a metric</div></div>
+  <nav class="side" aria-label="Metric directory">
+    <div class="side-top">
+      <div class="fs-field"><label for="q">Filter metrics</label><input type="search" id="q" placeholder="filter metrics…" autocomplete="off" spellcheck="false"></div>
+      <div class="fs-dir-count" id="qCount" role="status" aria-live="polite">loading…</div>
+    </div>
+    <div class="list fs-dir" id="list"><div class="state" aria-hidden="true" style="padding:var(--s4)"><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div></div></div>
+  </nav>
+  <main class="main" id="main">
+    <h1 class="fs-title">Metric reference</h1>
+    <div id="defs"><div class="state" role="status" aria-label="Loading metric definitions"><div class="fs-skel title"></div><div class="fs-skel line"></div><div class="fs-skel line"></div><div class="fs-skel block"></div></div></div>
+  </main>
 </div>
 
 <script>
@@ -167,68 +155,137 @@ async function sbAll(t,p){p=p||{};const PG=1000;let all=[],off=0;
     if(!Array.isArray(d)||!d.length)break;all=all.concat(d);if(d.length<PG)break;off+=PG;}
   return all;}
 
+/* Stable anchors. A metric definition is #m-<slug of its key>, a category is
+   #cat-<slug of its name>: lower case, every run of non-alphanumerics a single
+   hyphen, no leading or trailing hyphen. Other pages link to these. */
+function slug(s){return String(s==null?'':s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
+let MID={},CID={},MORE=true,userMoved=false;
+['wheel','touchmove','keydown','pointerdown'].forEach(function(t){
+  window.addEventListener(t,function(){userMoved=true},{passive:true})});
+function byKey(k){return DEFS.filter(function(x){return x.key===k})[0]}
+function groupsOf(rows){const g=[];rows.forEach(function(d){if(g.indexOf(d.grp)<0)g.push(d.grp)});return g}
+function matches(d,f){return !f||(d.label+' '+d.key+' '+(d.definition||'')).toLowerCase().indexOf(f)>=0}
+function filterText(){return document.getElementById('q').value.toLowerCase().trim()}
+
 async function init(){
   try{
     const r=await Promise.all([
       sbAll('metric_defs',{select:'*',order:'grp_order.asc,sort_order.asc'}),
       sbAll('mv_metric_examples',{select:'*'})
     ]);
-    DEFS=r[0];
+    DEFS=r[0];EX={};
     r[1].forEach(function(e){EX[e.metric]=e});
+    /* One id per definition and per category. Two keys that slug alike would
+       collide, so a later one takes a numeric suffix instead of a duplicate id. */
+    MID={};CID={};const used={};
+    DEFS.forEach(function(d){let id='m-'+slug(d.key),n=2;while(used[id])id='m-'+slug(d.key)+'-'+(n++);used[id]=1;MID[d.key]=id});
+    groupsOf(DEFS).forEach(function(g){let id='cat-'+slug(g),n=2;while(used[id])id='cat-'+slug(g)+'-'+(n++);used[id]=1;CID[g]=id});
     document.getElementById('hs').textContent=
       DEFS.length+' metrics · '+[...new Set(DEFS.map(function(d){return d.grp}))].length+
       ' groups · saved reference population; example counts shown per metric';
+    if(!DEFS.length){
+      renderList();
+      document.getElementById('defs').innerHTML='<div class="fs-empty" role="status"><h2>No metric definitions available.</h2><p>The reference returned zero definitions, so there is nothing to list here.</p><button type="button" class="fs-btn" onclick="init()">Reload the reference</button></div>';
+      return;
+    }
+    renderMain();
     renderList();
+    /* The anchor named in the address does not exist until now, so the browser
+       could not scroll to it on load. An anchor wins over ?m=; ?m= over the default. */
+    if(goHash(true))return;
     const q=new URLSearchParams(location.search).get('m');
-    if(DEFS.length)open(q&&DEFS.some(function(d){return d.key===q})?q:DEFS[0].key);else document.getElementById('main').innerHTML='<div class="empty" role="status">No metric definitions available.</div>';
-  }catch(e){document.getElementById('hs').textContent='Reference unavailable';document.getElementById('main').innerHTML='<div class="empty" role="alert">Failed: '+esc(e.message)+' <button onclick="init()">Retry</button></div>'}
+    if(q&&byKey(q))open(q,{scroll:true,history:'replace'});
+    else open(DEFS[0].key,{scroll:false,history:'replace'});
+  }catch(e){
+    document.getElementById('hs').textContent='Reference unavailable';
+    document.getElementById('qCount').textContent='Reference unavailable';
+    document.getElementById('list').innerHTML='';
+    document.getElementById('defs').innerHTML='<div class="fs-banner fs-banner-warn" role="alert"><span class="fs-banner-label">Error</span>'+
+      '<span class="fs-banner-text">Failed: '+esc(e.message)+'. The metric reference could not be loaded; nothing else on this page changed.</span>'+
+      '<button type="button" class="fs-btn" onclick="init()">Retry</button></div>';
+  }
 }
 
+/* The directory. Category headings jump to the category; rows open a metric. */
 function renderList(){
-  const f=document.getElementById('q').value.toLowerCase().trim();
-  const rows=DEFS.filter(function(d){
-    return !f || (d.label+' '+d.key+' '+(d.definition||'')).toLowerCase().indexOf(f)>=0});
-  const groups=[];rows.forEach(function(d){if(groups.indexOf(d.grp)<0)groups.push(d.grp)});
+  const f=filterText();
+  const rows=DEFS.filter(function(d){return matches(d,f)});
   let h='';
-  groups.forEach(function(g){
-    h+='<div class="gh">'+esc(g)+'</div>';
+  groupsOf(rows).forEach(function(g){
+    h+='<a class="gh" href="#'+CID[g]+'" aria-label="Go to the '+esc(g)+' category">'+esc(g)+'</a>';
     rows.filter(function(d){return d.grp===g}).forEach(function(d){
-      h+='<button type="button" class="mi'+(SEL===d.key?' on':'')+'"'+
+      h+='<button type="button" class="mi fs-dir-row'+(SEL===d.key?' on':'')+'"'+
          (SEL===d.key?' aria-current="true"':'')+
          ' aria-label="Read the '+esc(d.label)+' entry"'+
-         ' onclick="open_(\''+d.key+'\')">'+
-         '<span class="mi-n">'+esc(d.label)+'</span><span class="mi-k">'+esc(d.key)+'</span></button>';
+         ' data-key="'+esc(d.key)+'">'+
+         '<span class="mi-n fs-dir-name">'+esc(d.label)+'</span><span class="mi-k">'+esc(d.key)+'</span></button>';
     });
   });
-  document.getElementById('list').innerHTML=h||'<div class="gh">no match</div>';
+  document.getElementById('list').innerHTML=h||(DEFS.length?'<div class="gh">no match</div>':'');
+  document.getElementById('qCount').textContent=DEFS.length
+    ?(f?rows.length+' of '+DEFS.length+' metrics match':DEFS.length+' metrics · '+groupsOf(DEFS).length+' groups')
+    :'No metric definitions available';
 }
-document.getElementById('q').addEventListener('input',renderList);
+/* The filter narrows the directory and the document together. */
+function applyFilter(){
+  renderList();
+  const f=filterText();let shown=0;
+  document.querySelectorAll('#defs .cat').forEach(function(sec){
+    let any=false;
+    sec.querySelectorAll('.def').forEach(function(a){
+      const ok=matches(byKey(a.dataset.key),f);a.hidden=!ok;if(ok){any=true;shown++}});
+    sec.hidden=!any;
+  });
+  const none=document.getElementById('noMatch');
+  if(none){none.hidden=shown>0||!DEFS.length;
+    const w=document.getElementById('noMatchText');
+    if(w)w.textContent='Nothing among the '+DEFS.length+' metric names, keys and definitions contains “'+document.getElementById('q').value.trim()+'”.';}
+}
+function clearFilter(){const q=document.getElementById('q');if(!q.value)return false;q.value='';applyFilter();return true}
+document.getElementById('q').addEventListener('input',applyFilter);
+document.getElementById('list').addEventListener('click',function(ev){
+  const row=ev.target.closest('.mi');if(row)open(row.dataset.key,{scroll:true});
+});
+document.getElementById('main').addEventListener('click',function(ev){
+  const t=ev.target.closest('.def-tog');
+  if(t){const k=t.dataset.key;
+    if(SEL===k){MORE=!MORE;paintOpen();}else open(k,{scroll:false});
+    return;}
+  if(ev.target.closest('#noMatchClear')){clearFilter();document.getElementById('q').focus();}
+});
 
-function open_(k){open(k)}
-async function open(k){
-  SEL=k;renderList();
-  const d=DEFS.filter(function(x){return x.key===k})[0];if(!d)return;
-  const e=EX[k];
+/* Every definition is in the document: name, key, definition, calculation and
+   any real limitation. The saved reference population, the two example players
+   and the reading note belong to the open entry and are built when it opens. */
+function defHTML(d){
+  const cav=caveat(d.key),id=MID[d.key];
+  return '<article class="def" id="'+id+'" data-key="'+esc(d.key)+'" tabindex="-1" aria-labelledby="'+id+'-t">'+
+    '<div class="def-in entry">'+
+    '<div class="e-eye">'+esc(d.grp)+(d.higher_is_better===false?' · lower is better':'')+'</div>'+
+    '<h3 class="e-t" id="'+id+'-t">'+esc(d.label)+'</h3>'+
+    '<div class="e-k">'+esc(d.key)+' · <a href="#'+id+'" aria-label="Link to the '+esc(d.label)+' definition">#'+id+'</a></div>'+
+    '<div class="e-d">'+esc(d.definition||'')+'</div>'+
+    '<div class="blk"><div class="blk-h">How it is calculated</div><div class="blk-b">'+
+     '<div class="calc">'+esc(d.calc||'Counted directly from the event feed, then divided by minutes played over 90.')+'</div></div></div>'+
+    (cav?'<div class="blk"><div class="blk-h">Worth knowing</div><div class="blk-b">'+
+      '<div class="warn">'+cav+'</div></div></div>':'')+
+    '<button type="button" class="fs-btn def-tog" data-key="'+esc(d.key)+'" aria-expanded="false" aria-controls="'+id+'-more">Show reference population and examples</button>'+
+    '<div class="def-more" id="'+id+'-more" hidden></div>'+
+    '</div></article>';
+}
+function moreHTML(d){
+  const e=EX[d.key];
   const unit=d.unit==='%'?'%':(d.unit==='m'?' m':(d.unit==='s'?' s':''));
   const fmt=function(v){return v==null||String(v).trim()===''||!Number.isFinite(Number(v))?'—':Number(v).toLocaleString(undefined,{maximumFractionDigits:3})+unit};
-
-  let h='<div class="entry">'+
-    '<div class="e-eye">'+esc(d.grp)+(d.higher_is_better===false?' · lower is better':'')+'</div>'+
-    '<div class="e-t">'+esc(d.label)+'</div>'+
-    '<div class="e-k">'+esc(d.key)+'</div>'+
-    '<div class="e-d">'+esc(d.definition||'')+'</div>';
-
-  h+='<div class="blk"><div class="blk-h">How it is calculated</div><div class="blk-b">'+
-     '<div class="calc">'+esc(d.calc||'Counted directly from the event feed, then divided by minutes played over 90.')+'</div></div></div>';
-
+  let h='';
   if(e){
     const lo=e.min_v, md=e.med_v, hi=e.max_v;
     h+='<div class="blk"><div class="blk-h">Saved reference population</div><div class="blk-b">'+
       '<div class="stat-row">'+
         '<div class="st"><div class="st-l">Lowest</div><div class="st-v">'+fmt(lo)+'</div></div>'+
-        '<div class="st"><div class="st-l">Median</div><div class="st-v" style="color:var(--amber)">'+fmt(md)+'</div></div>'+
+        '<div class="st"><div class="st-l">Median</div><div class="st-v">'+fmt(md)+'</div></div>'+
         '<div class="st"><div class="st-l">Highest</div><div class="st-v">'+fmt(hi)+'</div></div>'+
-        '<div class="st"><div class="st-l">Players</div><div class="st-v" style="color:var(--dim)">'+e.n+'</div></div>'+
+        '<div class="st"><div class="st-l">Players</div><div class="st-v is-muted">'+esc(e.n)+'</div></div>'+
       '</div>'+
       '<p>Observed minimum, median and maximum across '+esc(e.n)+' qualifying players. These summaries do not describe the frequency distribution. Saved population: league '+esc(e.league||'unavailable')+'; role '+esc(e.pool||'mixed roles / not supplied')+'; season '+esc(e.season||'unavailable')+'. This is not the current profile filter cohort.</p>'+
       '</div></div>';
@@ -245,28 +302,96 @@ async function open(k){
       exCard(d.higher_is_better===false?'Lowest saved reference value':'Highest saved reference value',best,unit)+
       exCard(d.higher_is_better===false?'Highest saved reference value':'Lowest saved reference value',worst,unit)+
       '</div>'+
-      '<div class="read" style="margin-top:13px">'+readLine(d,best,worst,md,unit)+'</div>'+
+      '<div class="read">'+readLine(d,best,worst,md,unit)+'</div>'+
       '</div></div>';
   }
-
-  const cav=caveat(k);
-  if(cav)h+='<div class="blk"><div class="blk-h">Worth knowing</div><div class="blk-b">'+
-    '<div class="warn">'+cav+'</div></div></div>';
-
   h+='<div class="blk"><div class="blk-h">How to read it</div><div class="blk-b"><div class="read">'+
      'Player metrics retain their stated units: per 90, percentages, seconds or counts. Eligible metrics also show a '+
      '<b>percentile</b> against the same role. A striker on 0.6 xG per 90 sits in a different distribution '+
      'from a centre-back. Read the role, league and qualifying sample on the profile. The repository contains distinct three- and six-ninety percentile views; eligibility depends on the data source, not one universal site threshold. Separate reference and sequence samples also differ.'+
-     '</div></div></div></div>';
-
-  document.getElementById('main').innerHTML=h;
-  document.getElementById('main').scrollTop=0;
-  if(new URLSearchParams(location.search).get('m')!==k)history.pushState(null,'','?m='+encodeURIComponent(k));
+     '</div></div></div>';
+  return h;
 }
-window.addEventListener('popstate',function(){const key=new URLSearchParams(location.search).get('m');if(DEFS.some(d=>d.key===key))open(key);});
+function renderMain(){
+  let h='';
+  groupsOf(DEFS).forEach(function(g){
+    const rows=DEFS.filter(function(d){return d.grp===g});
+    h+='<section class="cat" id="'+CID[g]+'" aria-labelledby="'+CID[g]+'-h">'+
+       '<h2 class="cat-h" id="'+CID[g]+'-h" tabindex="-1">'+esc(g)+' <span class="fs-label">'+rows.length+' metric'+(rows.length===1?'':'s')+'</span></h2>';
+    rows.forEach(function(d){h+=defHTML(d)});
+    h+='</section>';
+  });
+  h+='<div class="fs-empty" id="noMatch" role="status" hidden><h2>No metric matches this filter</h2>'+
+     '<p id="noMatchText"></p><button type="button" class="fs-btn" id="noMatchClear">Clear the filter</button></div>';
+  document.getElementById('defs').innerHTML=h;
+  applyFilter();
+}
+/* Paint which entry is open. The open entry carries the 3px accent rule, the
+   same mark a selected row carries everywhere else on the site. */
+function paintOpen(){
+  document.querySelectorAll('#defs .def').forEach(function(a){
+    const on=a.dataset.key===SEL,more=a.querySelector('.def-more'),tog=a.querySelector('.def-tog');
+    a.classList.toggle('on',on);
+    const show=on&&MORE;
+    if(show&&!more.innerHTML)more.innerHTML=moreHTML(byKey(SEL));
+    if(!on)more.innerHTML='';
+    more.hidden=!show;
+    tog.setAttribute('aria-expanded',String(show));
+    tog.textContent=show?'Hide reference population and examples':'Show reference population and examples';
+  });
+}
+function settle(el){
+  /* Web fonts can land after the first scroll and move the target. Scroll again
+     once they have, unless the reader has already moved the page. */
+  userMoved=false;
+  el.scrollIntoView({block:'start'});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){
+    if(!userMoved&&el.isConnected&&!el.hidden)el.scrollIntoView({block:'start'})});
+}
+
+function open_(k){open(k,{scroll:true})}
+function open(k,opt){
+  opt=opt||{};
+  const d=byKey(k);if(!d)return;
+  /* A filter that hides the entry being opened is cleared, so it can be seen. */
+  if(!matches(d,filterText())&&clearFilter()&&window.FutScout&&FutScout.toast)FutScout.toast('Filter cleared to show '+d.label);
+  SEL=k;MORE=true;renderList();
+  document.querySelectorAll('#defs .cat-h.is-target').forEach(function(h){h.classList.remove('is-target')});
+  paintOpen();
+  const art=document.getElementById(MID[k]);
+  const row=document.querySelector('#list .mi.on'),list=document.getElementById('list');
+  if(row&&(row.offsetTop<list.scrollTop+30||row.offsetTop+row.offsetHeight>list.scrollTop+list.clientHeight))
+    list.scrollTop=Math.max(0,row.offsetTop-list.clientHeight/3);
+  if(opt.scroll&&art){settle(art);try{art.focus({preventScroll:true})}catch(e){}}
+  const url='?m='+encodeURIComponent(k);
+  if(opt.history==='replace')history.replaceState(null,'',url+(opt.hash?'#'+MID[k]:''));
+  else if(opt.history!=='none'&&new URLSearchParams(location.search).get('m')!==k)history.pushState(null,'',url);
+}
+/* #m-<slug> opens and marks that definition; #cat-<slug> lands on that category. */
+function goHash(initial){
+  let h='';try{h=decodeURIComponent(location.hash.slice(1))}catch(e){h=location.hash.slice(1)}
+  if(!h||!DEFS.length)return false;
+  const d=DEFS.filter(function(x){return MID[x.key]===h})[0];
+  if(d){open(d.key,{scroll:true,history:'replace',hash:true});return true}
+  const g=groupsOf(DEFS).filter(function(x){return CID[x]===h})[0];
+  if(g){
+    /* A category every one of whose metrics is filtered out would be hidden. */
+    if(!DEFS.some(function(x){return x.grp===g&&matches(x,filterText())})&&clearFilter()&&window.FutScout&&FutScout.toast)FutScout.toast('Filter cleared to show '+g);
+    document.querySelectorAll('#defs .cat-h.is-target').forEach(function(x){x.classList.remove('is-target')});
+    const head=document.getElementById(h+'-h');
+    head.classList.add('is-target');
+    settle(document.getElementById(h));
+    try{head.focus({preventScroll:true})}catch(e){}
+    return true;
+  }
+  if(/^(m|cat)-/.test(h)&&window.FutScout&&FutScout.toast)FutScout.toast('No definition at #'+h);
+  return false;
+}
+window.addEventListener('hashchange',function(){goHash(false)});
+window.addEventListener('popstate',function(){const key=new URLSearchParams(location.search).get('m');if(key!==SEL&&DEFS.some(d=>d.key===key))open(key,{scroll:true,history:'none'});});
 
 function exCard(label,p,unit){
-  if(!p||!p.n)return '<div class="ex-c"><div class="ex-l">'+label+'</div><div class="ex-m" style="margin-top:9px">no qualifying player</div></div>';
+  if(!p||!p.n)return '<div class="ex-c"><div class="ex-l">'+label+'</div><div class="ex-m is-none">no qualifying player</div></div>';
   return '<a class="ex-c" href="players.html?player='+encodeURIComponent(p.id)+'"'+
     ' aria-label="Open the '+esc(p.n)+' profile, the '+esc(String(label).toLowerCase())+' for this metric">'+
     '<div class="ex-l">'+label+'</div>'+
@@ -309,17 +434,10 @@ function caveat(k){
 }
 init();
 
-function paintThemeBtn(){var b=document.getElementById('themeBtn');
-  if(b) b.textContent=document.documentElement.classList.contains('dark')?'\u2600':'\u263e';}
-(function(){var b=document.getElementById('themeBtn');
-  if(!b) return;
-  b.addEventListener('click',function(){
-    var d=document.documentElement.classList.toggle('dark');
-    try{localStorage.setItem('theme',d?'dark':'light')}catch(e){}
-    paintThemeBtn();
-  });
-  paintThemeBtn();
-})();
+/* Printing: every definition, on the light palette whatever the screen theme:
+   the root theme is set to light for the print and put back afterwards. */
+window.addEventListener('beforeprint',function(){var r=document.documentElement;if(!r.hasAttribute('data-print-theme')){r.setAttribute('data-print-theme',r.getAttribute('data-theme')||'');r.setAttribute('data-theme','light')}});
+window.addEventListener('afterprint',function(){var r=document.documentElement;if(r.hasAttribute('data-print-theme')){var t=r.getAttribute('data-print-theme');if(t)r.setAttribute('data-theme',t);else r.removeAttribute('data-theme');r.removeAttribute('data-print-theme')}});
 </script>
 </body>
 </html>
