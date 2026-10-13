@@ -141,6 +141,15 @@
 
 .fs-table-scroll{max-width:100%;overflow:auto}
 
+/* ---------- 761 to 1100px: the top bar keeps every control, on two lines ---------- */
+@media (min-width:761px) and (max-width:1100px){
+  .fs-top{flex-wrap:wrap;height:auto;min-height:var(--h-top);row-gap:0}
+  .fs-groups{flex:1 1 auto}
+  .fs-right{flex:1 1 100%;margin-left:0;justify-content:flex-end;min-height:38px;border-top:1px solid var(--rule2)}
+  .fs-fresh{margin-right:auto}
+  .fs-pop{max-width:34vw}
+}
+
 /* ---------- 760px and under: phone shell ---------- */
 @media (max-width:760px){
   .fs-top{flex-wrap:wrap;height:auto;min-height:var(--h-top);gap:var(--s2) var(--s3);padding:0 var(--s4)}
@@ -159,7 +168,7 @@
   .fs-ws{gap:var(--s3);padding:0 var(--s4)}
   .fs-crumb{display:none}
   .fs-pop{display:none}
-  .fs-ws:has(.fs-ws-tabs:empty):has(.fs-actions:empty){display:none}
+  .fs-ws.is-empty{display:none}
   .fs-bottom{display:flex;align-items:stretch;height:var(--h-bottom);flex:0 0 auto;width:100%;background:var(--panel);border-top:1px solid var(--ink);position:relative;z-index:80}
   .fs-bottom :is(a,button){flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;padding:0 2px;background:none;border:0;border-top:2px solid transparent;margin-top:-1px;
     color:var(--muted);font:400 10px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;text-decoration:none;cursor:pointer}

@@ -636,6 +636,24 @@
     });
     clone.style.maxHeight = 'none';
     clone.style.overflow = 'visible';
+    /* html2canvas rasterises each inline SVG as a standalone image, where
+       stylesheet classes and var() do not resolve. The stage is in the live
+       document under the light tokens, so resolve the paint here and write it
+       onto every SVG node. */
+    (function(){
+      var px=document.createElement('canvas');px.width=px.height=1;var cx=px.getContext('2d'),memo={};
+      function plain(value){
+        if(!value||!/(?:color|oklch|oklab|lab|lch|color-mix)\(/.test(value))return value;
+        if(memo[value])return memo[value];
+        cx.clearRect(0,0,1,1);cx.fillStyle=value;cx.fillRect(0,0,1,1);var d=cx.getImageData(0,0,1,1).data;
+        return memo[value]='rgba('+d[0]+','+d[1]+','+d[2]+','+(d[3]/255)+')';
+      }
+      var props=['fill','stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-linejoin','opacity','fill-opacity','stroke-opacity','color','font-family','font-size','font-weight','letter-spacing','text-anchor','dominant-baseline','visibility','display'];
+      stage.querySelectorAll('svg, svg *').forEach(function(node){
+        var cs=getComputedStyle(node);
+        props.forEach(function(prop){var v=cs.getPropertyValue(prop);if(v)node.style.setProperty(prop,plain(v));});
+      });
+    })();
     // Wide tables must expand the capture surface, not disappear beyond its edge.
     stage.style.width=Math.max(1120,stage.scrollWidth)+'px';
     try {
@@ -744,9 +762,20 @@
     });
   }
 
+  /* The workspace row is dropped on phone when it has neither tabs nor
+     actions. Slots hold adopted containers, so emptiness is measured by
+     controls, not by child nodes. */
+  function markWorkspace() {
+    var ws = els.shell.querySelector('.fs-ws');
+    var has = !!ws.querySelector('#fsTabsSlot :is(a,button), #fsActionsSlot :is(a,button)');
+    ws.classList.toggle('is-empty', !has);
+  }
+
   /* ---------- Ready ---------- */
   function ready() {
     adopt();
+    markWorkspace();
+    new MutationObserver(markWorkspace).observe(els.shell.querySelector('.fs-ws'), {childList: true, subtree: true});
     if (scopeReg) registerScope(scopeReg);
     buildBottomBar();
     buildPalette();
@@ -784,6 +813,10 @@
     setTheme: function (theme) { store('local', 'theme', theme); applyTheme(theme, true); },
     toggleTheme: toggleTheme
   };
+
+  /* Older regression scripts flip the theme through a page-level toggleTheme();
+     the pages no longer define one, so the name points at the global control. */
+  if (typeof window.toggleTheme !== 'function') window.toggleTheme = toggleTheme;
 
   /* A page that has not been given the body hook still gets the shell. */
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
