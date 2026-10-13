@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<script>(function(){try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.remove('dark')}catch(e){}})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Metrics validation · FutScout</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css?v=pr1">
+<script src="site-tools.js?v=pr1"></script>
 <style>
 /* Canvas, surfaces, lines, text, green and red come from theme.css, which
    carries this page's token names as aliases onto the shared palette, --f-disp
    included. What is left is this page's own accent family and its blue. */
 :root{
   /* Light amber a step darker, so the section headings and the inline key
-     figures clear AA on the shared surfaces. #9a6f2a was 3.97:1 on a card;
-     #8a5e1a is 5.03:1. Same hue family, tints rebased, dark mode untouched. */
-  --amber:#8a5e1a;--amber-dim:rgba(138,94,26,.09);--amber-line:rgba(138,94,26,.34);
-  --blue:#2f6fd0;
+     figures clear AA on the shared surfaces. var(--gold) was 3.97:1 on a card;
+     var(--gold) is 5.03:1. Same hue family, tints rebased, dark mode untouched. */
+  --amber-dim:rgba(138,94,26,.09);
+  
 }
 html.dark{
-  --bg:#0e1219;--panel:#161b24;--panel2:#1e242e;--line:#272e3a;--line2:#3a4351;
-  --text:#f2f5fa;--dim:#b6c2d4;--dim2:#8b98ab;
-  --amber:#e2b877;--amber-dim:rgba(226,184,119,.10);--amber-line:rgba(226,184,119,.32);--green:#3ddc97;--red:#ff5f56;--blue:#5aa9ff;
+  --panel:var(--panel);--line:var(--rule);
+  --dim:var(--muted);
+  --amber-dim:rgba(226,184,119,.10);--green:var(--p80);--blue:var(--blue);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:var(--bg);color:var(--text);font-family:var(--f-body)}
@@ -32,7 +32,7 @@ body{max-width:920px;margin:0 auto;padding:0 22px 80px;-webkit-font-smoothing:an
 h1{font:800 22px/1.1 var(--f-disp);letter-spacing:-.02em}
 .sub{font:500 11px/1.5 var(--f-mono);color:var(--dim);width:100%;margin-top:4px}
 .nav{margin-left:auto;display:flex;gap:8px;align-self:center}
-.nav a,.nav button{font:600 11px/1 var(--f-body);color:var(--dim);text-decoration:none;background:none;border:1px solid var(--line2);padding:7px 11px;border-radius:6px;cursor:pointer}
+.nav a,.nav button{font:600 11px/1 var(--f-body);color:var(--dim);text-decoration:none;background:none;border:1px solid var(--line2);padding:7px 11px;border-radius:var(--radius);cursor:pointer}
 .nav a:hover,.nav button:hover{color:var(--text)}
 h2{font:800 9px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin:34px 0 4px;display:flex;gap:9px;align-items:baseline}
 h2 .n{font-family:var(--f-mono);color:var(--dim2)}
@@ -40,11 +40,11 @@ h3{font:700 15px/1.2 var(--f-disp);letter-spacing:-.01em;margin:0 0 10px}
 p{font:400 13.5px/1.65 var(--f-body);color:var(--text);margin:9px 0}
 p.lede{font-size:14.5px;color:var(--text)}
 .dim{color:var(--dim)}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:17px 19px;margin:12px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:17px 19px;margin:12px 0}
 .methods{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
 @media(max-width:680px){.methods{grid-template-columns:1fr}}
 @media(max-width:680px){body{padding:0 14px 60px}.nav{margin-left:0;flex-wrap:wrap}table{display:block;max-width:100%;overflow-x:auto;white-space:nowrap}}
-.m{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:9px;padding:13px 14px}
+.m{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:var(--radius);padding:13px 14px}
 .m b{font:700 12px/1.3 var(--f-body)}
 .m span{display:block;font:500 11px/1.5 var(--f-body);color:var(--dim);margin-top:5px}
 table{width:100%;border-collapse:collapse;margin:12px 0;font:500 12.5px/1.4 var(--f-body)}
@@ -53,7 +53,7 @@ td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .tick{color:var(--green);font-weight:700}
 .warn{color:var(--amber);font-weight:700}
-.pill{display:inline-block;font:700 10px/1 var(--f-mono);padding:3px 7px;border-radius:5px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-line)}
+.pill{display:inline-block;font:700 10px/1 var(--f-mono);padding:3px 7px;border-radius:var(--radius);background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-line)}
 .foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font:500 11px/1.7 var(--f-mono);color:var(--dim2)}
 ul{margin:8px 0 8px 2px;padding:0;list-style:none}
 li{font:400 13px/1.6 var(--f-body);padding-left:18px;position:relative;margin:5px 0}
@@ -62,22 +62,23 @@ li:before{content:'—';position:absolute;left:0;color:var(--amber)}
 @media print{.nav{display:none}body{max-width:100%}.card,.m{break-inside:avoid}h2{break-after:avoid}}
 
 .tierbadge{font:700 8.5px/1 var(--f-mono,monospace);letter-spacing:.1em;text-transform:uppercase;
-  border-radius:3px;padding:4px 7px;margin-left:9px;vertical-align:middle}
-.tierbadge.t2{color:var(--blue,#5aa9ff);border:1px solid rgba(90,169,255,.4)}
-.tierbadge.t4{color:var(--red,#ff5f56);border:1px solid rgba(255,95,86,.4)}
+  border-radius:var(--radius);padding:4px 7px;margin-left:9px;vertical-align:middle}
+.tierbadge.t2{color:var(--blue,var(--blue));border:1px solid rgba(90,169,255,.4)}
+.tierbadge.t4{color:var(--red,var(--accent-text));border:1px solid rgba(255,95,86,.4)}
 .callout{border:1px solid var(--line2);border-left:3px solid var(--dim2);background:var(--panel2);
-  border-radius:4px;padding:12px 15px;margin:14px 0;font-size:13.5px}
+  border-radius:var(--radius);padding:12px 15px;margin:14px 0;font-size:13.5px}
 .callout.warn{border-left-color:var(--amber);background:var(--amber-dim)}
 .callout b{color:var(--text)}
-.unavail{color:var(--red,#ff5f56);font-weight:600}
-.snap{border:1px solid var(--line2);border-left:3px solid var(--amber);background:var(--amber-dim);border-radius:4px;padding:9px 13px;margin:10px 0 12px;font:500 12px/1.65 var(--f-mono);color:var(--dim)}
+.unavail{color:var(--red,var(--accent-text));font-weight:600}
+.snap{border:1px solid var(--line2);border-left:3px solid var(--amber);background:var(--amber-dim);border-radius:var(--radius);padding:9px 13px;margin:10px 0 12px;font:500 12px/1.65 var(--f-mono);color:var(--dim)}
 .snap b{color:var(--text);font-weight:700}
 </style>
 <script src="gate.js"></script>
 <meta name="robots" content="noindex,nofollow">
-<script src="site-tools.js" defer></script>
+<link rel="stylesheet" href="shell.css?v=pr1">
+<link rel="stylesheet" href="components.css?v=pr1">
 </head>
-<body>
+<body><script>window.FutScout&&FutScout.mount()</script>
 <div class="top">
   <div class="mark"></div>
   <div><h1>Metrics Validation</h1></div>

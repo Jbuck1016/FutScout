@@ -1,127 +1,156 @@
 /* ---------------------------------------------------------------------------
-   Design tokens: one light palette and one set of font tokens for the whole
-   dashboard.
+   FutScout · Press Room tokens.
 
-   BEFORE THIS FILE there were four light palettes. players/teams/match ran a
-   neutral white (--bg:#f5f4f1), sequences/insights/search/glossary a warm paper
-   (#f4f2ea), index a third warm variant (#f4f2ec), and match.html carried a
-   SECOND light block of its own (#f4f2ec with a different --text3) plus a
-   runtime override that wrote --bg and --bg2 straight onto the root element.
-   That is why light mode felt like a different product on every page.
+   Every colour, face and spacing value on the site resolves to a token declared
+   here. Light is canonical. Dark is derived and is switched by one global
+   control (THEME in the shell, which writes data-theme on <html>); with no
+   stored choice the system preference decides. No page carries a palette of its
+   own any more.
 
-   Linked BEFORE each page's inline <style>, like shell.css.
+   TWO FAMILIES
+   app        every working surface, including match and market values.
+   editorial  model-lab, model-review, match-review, writing-lab, quick-ingest:
+              the same tokens, plus the warm --paper ground and the serif
+              reading face INSIDE THE CANVAS ONLY ([data-fs-canvas="editorial"]).
+              Chrome is identical on both.
 
-   WHY html:not(.dark) AND NOT :root
-   The pages declare their light values on :root and their dark values on
-   html.dark. A light palette on :root here would lose to each page's own :root
-   (same specificity, later in source) and would also leak into dark mode for
-   any token a page's dark block happens not to redeclare. html:not(.dark)
-   (0,2,0) outranks a page :root (0,1,0) in light and cannot match at all in
-   dark, so a page's :root value survives as its dark value where it was already
-   serving as one. Both themes now explicitly pair surface and foreground tokens;
-   dark aliases below prevent terminal pages inheriting a light overlay.
-   A page that genuinely needs to differ in light overrides at html:not(.dark)
-   or higher.
+   WHY THE ALIAS BLOCK REPEATS ITS SELECTORS
+   A custom property that references another one is resolved on the element that
+   declares it, and the resolved value is what descendants inherit. An alias
+   declared only on :root would therefore keep the root theme inside a subtree
+   that re-themes itself (.fs-light, used by every export so that PNG and PDF
+   are always light). So the aliases are declared on each scope that declares a
+   palette.
 
-   FONT TOKENS are theme independent, with explicit theme specificity, and apply to
-   both modes. teams.html declared none of them while using them in ten font:
-   shorthands; an unresolved var() invalidates the whole declaration, so weight,
-   size and line-height were being dropped along with the family and those rules
-   rendered as inherited body type. They resolve now.
+   CONTRAST IS A CONSTRAINT
+   Text pairs clear 4.5:1 and graphic pairs clear 3:1 on --bg, --panel, --panel2
+   and --paper in both themes. Four light values from the approved brief were
+   nudged to make that true (gold/p40 #B8860B -> #AD7E0A, p60 #4F9E6E -> #4A9568,
+   p20 #D0702A -> #CA6D29, pitchline #8F8878 -> #8B8474; dark pitchline
+   #4A5566 -> #5C6675). --accent is kept exactly as approved: it clears 3:1 as a
+   graphic everywhere, and the -text variants below exist for the places a role
+   colour is used as small text, where the graphic value is under 4.5:1.
+   1px --rule dividers are decoration, not information, and are exempt.
 --------------------------------------------------------------------------- */
 
-:root{
-  --f-display:'Archivo','Inter',system-ui,sans-serif;
-  --f-body:'Inter',system-ui,sans-serif;
-  --f-mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
-
-  /* Spelling aliases. The pages were written with two other names for the same
-     two stacks; they alias here rather than being renamed across several
-     hundred rules, so there is still one source of truth for the values. */
-  --f-disp:var(--f-display);
-  --f-data:var(--f-mono);
-  /* Plot roles stay consistent between player, team and match views. Event
-     outcome still has its own shape, so colour is never its only cue. */
-  --viz-positive:#0b5f50;
-  --viz-negative:#c04c3d;
-  --viz-progress:#2d66b1;
-  --viz-carry:#966817;
-  --viz-box:#86529b;
-  --viz-neutral:#596674;
-  --viz-key:#965018;
-}
-
-html.dark:root{
-  color-scheme:dark;
-  --bg:#111820;--bg2:#19232e;--bg3:#23313f;
-  --surface:#19232e;--surface2:#293746;
-  --border:#405063;--border2:#687c91;
-  --text:#f2f5fa;--text2:#d0d9e5;--text3:#aab8ca;--text4:#aab8ca;
-  --panel:var(--bg2);--panel2:var(--bg3);--paper:var(--bg2);
-  --ink:var(--text);--muted:var(--text2);--dim:var(--text2);--dim2:var(--text3);
-  --line:var(--border);--line2:var(--border2);
-  --overlay:#19232e;--overlay-text:#f2f5fa;
-  --selection:#304963;--selection-text:#fff;--focus:#9cc8ff;
-  --accent:#ff8d88;--red:#ff8d88;--red-bright:#ff8d88;--green:#59cbb3;--amber:#e8c477;
-  --viz-positive:#59cbb3;
-  --viz-negative:#ff826f;
-  --viz-progress:#83b4f0;
-  --viz-carry:#e8c477;
-  --viz-box:#ca9fdf;
-  --viz-neutral:#aab7c6;
-  --viz-key:#f4ab67;
-}
-
-html:not(.dark){
+:root,.fs-light{
   color-scheme:light;
-  --overlay:#fffdf8;--overlay-text:#16191f;
-  --selection:#dce8f5;--selection-text:#132b43;--focus:#145bbb;
-  --paper:var(--bg2);--ink:var(--text);--muted:var(--text2);
-  --bg:#faf8f3;          /* page canvas */
-  --bg2:#f4f1e9;         /* raised surface: header, cards */
-  --bg3:#eceadf;         /* recessed surface: pitch fill */
-  --surface:rgba(25,28,34,.03);
-  --surface2:#e8e4d8;
-  --border:#ded9cd;
-  --border2:#b9b2a1;
-  --text:#16191f;        /* primary */
-  --text2:#4a5262;       /* secondary, body */
-  --text3:#596170;
-  --text4:#596170;
-  --green:#0f7a52;
-  --red-bright:#c23b34;
-  --accent:#EF0107;
-
-  /* Same palette under the names the terminal-styled pages use: index,
-     insights, search, glossary, sequences, and the three gated documents
-     guide, methodology and validation. Aliases, not new values, so those pages
-     share the canvas, surfaces, lines and text colours rather than keeping a
-     warm paper set of their own. The three gated pages needed no new aliases:
-     their vocabulary is the same one this block already covered, and --f-disp
-     is aliased at root scope above.
-     What stays on those pages is what this file does not carry: --amber and its
-     tints, which are their own accent and deliberately not the brand red, plus
-     --blue, and guide.html's reading serif --f-read. */
-  --panel:var(--bg2);
-  --panel2:var(--bg3);
-  --line:var(--border);
-  --line2:var(--border2);
-  --dim:var(--text2);
-  --dim2:var(--text3);
-  --red:var(--red-bright);
+  --bg:#F6F1E7; --panel:#FFFDF8; --panel2:#F1EBDD; --ink:#17181C; --muted:#6B6A63;
+  --rule:#DCD5C6; --rule2:#EEE8DA; --accent:#EF0107; --gold:#AD7E0A;
+  --pitch:#EFEADB; --pitchline:#8B8474;
+  --p80:#1B7F5A; --p60:#4A9568; --p40:#AD7E0A; --p20:#CA6D29; --p0:#B3261E;
+  --blue:#1F5FA8; --purple:#7B3FA0; --skel:#E8E1D1;
+  --paper:#FBF7EE; /* editorial ground only */
+  /* role colours used as small text */
+  --accent-text:#D40106; --gold-text:#886308;
+  --p80-text:#197855; --p60-text:#3A7551; --p40-text:#886308; --p20-text:#9E5520; --p0-text:#B3261E;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1219; --panel:#151B24; --panel2:#1B2330; --ink:#E8ECF2; --muted:#9AA3B2;
+    --rule:#273040; --rule2:#1F2733; --accent:#FF3B3F; --gold:#E0B35A;
+    --pitch:#121821; --pitchline:#5C6675;
+    --p80:#3DD68C; --p60:#8FD3A6; --p40:#E0B35A; --p20:#F0955A; --p0:#F0708A;
+    --blue:#6FA8FF; --purple:#C58BF2; --skel:#222B38; --paper:#161C26;
+    --accent-text:#FF4145; --gold-text:#E0B35A;
+    --p80-text:#3DD68C; --p60-text:#8FD3A6; --p40-text:#E0B35A; --p20-text:#F0955A; --p0-text:#F0708A;
+  }
+}
+/* Identical to the block above, so the toggle wins both ways. */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1219; --panel:#151B24; --panel2:#1B2330; --ink:#E8ECF2; --muted:#9AA3B2;
+  --rule:#273040; --rule2:#1F2733; --accent:#FF3B3F; --gold:#E0B35A;
+  --pitch:#121821; --pitchline:#5C6675;
+  --p80:#3DD68C; --p60:#8FD3A6; --p40:#E0B35A; --p20:#F0955A; --p0:#F0708A;
+  --blue:#6FA8FF; --purple:#C58BF2; --skel:#222B38; --paper:#161C26;
+  --accent-text:#FF4145; --gold-text:#E0B35A;
+  --p80-text:#3DD68C; --p60-text:#8FD3A6; --p40-text:#E0B35A; --p20-text:#F0955A; --p0-text:#F0708A;
+}
+/* Exports are always light, whatever the page theme. Declared after the dark
+   blocks and with the root in the selector so it outranks them on a stage that
+   sits inside a dark document. */
+:root .fs-light,:root[data-theme="dark"] .fs-light{
+  color-scheme:light;
+  --bg:#F6F1E7; --panel:#FFFDF8; --panel2:#F1EBDD; --ink:#17181C; --muted:#6B6A63;
+  --rule:#DCD5C6; --rule2:#EEE8DA; --accent:#EF0107; --gold:#AD7E0A;
+  --pitch:#EFEADB; --pitchline:#8B8474;
+  --p80:#1B7F5A; --p60:#4A9568; --p40:#AD7E0A; --p20:#CA6D29; --p0:#B3261E;
+  --blue:#1F5FA8; --purple:#7B3FA0; --skel:#E8E1D1; --paper:#FBF7EE;
+  --accent-text:#D40106; --gold-text:#886308;
+  --p80-text:#197855; --p60-text:#3A7551; --p40-text:#886308; --p20-text:#9E5520; --p0-text:#B3261E;
 }
 
-html:not(.dark),html.dark:root{
-  --f-display:'Archivo','Inter',system-ui,sans-serif;
-  --f-body:'Inter',system-ui,sans-serif;
-  --f-mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
-  --f-disp:var(--f-display);--f-data:var(--f-mono);
-  --sans:var(--f-body);--mono:var(--f-mono);--serif:Georgia,serif;
-}
+:root,.fs-light{
+  /* Type */
+  --display:'Fraunces',Georgia,'Times New Roman',serif;
+  --body:'IBM Plex Sans','Helvetica Neue',Arial,sans-serif;
+  --mono:'IBM Plex Mono',Menlo,Consolas,monospace;
 
-/* Shared interaction semantics; plot series retain their own role tokens. */
-:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
-button,input,select,textarea{color:var(--text);font-family:var(--f-body)}
-select option{background:var(--overlay);color:var(--overlay-text)}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-@media(max-width:640px){pre{max-width:100%;overflow:auto}main{min-width:0}table{max-width:100%}}
+  /* Space scale, radius, shell geometry */
+  --s1:4px; --s2:6px; --s3:8px; --s4:10px; --s5:14px; --s6:18px;
+  --radius:2px;
+  --h-top:46px; --h-ws:40px; --h-bottom:48px;
+  --rail:250px; --rail-wide:320px;
+  --tap:30px;               /* minimum control height; 44px on phone, below */
+  --menu-shadow:0 8px 20px rgba(0,0,0,.12);
+
+  /* -------------------------------------------------------------------------
+     Legacy names. The pages were written against several older vocabularies
+     (--bg2/--text/--border, --panel/--line/--dim, --paper/--ink/--muted). They
+     alias the Press Room tokens here so there is one source of truth for the
+     values; no page declares any of these itself.
+  ------------------------------------------------------------------------- */
+  --bg2:var(--panel); --bg3:var(--panel2);
+  --surface:var(--panel); --surface2:var(--panel2); --sheet:var(--panel); --soft:var(--panel2);
+  --border:var(--rule); --border2:var(--rule); --line:var(--rule); --line2:var(--rule); --faint:var(--rule2);
+  --text:var(--ink); --text2:var(--muted); --text3:var(--muted); --text4:var(--muted);
+  --dim:var(--muted); --dim2:var(--muted);
+  --overlay:var(--panel); --overlay-text:var(--ink);
+  --selection:var(--bg); --selection-text:var(--ink); --focus:var(--accent);
+  --accent-dim:color-mix(in srgb,var(--accent) 9%,transparent);
+  --accent-glow:color-mix(in srgb,var(--accent) 32%,transparent);
+  --red:var(--p0-text); --red-bright:var(--p0-text); --warn:var(--p0-text); --hot:var(--p0-text);
+  --green:var(--p80-text); --ok:var(--p80-text);
+  --amber:var(--gold-text); --gold2:var(--gold-text); --wait:var(--gold-text);
+  --amber-dim:color-mix(in srgb,var(--gold) 12%,transparent);
+  --amber-line:color-mix(in srgb,var(--gold) 55%,transparent);
+  --acid:var(--blue); --cyan:var(--blue); --signal:var(--accent); --signal2:var(--blue);
+  --elite:var(--p80); --above:var(--p60); --avg:var(--p40); --below:var(--p20); --poor:var(--p0);
+  --viz-positive:var(--p80); --viz-negative:var(--p0); --viz-progress:var(--blue);
+  --viz-carry:var(--gold); --viz-box:var(--purple); --viz-neutral:var(--muted); --viz-key:var(--p20);
+  --shadow:none; --shadow2:none;
+  --f-display:var(--display); --f-disp:var(--display); --f-read:var(--display); --serif:var(--display);
+  --f-body:var(--body); --sans:var(--body); --font-body:var(--body);
+  --f-mono:var(--mono); --f-data:var(--mono);
+}
+@media (max-width:760px){ :root{--tap:44px} }
+
+/* ---------- Base ---------- */
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 13px/1.45 var(--body);-webkit-text-size-adjust:100%}
+button,input,select,textarea{color:var(--ink);font-family:var(--body)}
+select option{background:var(--panel);color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::selection{background:var(--ink);color:var(--bg)}
+
+/* ---------- Type scale ---------- */
+.t-d1{font:600 30px/1.05 var(--display);letter-spacing:-.01em}
+.t-d2{font:600 24px/1.1 var(--display)}
+.t-d3{font:500 20px/1.2 var(--display)}
+.t-body{font:400 13px/1.45 var(--body)}
+.t-small{font:400 12px/1.4 var(--body)}
+.t-note{font:400 11px/1.4 var(--body);color:var(--muted)}
+.t-label{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.t-nav{font:400 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.t-num,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+@media (max-width:760px){ .t-d1{font-size:24px} }
+
+/* ---------- Editorial canvas ---------- */
+[data-fs-canvas="editorial"]{background:var(--paper);font-family:var(--display)}
+[data-fs-canvas="editorial"] :is(button,input,select,textarea,table,th,td,label,.t-label,.t-note,.t-small,code,pre){font-family:var(--body)}
+[data-fs-canvas="editorial"] :is(code,pre,.t-label,.num,.t-num){font-family:var(--mono)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:640px){pre{max-width:100%;overflow:auto}main{min-width:0}table{max-width:100%}}

@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<script>(function(){try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.remove('dark')}catch(e){}})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Domestic forecast lab · Private review</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="gate.js"></script>
 <script src="model-review-data.js?v=20260930T040030Z"></script>
 <script src="model-review-archive-data.js"></script>
 <script src="model-lab-data.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css?v=pr1">
+<script src="site-tools.js?v=pr1"></script>
 <style>
-:root{--bg:#f1efe8;--paper:#fbfaf6;--ink:#171b22;--muted:#667080;--faint:#929aa6;--line:#d8d3c8;--gold:#96681c;--gold2:#d9ac62;--green:#087854;--red:#ba3f38;--blue:#2766b0;--mono:'JetBrains Mono',Consolas,monospace;--display:'Archivo',sans-serif;--body:'Inter',sans-serif}
-html.dark{--bg:#0b1017;--paper:#141a23;--ink:#f3f5f8;--muted:#aeb9c8;--faint:#778395;--line:#2a323e;--gold:#edbd70;--gold2:#8e6326;--green:#42d89c;--red:#ff746b;--blue:#70b4ff}
+:root{--paper:var(--ink);--muted:var(--pitchline);--line:var(--ink);--gold2:var(--gold);--red:var(--p0);--mono:'JetBrains Mono',Consolas,monospace;--body:'Inter',sans-serif}
+html.dark{--paper:var(--panel);--muted:var(--muted);--line:var(--rule);--gold2:var(--gold);--red:var(--p0);}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);background-image:linear-gradient(90deg,transparent 49.8%,color-mix(in srgb,var(--line) 18%,transparent) 50%,transparent 50.2%),radial-gradient(circle at 12% -10%,color-mix(in srgb,var(--gold) 12%,transparent),transparent 38%)}
 .wrap{max-width:1360px;margin:auto;padding:24px 24px 70px}.top{display:flex;align-items:flex-start;gap:16px;border-top:4px solid var(--gold);padding-top:16px}.eyebrow{font:700 10px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}h1{font:800 clamp(27px,4vw,52px)/.95 var(--display);letter-spacing:-.045em;margin:7px 0 0;max-width:780px}.actions{margin-left:auto;display:flex;gap:8px}.action{border:1px solid var(--line);background:var(--paper);color:var(--muted);font:600 10px/1 var(--mono);padding:9px 11px;text-decoration:none;cursor:pointer}.action:hover,.action:focus-visible{border-color:var(--gold);color:var(--ink)}
 .status{margin:22px 0;display:grid;grid-template-columns:1fr auto;gap:18px;padding:14px 16px;border:1px solid var(--gold2);background:color-mix(in srgb,var(--gold) 7%,var(--paper))}.status strong{font:800 12px/1 var(--mono);letter-spacing:.12em;color:var(--gold)}.status p{margin:6px 0 0;color:var(--muted);font-size:12px}.stamp{text-align:right;font:600 10px/1.6 var(--mono);color:var(--muted)}
@@ -26,8 +27,8 @@ html.dark{--bg:#0b1017;--paper:#141a23;--ink:#f3f5f8;--muted:#aeb9c8;--faint:#77
 @media(max-width:980px){.fixtures{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.wrap{padding:16px 12px 50px}.top{display:block}.actions{margin-top:14px}.status{grid-template-columns:1fr}.stamp{text-align:left}.section-head{align-items:flex-start;flex-direction:column}.filters{margin-left:0;justify-content:flex-start}.fixtures{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:no-preference){.match{animation:rise .35s ease both}.match:nth-child(2n){animation-delay:.035s}.match:nth-child(3n){animation-delay:.07s}@keyframes rise{from{opacity:0;transform:translateY(6px)}}}
 /* Keep the forecast reading scale aligned with the match and research pages. */
-:root{--bg:#faf8f3;--paper:#fffdf8;--ink:#1b222b;--muted:#536170;--faint:#63707e;--line:#d5d0c5;--gold:#865715;--gold2:#b48742}
-html.dark{--bg:#0e1219;--paper:#1a2029;--ink:#eef3f7;--muted:#b6c4d0;--faint:#a0afbd;--line:#35404d;--gold:#e8bc74;--gold2:#866838}
+:root{--paper:var(--ink);--muted:var(--pitchline);--line:var(--ink);--gold2:var(--gold)}
+html.dark{--paper:var(--panel);--muted:var(--muted);--line:var(--rule);--gold2:var(--gold)}
 body{background-image:radial-gradient(circle at 10% -12%,color-mix(in srgb,var(--gold) 9%,transparent),transparent 38%)}
 .eyebrow,.action,.section-head span,.stamp,.chip,.note{font-size:12px}
 .status p{font-size:14px;line-height:1.5}.status strong{font-size:13px}
@@ -43,9 +44,11 @@ table{font-size:12px}th{font-size:11px;color:var(--muted)}th,td{padding:11px 12p
 @media(max-width:850px){.health-grid{grid-template-columns:1fr}}
 .top h1{font-size:36px;line-height:1.1}.wrap{padding-top:16px}.status{margin:14px 0 10px;padding:10px 14px}.review-health{padding:10px 14px;margin-bottom:12px}.review-health summary{cursor:pointer;font-size:14px;font-weight:600}.review-health[open] .health-grid{margin-top:14px}.section-head{margin-top:18px}.action{white-space:nowrap}.actions{flex-wrap:wrap}@media(max-width:650px){.top h1{font-size:30px}}
 </style>
-<script src="site-tools.js?v=20261001-density" defer></script><script src="forecast-evidence.js"></script>
+<script src="forecast-evidence.js"></script>
+<link rel="stylesheet" href="shell.css?v=pr1">
+<link rel="stylesheet" href="components.css?v=pr1">
 </head>
-<body><main class="wrap">
+<body><script>window.FutScout&&FutScout.mount()</script><main class="wrap">
 <header class="top"><div><div class="eyebrow">Private model room · domestic v2</div><h1>Match forecasts</h1></div><div class="actions"><a class="action" id="archiveToggle" href="model-review.html?view=archive">frozen archive</a><a class="action" href="model-lab.html">model lab →</a><a class="action" href="index.html">← analytics</a><button class="action" id="theme">light / dark</button></div></header>
 <section class="status"><div><strong id="statusLabel">SHADOW · PRIVATE</strong><p id="statusDetail">Experimental review output. These forecasts cannot activate or promote the model.</p></div><div class="stamp" id="stamp"></div></section>
 <details class="review-health" id="reviewHealth" aria-label="Forecast evidence and uncertainty"></details>
