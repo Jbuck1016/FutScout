@@ -11,66 +11,182 @@
 <link rel="stylesheet" href="theme.css?v=pr1">
 <script src="site-tools.js?v=pr1"></script>
 <style>
-:root{--paper:var(--ink);--line:var(--ink);--signal:var(--gold);--soft:rgba(166,106,18,.1);}
-html.dark{--paper:var(--bg);--line:var(--rule);--signal:var(--gold);--soft:rgba(239,189,111,.09);}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);background-image:linear-gradient(rgba(127,118,99,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(127,118,99,.055) 1px,transparent 1px);background-size:36px 36px}
-a{color:inherit}.shell{max-width:1320px;margin:auto;padding:24px 24px 70px}.top{display:flex;align-items:center;gap:12px;border-top:3px solid var(--signal);padding:12px 0 24px}.back{font:600 10px var(--mono);text-decoration:none;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.back:hover{color:var(--signal)}.theme{margin-left:auto;border:1px solid var(--line);background:var(--panel);color:var(--muted);height:30px;padding:0 10px;font:600 9px var(--mono);cursor:pointer}
-.hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,.7fr);gap:22px;align-items:end;margin:6px 0 24px}.eyebrow{font:600 10px var(--mono);color:var(--signal);text-transform:uppercase;letter-spacing:.2em}.hero h1{font:800 clamp(42px,7vw,88px)/.88 var(--display);margin:10px 0 14px;letter-spacing:-.065em;max-width:760px}.hero p{font:500 14px/1.65 var(--body);color:var(--muted);max-width:720px}.method{border-left:2px solid var(--signal2);padding:13px 16px;background:color-mix(in srgb,var(--panel) 88%,transparent);font:500 11px/1.65 var(--mono);color:var(--muted)}.method b{display:block;color:var(--ink);margin-bottom:5px;text-transform:uppercase;letter-spacing:.1em;font-size:9px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);margin-bottom:14px}.stat{padding:17px 18px;border-right:1px solid var(--line)}.stat:last-child{border:0}.stat strong{display:block;font:700 24px/1 var(--display);color:var(--ink);font-variant-numeric:tabular-nums}.stat span{display:block;font:600 8px/1 var(--mono);color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-top:8px}
-.toolbar{display:grid;grid-template-columns:1fr 1fr 1.4fr auto;gap:9px;padding:11px;border:1px solid var(--line);background:var(--panel);margin-bottom:14px}.ctrl{min-width:0;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:10px 11px;font:500 11px var(--mono)}.ctrl:focus{outline:1px solid var(--signal)}
-.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;margin-bottom:14px}.panel{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);min-width:0}.ph{display:flex;align-items:start;justify-content:space-between;gap:16px;padding:14px 16px;border-bottom:1px solid var(--line)}.ph h2{font:700 18px var(--display);margin:0;letter-spacing:-.025em}.ph p{font:500 10px/1.45 var(--body);color:var(--muted);margin:4px 0 0}.tag{font:600 8px var(--mono);color:var(--signal);text-transform:uppercase;letter-spacing:.12em;white-space:nowrap}.body{padding:14px 16px}
-.squad-row{display:grid;grid-template-columns:28px minmax(110px,1fr) minmax(130px,1.4fr) 82px 54px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid color-mix(in srgb,var(--line) 65%,transparent);font:600 10px var(--mono)}.squad-row:last-child{border:0}.squad-row .rank{color:var(--muted)}.squad-row .team{font-family:var(--body);font-size:12px}.track{height:6px;background:color-mix(in srgb,var(--line) 55%,transparent)}.track i{display:block;height:100%;background:linear-gradient(90deg,var(--signal2),var(--signal))}.money{text-align:right;font-variant-numeric:tabular-nums}.coverage{text-align:right;color:var(--muted)}.coverage.low{color:var(--p20-text)}
-.chart-wrap{position:relative;min-height:360px}.chart{width:100%;height:360px;display:block}.axis{stroke:var(--line);stroke-width:1}.dot{fill:var(--signal2);fill-opacity:.72;stroke:var(--panel);stroke-width:1.2}.dot.hot{fill:var(--signal)}.chart-label{fill:var(--muted);font:9px var(--mono)}.chart-name{fill:var(--ink);font:600 9px var(--body)}.empty{padding:40px 18px;text-align:center;color:var(--muted);font:500 12px/1.6 var(--body)}
-.league-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:14px}.league-card{border:1px solid var(--line);background:var(--panel);padding:13px 14px;cursor:pointer;text-align:left;color:var(--ink)}.league-card:hover,.league-card.on{border-color:var(--signal);background:var(--soft)}.league-card b{font:700 12px var(--display);display:block}.league-card span{font:500 9px/1.5 var(--mono);color:var(--muted);display:block;margin-top:5px}
-.table-wrap{overflow:auto;max-height:620px}table{width:100%;border-collapse:collapse;font:500 10px/1.35 var(--mono)}th{position:sticky;top:0;background:var(--panel);z-index:1;color:var(--muted);text-align:left;font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}td{padding:9px 12px;border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent);white-space:nowrap}tbody tr:hover{background:var(--soft)}td.num,th.num{text-align:right}.player-link{font:700 11px var(--body);text-decoration:none}.player-link:hover{color:var(--signal)}.pill{display:inline-block;border:1px solid var(--line);padding:2px 5px;color:var(--muted);font-size:8px}.note{padding:12px 16px;border-top:1px solid var(--line);font:500 10px/1.55 var(--body);color:var(--muted)}
-.loading{padding:44px;text-align:center;font:600 10px var(--mono);color:var(--signal);letter-spacing:.12em}.loading:after{content:'_';animation:blink 1s step-end infinite}@keyframes blink{50%{opacity:0}}
-@media(max-width:900px){.hero,.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--line)}.toolbar{grid-template-columns:1fr 1fr}.league-strip{grid-template-columns:1fr 1fr}.league-card:last-child{grid-column:1/-1}.chart-wrap{min-height:320px}.chart{height:320px}}
-@media(max-width:560px){.shell{padding:16px 12px 50px}.hero h1{font-size:46px}.toolbar{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stat strong{font-size:19px}.squad-row{grid-template-columns:24px 1fr 68px 46px}.squad-row .track{display:none}.league-strip{grid-template-columns:1fr}.league-card:last-child{grid-column:auto}.hide-sm{display:none}}
-@media(max-width:560px){.top{flex-wrap:wrap}.top .back{flex:1 1 180px}.hero h1{overflow-wrap:anywhere}.shell{min-width:0}.table-wrap{max-width:100%;overflow:auto}}
-.hero h1{font-family:var(--f-display)}.hero p,.theme{font-family:var(--f-body)}
+/* Page-local layout only. Colour, type, radius and spacing all resolve to
+   theme.css tokens; components come from components.css (fs-*). */
+*{box-sizing:border-box}
+.mv{max-width:1320px;margin:0 auto;width:100%}
+.mv a{color:inherit}
+.mv-read{margin:var(--s4) 0 0;padding-left:var(--s4);border-left:3px solid var(--gold);font:400 12px/1.4 var(--body);color:var(--ink);max-width:76ch}
+.mv-read .fs-label{display:block;margin-bottom:var(--s1);color:var(--gold-text)}
+.mv .fs-dl dd{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.mv .fs-dl dd.is-text{font-family:var(--body)}
+.mv-filters{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.mv-filters .is-wide{grid-column:span 2}
+.mv-clear{align-self:end}
+
+/* League cards: the page's own league scope. Selection is the 3px accent rule. */
+.league-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:var(--s3)}
+.league-strip:empty{display:none}
+.league-card{appearance:none;display:flex;flex-direction:column;gap:var(--s1);min-height:var(--tap);padding:var(--s3) var(--s4);background:var(--panel);color:var(--ink);
+  border:1px solid var(--rule);border-left:3px solid var(--rule);border-radius:var(--radius);text-align:left;cursor:pointer}
+.league-card:hover{background:var(--panel2)}
+.league-card.on{border-left-color:var(--accent);background:var(--bg)}
+.league-card b{font:600 13px/1.3 var(--body)}
+.league-card span{font:400 11px/1.4 var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.mv-coverage{margin:0}
+
+/* Squad value board */
+.squad-list{max-height:560px;overflow:auto}
+.squad-head,.squad-row{display:grid;grid-template-columns:26px minmax(110px,1fr) minmax(90px,1.2fr) 96px 84px;gap:var(--s4);align-items:center}
+.squad-head{padding:0 0 var(--s2);border-bottom:1px solid var(--ink);position:sticky;top:0;background:var(--panel);z-index:1}
+.squad-head span:nth-child(n+4){text-align:right}
+.squad-row{padding:var(--s2) 0;border-bottom:1px solid var(--rule2);font:400 12px/1.4 var(--body)}
+.squad-row .rank{font:400 11px/1 var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.squad-row .team{min-width:0;overflow-wrap:anywhere}
+.squad-row .team small{display:block;font:400 11px/1.4 var(--body);color:var(--muted)}
+.squad-row .money,.squad-row .coverage{text-align:right;font:400 12px/1.4 var(--mono);font-variant-numeric:tabular-nums}
+.squad-row .coverage{color:var(--muted)}
+.squad-row .coverage.low{color:var(--ink)}
+.squad-row .coverage .fs-tag{margin-left:var(--s1)}
+
+/* Value against usage plot. Text and colours are written into the SVG at draw
+   time from tokens (see renderChart), so the plot survives export. */
+.chart-wrap{min-width:0}
+.chart{display:block;width:100%;height:auto}
+.chart a:focus-visible circle{stroke:var(--accent);stroke-width:2}
+.mv-legend{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);margin:var(--s3) 0 0}
+.mv-legend span{display:inline-flex;align-items:center;gap:var(--s2)}
+.mv-legend i{width:9px;height:9px;border-radius:50%;background:var(--blue);flex:0 0 auto}
+.mv-legend i.top{background:var(--ink)}
+
+/* Ledger */
+.mv-ledger{max-height:620px}
+.mv-ledger th{position:sticky;top:0;z-index:1}
+.mv-ledger td{white-space:nowrap}
+.mv-ledger .player-link{color:inherit;font-weight:600;text-decoration:none}
+.mv-ledger tr:hover .player-link,.mv-ledger .player-link:hover{text-decoration:underline;text-underline-offset:2px}
+.mv-ledger td.is-empty{white-space:normal;padding:var(--s4)}
+.mv-ledger tbody tr.is-empty:hover{background:none}
+.mv-count{margin-left:auto}
+.mv-foot-note{flex:1 1 320px;min-width:0;margin:0}
+.mv-empty-sm{padding:var(--s5)}
+.mv-empty-sm h3{font-size:16px}
+
+@media (max-width:760px){
+  .squad-head,.squad-row{grid-template-columns:22px minmax(0,1fr) 92px 78px}
+  .squad-head .bar-h,.squad-row .fs-bar{display:none}
+  .mv-filters .is-wide{grid-column:auto}
+  .mv-count{margin-left:0}
+}
 </style>
 <link rel="stylesheet" href="shell.css?v=pr1">
 <link rel="stylesheet" href="components.css?v=pr1">
 </head>
 <body><script>window.FutScout&&FutScout.mount()</script>
-<main class="shell">
-  <section class="hero">
-    <div><div class="eyebrow">Valuation is context, not verdict</div><h1>Market values</h1><p>Transfermarkt estimates joined to FutScout’s current player identities, roles and usage. Compare price concentration, squad coverage and how heavily each club is leaning on its most valuable players.</p></div>
-    <aside class="method"><b>Read this first</b>These are public market estimates—not fees, salary data, or our opinion of player quality. Squad totals cover linked players in the current analysis dataset. Always read the coverage percentage beside a total.</aside>
+<main class="fs-canvas fs-stack mv" data-fs-app>
+  <section class="fs-identity" aria-labelledby="mvTitle">
+    <div class="fs-identity-main">
+      <h1 class="fs-title" id="mvTitle">Market values</h1>
+      <p class="fs-identity-meta">Transfermarkt estimates joined to FutScout’s current player identities, roles and usage. Compare price concentration, squad coverage and how heavily each club is leaning on its most valuable players.</p>
+      <p class="mv-read"><span class="fs-label">Read this first · valuation is context, not verdict</span>These are public market estimates, not fees, salary data, or our opinion of player quality. Squad totals cover linked players in the current analysis dataset. Always read the coverage percentage beside a total.</p>
+    </div>
+    <dl class="fs-dl" aria-label="Valuation summary for the current filters">
+      <dt>Linked players</dt><dd id="stPlayers">—</dd>
+      <dt>Visible market value</dt><dd id="stValue">—</dd>
+      <dt>Median player</dt><dd id="stMedian">—</dd>
+      <dt>Latest observation</dt><dd id="stDate">—</dd>
+      <dt>Coverage</dt><dd id="stCoverage">—</dd>
+      <dt>Source</dt><dd class="is-text" id="stSource">Transfermarkt public estimates, EUR</dd>
+    </dl>
   </section>
-  <section class="stats">
-    <div class="stat"><strong id="stPlayers">—</strong><span>linked players</span></div>
-    <div class="stat"><strong id="stValue">—</strong><span>visible market value</span></div>
-    <div class="stat"><strong id="stMedian">—</strong><span>median player</span></div>
-    <div class="stat"><strong id="stDate">—</strong><span>latest observation</span></div>
+
+  <div class="fs-banner fs-banner-warn" id="mvError" role="alert" hidden>
+    <span class="fs-banner-label">Load failed</span>
+    <span class="fs-banner-text" id="mvErrorText"></span>
+    <button type="button" class="fs-btn k" onclick="init()">Retry</button>
+  </div>
+
+  <section class="fs-panel" aria-label="Market value filters">
+    <div class="fs-fields mv-filters">
+      <div class="fs-field"><label for="league">League</label><select id="league" onchange="setLeague(this.value)"><option value="ALL">All leagues</option></select></div>
+      <div class="fs-field"><label for="team">Team</label><select id="team" onchange="filtersChanged()"><option value="ALL">All teams</option></select></div>
+      <div class="fs-field is-wide"><label for="search">Search player or club</label><input id="search" type="search" placeholder="Search player or club…" oninput="filtersChanged()"></div>
+      <div class="fs-field"><label for="role">Role</label><select id="role" onchange="filtersChanged()"><option value="ALL">All roles</option><option>GK</option><option>CB</option><option>FB</option><option>CM</option><option>AM</option><option>W</option><option>ST</option><option value="UNCLASSIFIED">Unclassified</option></select></div>
+    </div>
   </section>
-  <section class="toolbar" aria-label="Market value filters">
-    <select aria-label="League" id="league" class="ctrl" onchange="setLeague(this.value)"><option value="ALL">All leagues</option></select>
-    <select aria-label="Team" id="team" class="ctrl" onchange="filtersChanged()"><option value="ALL">All teams</option></select>
-    <input aria-label="Search player or club" id="search" class="ctrl" type="search" placeholder="Search player or club…" oninput="filtersChanged()">
-    <select aria-label="Role" id="role" class="ctrl" onchange="filtersChanged()"><option value="ALL">All roles</option><option>GK</option><option>CB</option><option>FB</option><option>CM</option><option>AM</option><option>W</option><option>ST</option><option value="UNCLASSIFIED">Unclassified</option></select>
+
+  <section id="leagueStrip" class="league-strip" aria-label="League scope"></section>
+  <p class="fs-note mv-coverage" id="coverageNote" role="status">Checking valuation coverage…</p>
+
+  <section class="fs-cols-2">
+    <article class="fs-panel" data-mv-card>
+      <div class="fs-panel-h"><h2>Squad value board</h2><span class="fs-tag">team context</span></div>
+      <p class="fs-sub">Linked current-season players; coverage guards against false precision.</p>
+      <div id="squads" style="margin-top:var(--s4)"><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div></div>
+      <div class="fs-panel-foot"><p class="fs-note mv-foot-note">All linked clubs shown. Totals cover linked players in the selected league/team scope, not necessarily the whole squad. Linkage is the share of the club’s current-season players that carry a valuation.</p></div>
+    </article>
+    <article class="fs-panel" data-mv-card>
+      <div class="fs-panel-h"><h2>Value × usage</h2><span class="fs-tag">not a quality score</span></div>
+      <p class="fs-sub">Current-season nineties against estimated market value.</p>
+      <div class="chart-wrap" id="chart" style="margin-top:var(--s4)"><div class="fs-skel block"></div></div>
+      <p class="fs-note">Upper-right: valuable, heavily used core players. Upper-left: valuable players with limited current minutes. Minutes can reflect availability and selection, not performance.</p>
+      <div class="fs-panel-foot">
+        <span class="fs-note mv-foot-note" data-stamp></span>
+        <span class="fs-push"><button type="button" class="fs-btn k" data-export="png" onclick="exportCard(this,'png')">PNG</button> <button type="button" class="fs-btn k" data-export="pdf" onclick="exportCard(this,'pdf')">PDF</button></span>
+      </div>
+    </article>
   </section>
-  <section id="leagueStrip" class="league-strip"></section>
-  <p class="note" id="coverageNote" role="status">Checking valuation coverage…</p>
-  <section class="grid">
-    <article class="panel"><div class="ph"><div><h2>Squad value board</h2><p>Linked current-season players; coverage guards against false precision.</p></div><span class="tag">team context</span></div><div class="body" id="squads"><div class="loading">loading</div></div></article>
-    <article class="panel"><div class="ph"><div><h2>Value × usage</h2><p>Current-season nineties against estimated market value.</p></div><span class="tag">not a quality score</span></div><div class="body chart-wrap" id="chart"><div class="loading">loading</div></div><div class="note">Upper-right: valuable, heavily used core players. Upper-left: valuable players with limited current minutes. Minutes can reflect availability and selection—not performance.</div></article>
+
+  <section class="fs-panel" data-mv-card>
+    <div class="fs-panel-h"><h2>Player value ledger</h2><span class="fs-label mv-count fs-num" id="rowCount">—</span></div>
+    <p class="fs-sub">Sortable valuation context with role and current usage. Select a row to open the player fingerprint.</p>
+    <div class="fs-table-wrap mv-ledger" style="margin-top:var(--s4)" tabindex="0" role="region" aria-label="Player value ledger, scrollable">
+      <table class="fs-table">
+        <thead><tr>
+          <th data-sort="name" aria-sort="none"><button type="button">Player</button></th>
+          <th data-sort="team" aria-sort="none"><button type="button">Club</button></th>
+          <th data-sort="league" aria-sort="none"><button type="button">League</button></th>
+          <th data-sort="role" aria-sort="none"><button type="button">Role</button></th>
+          <th data-sort="n90" class="num" aria-sort="none"><button type="button">90s</button></th>
+          <th data-sort="value" class="num" aria-sort="descending"><button type="button">Value</button></th>
+          <th data-sort="date" aria-sort="none"><button type="button">Valuation date</button></th>
+          <th data-sort="valueRank" class="num" aria-sort="none"><button type="button">League rank</button></th>
+        </tr></thead>
+        <tbody id="ledger"><tr class="is-empty"><td colspan="8" class="is-empty"><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div></td></tr></tbody>
+      </table>
+    </div>
+    <div class="fs-panel-foot">
+      <span class="fs-note mv-foot-note"><span data-stamp></span> Values retain dated snapshots in Supabase so future changes can be analysed over time.</span>
+      <span class="fs-push"><button type="button" class="fs-btn k" data-export="png" onclick="exportCard(this,'png')">PNG</button> <button type="button" class="fs-btn k" data-export="pdf" onclick="exportCard(this,'pdf')">PDF</button> <button type="button" class="fs-btn k" data-export="csv" onclick="exportLedgerCSV()">CSV</button></span>
+    </div>
   </section>
-  <section class="panel"><div class="ph"><div><h2>Player value ledger</h2><p>Sortable valuation context with role and current usage.</p></div><span class="tag" id="rowCount">—</span></div><div class="table-wrap"><table><thead><tr><th data-sort="name">Player</th><th data-sort="team">Club</th><th data-sort="league" class="hide-sm">League</th><th data-sort="role">Role</th><th data-sort="n90" class="num">90s</th><th data-sort="value" class="num">Value</th><th data-sort="date">Valuation date</th><th data-sort="valueRank" class="num hide-sm">League rank</th></tr></thead><tbody id="ledger"></tbody></table></div><div class="note">Click a player to open the full Player Fingerprint. Values retain dated snapshots in Supabase so future changes can be analysed over time.</div></section>
 </main>
 <script>
 const SB='https://xrsilhiffjoulyoqhdmp.supabase.co';
 const AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc2lsaGlmZmpvdWx5b3FoZG1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2Nzc5NDAsImV4cCI6MjEwMDI1Mzk0MH0.3_ccOJi0SBKOwHGxhJL3fsWCSSLoxZumzt-KH4wO8OU';
 const HD={apikey:AK,Authorization:'Bearer '+AK};
 const LEAGUE_NAME={'ENG-Premier League':'Premier League','ESP-La Liga':'La Liga','GER-Bundesliga':'Bundesliga','ITA-Serie A':'Serie A','FRA-Ligue 1':'Ligue 1','USA-MLS':'MLS'};
-let VALUES=[],SEASON=[],ROWS=[],SCOPE='ALL',SORT={key:'value',dir:-1},TEAM_LEAGUE={};
+const SOURCE_TEXT='Transfermarkt public market-value estimates in EUR, joined to FutScout player identities. Not transfer fees, salaries or quality scores.';
+let VALUES=[],SEASON=[],ROWS=[],SCOPE='ALL',SORT={key:'value',dir:-1},TEAM_LEAGUE={},LEAGUES=[],SORT_BOUND=false,CHART_W=0;
 
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function euro(v){v=+v||0;if(v>=1e9)return'€'+(v/1e9).toFixed(2).replace(/\.00$/,'')+'bn';if(v>=1e6)return'€'+(v/1e6).toFixed(v>=1e8?0:1).replace(/\.0$/,'')+'m';if(v>=1e3)return'€'+Math.round(v/1e3)+'k';return'€'+Math.round(v).toLocaleString()}
 function pct(v){return Math.round(v*100)+'%'}
 function median(a){if(!a.length)return 0;const b=a.slice().sort(function(x,y){return x-y}),m=Math.floor(b.length/2);return b.length%2?b[m]:(b[m-1]+b[m])/2}
+function fmtDate(d){if(!d)return'Unavailable';const x=new Date(d+'T00:00:00');return isNaN(x)?String(d):x.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}
+function leagueLabel(l){return l==='ALL'?'All leagues':(LEAGUE_NAME[l]||l)}
+/* Tokens are read from the element being drawn, at draw time, so the same code
+   paints the live theme and the always-light export surface. */
+function tok(el,name){return getComputedStyle(el).getPropertyValue(name).trim()}
 window.addEventListener('fs:theme',function(){renderChart(filteredRows())});
 async function sbAll(table,select){const page=1000,all=[];let from=0;while(true){const u=new URL(SB+'/rest/v1/'+table);u.searchParams.set('select',select);const r=await fetch(u,{headers:Object.assign({},HD,{'Range':from+'-'+(from+page-1),'Range-Unit':'items'})});if(!r.ok)throw new Error(table+' '+r.status);const rows=await r.json();all.push.apply(all,rows);if(rows.length<page)return all;from+=page}}
+
+function emptyHTML(title,reason,small){return'<div class="fs-empty'+(small?' mv-empty-sm':'')+'" role="status"><h3>'+esc(title)+'</h3><p>'+esc(reason)+'</p><button type="button" class="fs-btn" onclick="clearFilters()">Clear filters</button></div>'}
+function showError(message){const had=ROWS.length>0;document.getElementById('mvErrorText').textContent='Market data could not be loaded ('+message+'). '+(had?'Nothing on this page changed: the last loaded valuations stay visible below.':'Nothing has been loaded yet, so no valuations are shown.');document.getElementById('mvError').hidden=false;
+  if(had)return;
+  const none='<div class="fs-empty mv-empty-sm" role="status"><h3>Market data unavailable</h3><p>The valuation request failed, so there is nothing to show. This is a loading failure, not an absence of valuations.</p><button type="button" class="fs-btn" onclick="init()">Retry</button></div>';
+  document.getElementById('squads').innerHTML=none;document.getElementById('chart').innerHTML=none;document.getElementById('ledger').innerHTML='<tr class="is-empty"><td colspan="8" class="is-empty">'+none+'</td></tr>';
+  document.getElementById('coverageNote').textContent='Valuation coverage could not be checked.'}
 
 async function init(){
   try{
@@ -82,7 +198,7 @@ async function init(){
     VALUES=data[0];SEASON=data[1];
     const sm={},rm={};SEASON.forEach(function(p){sm[p.player_id]=p});data[2].forEach(function(r){rm[r.player_id]=r.pool});VALUES.forEach(function(v){if(v.team&&v.league)TEAM_LEAGUE[v.team]=v.league});
     ROWS=VALUES.map(function(v){const p=sm[v.player_id]||{};return{id:v.player_id,name:p.player_name||v.player_name,team:p.team||v.team,league:v.league||TEAM_LEAGUE[p.team],role:rm[v.player_id]||'',n90:+p.nineties||0,apps:+p.apps||0,value:+v.market_value_eur||0,date:v.observed_on,confidence:+v.confidence||0}});
-    const leagues=Array.from(new Set(ROWS.map(function(r){return r.league}).filter(Boolean))).sort();
+    const leagues=LEAGUES=Array.from(new Set(ROWS.map(function(r){return r.league}).filter(Boolean))).sort();
     const missing=Object.keys(LEAGUE_NAME).filter(function(l){return leagues.indexOf(l)<0});
     document.getElementById('coverageNote').textContent='Valuation coverage: '+leagues.length+' of '+Object.keys(LEAGUE_NAME).length+
       ' site leagues ('+leagues.map(function(l){return LEAGUE_NAME[l]||l}).join(', ')+'). '+
@@ -91,26 +207,108 @@ async function init(){
     document.getElementById('league').innerHTML='<option value="ALL">All leagues</option>'+leagues.map(function(l){return'<option value="'+esc(l)+'">'+esc(LEAGUE_NAME[l]||l)+'</option>'}).join('');
     try{const saved=localStorage.getItem('leagueScope');if(saved&&saved!=='GER-Bundesliga'&&(saved==='ALL'||leagues.indexOf(saved)>=0))SCOPE=saved}catch(e){}
     document.getElementById('league').value=SCOPE;
-    assignLeagueRanks();renderLeagueStrip(leagues);fillTeams();restoreMarketState();render();bindSort();
-  }catch(e){document.getElementById('squads').innerHTML='<div class="empty">Could not load market data: '+esc(e.message)+'</div>';document.getElementById('chart').innerHTML='';document.getElementById('ledger').innerHTML='<tr><td colspan="7" class="empty">Market data unavailable.</td></tr>'}
+    document.getElementById('mvError').hidden=true;
+    assignLeagueRanks();renderLeagueStrip(leagues);fillTeams();restoreMarketState();registerShellScope();render();bindSort();
+  }catch(e){showError(e.message)}
 }
+/* The shell SCOPE select drives the same state as the page's league field and
+   league cards; all three go through setLeague. */
+function registerShellScope(){if(!window.FutScout||!FutScout.registerScope)return;FutScout.registerScope({options:[{value:'ALL',label:'All leagues'}].concat(LEAGUES.map(function(l){return{value:l,label:LEAGUE_NAME[l]||l}})),value:SCOPE,onChange:setLeague,title:'League scope for market values. Leagues without linked valuation records are not listed.'})}
+function syncScopeUI(){document.getElementById('league').value=SCOPE;document.querySelectorAll('.league-card').forEach(function(c){const on=c.dataset.league===SCOPE;c.classList.toggle('on',on);c.setAttribute('aria-pressed',on)});if(window.FutScout&&FutScout.setScopeValue)FutScout.setScopeValue(SCOPE)}
 function assignLeagueRanks(){const by={};ROWS.forEach(function(r){(by[r.league]||(by[r.league]=[])).push(r)});Object.keys(by).forEach(function(l){by[l].sort(function(a,b){return b.value-a.value});by[l].forEach(function(r,i){r.valueRank=i+1})})}
-function renderLeagueStrip(leagues){const host=document.getElementById('leagueStrip');host.innerHTML=leagues.map(function(l){const a=ROWS.filter(function(r){return r.league===l}),total=a.reduce(function(s,r){return s+r.value},0);return'<button class="league-card'+(SCOPE===l?' on':'')+'" onclick="setLeague(\''+esc(l)+'\')"><b>'+esc(LEAGUE_NAME[l]||l)+'</b><span>'+a.length+' linked · '+euro(total)+'</span></button>'}).join('')}
-function setLeague(v){SCOPE=v;document.getElementById('league').value=v;try{localStorage.setItem('leagueScope',v)}catch(e){}document.querySelectorAll('.league-card').forEach(function(c){c.classList.toggle('on',c.textContent.indexOf(LEAGUE_NAME[v]||v)===0)});fillTeams();saveMarketState();render()}
+function renderLeagueStrip(leagues){const host=document.getElementById('leagueStrip');host.innerHTML=leagues.map(function(l){const a=ROWS.filter(function(r){return r.league===l}),total=a.reduce(function(s,r){return s+r.value},0);return'<button type="button" class="league-card'+(SCOPE===l?' on':'')+'" data-league="'+esc(l)+'" aria-pressed="'+(SCOPE===l)+'" onclick="setLeague(this.dataset.league)"><b>'+esc(LEAGUE_NAME[l]||l)+'</b><span>'+a.length+' linked · '+euro(total)+'</span></button>'}).join('')}
+function setLeague(v){SCOPE=v;try{localStorage.setItem('leagueScope',v)}catch(e){}syncScopeUI();fillTeams();saveMarketState();render()}
 function fillTeams(){const s=document.getElementById('team'),old=s.value;const teams=Array.from(new Set(ROWS.filter(function(r){return SCOPE==='ALL'||r.league===SCOPE}).map(function(r){return r.team}))).sort();s.innerHTML='<option value="ALL">All teams</option>'+teams.map(function(t){return'<option value="'+esc(t)+'">'+esc(t)+'</option>'}).join('');s.value=teams.indexOf(old)>=0?old:'ALL'}
 function filtersChanged(){saveMarketState();render()}
+function clearFilters(){document.getElementById('team').value='ALL';document.getElementById('role').value='ALL';document.getElementById('search').value='';filtersChanged()}
 function saveMarketState(){const u=new URL(location);u.searchParams.set('league',SCOPE);['team','role','search'].forEach(id=>u.searchParams.set(id,document.getElementById(id).value));if(u.href!==location.href)history.pushState(null,'',u);}
-function restoreMarketState(){const q=new URL(location).searchParams,l=q.get('league');if(Array.from(document.getElementById('league').options).some(o=>o.value===l)){SCOPE=l;document.getElementById('league').value=l;}fillTeams();['team','role','search'].forEach(id=>{const el=document.getElementById(id),v=q.get(id);if(v!==null&&(id==='search'||Array.from(el.options).some(o=>o.value===v)))el.value=v;});}
+function restoreMarketState(){const q=new URL(location).searchParams,l=q.get('league');if(Array.from(document.getElementById('league').options).some(o=>o.value===l)){SCOPE=l;document.getElementById('league').value=l;}fillTeams();['team','role','search'].forEach(id=>{const el=document.getElementById(id),v=q.get(id);if(v!==null&&(id==='search'||Array.from(el.options).some(o=>o.value===v)))el.value=v;});syncScopeUI();}
 window.addEventListener('popstate',()=>{restoreMarketState();render()});
-window.futScoutExportContext=()=>({league:SCOPE,team:document.getElementById('team').value,role:document.getElementById('role').value,query:document.getElementById('search').value,measure:'Transfermarkt estimates in EUR; not transfer fees',sample:filteredRows().length,observation_dates:[...new Set(filteredRows().map(r=>r.date))],chart_scale:'Square-root EUR vertical axis'});
+
 function filteredRows(){const team=document.getElementById('team').value,role=document.getElementById('role').value,q=document.getElementById('search').value.toLowerCase().trim();return ROWS.filter(function(r){return(SCOPE==='ALL'||r.league===SCOPE)&&(team==='ALL'||r.team===team)&&(role==='ALL'||(role==='UNCLASSIFIED'?!r.role:r.role===role))&&(!q||(r.name+' '+r.team).toLowerCase().indexOf(q)>=0)})}
 function scopeRows(){const team=document.getElementById('team').value;return ROWS.filter(function(r){return(SCOPE==='ALL'||r.league===SCOPE)&&(team==='ALL'||r.team===team)})}
+/* Current-season players per club in the league/team scope: the denominator of
+   the squad board's linkage column. */
+function squadDenominators(){const team=document.getElementById('team').value,denom={};SEASON.forEach(function(p){const lg=TEAM_LEAGUE[p.team];if((SCOPE==='ALL'||lg===SCOPE)&&(team==='ALL'||p.team===team))denom[p.team]=(denom[p.team]||0)+1});return denom}
+
+/* Human-readable provenance for the strip, the panel footers and every export. */
+function filterWords(){const team=document.getElementById('team').value,role=document.getElementById('role').value,q=document.getElementById('search').value.trim();return'Team: '+(team==='ALL'?'all teams':team)+'; Role: '+(role==='ALL'?'all roles':role==='UNCLASSIFIED'?'unclassified':role)+'; Search: '+(q?'"'+q+'"':'none')}
+function valuationDateWords(rows){const d=Array.from(new Set(rows.map(function(r){return r.date}).filter(Boolean))).sort(),missing=rows.filter(function(r){return!r.date}).length;if(!d.length)return'Unavailable (no observation date supplied)';return(d.length===1?fmtDate(d[0]):'latest '+fmtDate(d[d.length-1])+'; earliest '+fmtDate(d[0])+' ('+d.length+' dates)')+(missing?'; '+missing+' without a date':'')}
+function coverageWords(){const rows=scopeRows(),denom=squadDenominators(),by={};rows.forEach(function(r){by[r.team]=(by[r.team]||0)+1});const clubs=Object.keys(by);if(!clubs.length)return'No linked players in this scope';let d=0;clubs.forEach(function(t){d+=denom[t]||by[t]});return rows.length.toLocaleString()+' of '+d.toLocaleString()+' current-season players linked ('+pct(rows.length/d)+') at '+clubs.length+' club'+(clubs.length===1?'':'s')+'; '+LEAGUES.length+' of '+Object.keys(LEAGUE_NAME).length+' site leagues have valuations'}
+function snapshotWords(){const s=window.FutScout&&FutScout.snapshot&&FutScout.snapshot();return s?s.text+' ('+s.age+(s.stale?', stale':'')+')':'not reported'}
+window.futScoutExportContext=function(card){const rows=filteredRows(),team=document.getElementById('team').value,o={
+  entity:'Market values · '+(team==='ALL'?leagueLabel(SCOPE):team),
+  scope:'League: '+leagueLabel(SCOPE)+'; '+filterWords(),
+  valuationDate:valuationDateWords(rows),
+  source:SOURCE_TEXT,
+  coverage:coverageWords(),
+  sample:rows.length.toLocaleString()+' linked players in view',
+  dataSnapshot:'analytics snapshot '+snapshotWords()+'; valuations are dated separately (see valuationDate)'};
+  if(card&&card.querySelector&&card.querySelector('#chart'))o.chartScale='Square-root EUR vertical axis; horizontal axis is current-season nineties';
+  if(card&&card.querySelector&&card.querySelector('#ledger'))o.sort=SORT.key+' '+(SORT.dir>0?'ascending':'descending');
+  return o};
+
 function render(){const rows=filteredRows();renderStats(rows);renderSquads(scopeRows());renderChart(rows);renderLedger(rows)}
-function renderStats(rows){const vals=rows.map(function(r){return r.value}).filter(Boolean),total=vals.reduce(function(a,b){return a+b},0),dates=rows.map(function(r){return r.date}).filter(Boolean).sort();document.getElementById('stPlayers').textContent=rows.length.toLocaleString();document.getElementById('stValue').textContent=euro(total);document.getElementById('stMedian').textContent=euro(median(vals));document.getElementById('stDate').textContent=dates.length?new Date(dates[dates.length-1]+'T00:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'}):'—'}
-function renderSquads(rows){const denom={};SEASON.forEach(function(p){const lg=TEAM_LEAGUE[p.team];if((SCOPE==='ALL'||lg===SCOPE)&&(document.getElementById('team').value==='ALL'||p.team===document.getElementById('team').value))denom[p.team]=(denom[p.team]||0)+1});const m={};rows.forEach(function(r){const x=m[r.team]||(m[r.team]={team:r.team,total:0,n:0,values:[]});x.total+=r.value;x.n++;x.values.push(r.value)});const teams=Object.values(m).sort(function(a,b){return b.total-a.total}),max=teams.length?teams[0].total:1;const host=document.getElementById('squads');if(!teams.length){host.innerHTML='<div class="empty">No linked squads in this scope.</div>';return}host.innerHTML=teams.map(function(t,i){const cov=t.n/(denom[t.team]||t.n),top=t.values.sort(function(a,b){return b-a}).slice(0,3).reduce(function(a,b){return a+b},0)/(t.total||1);return'<div class="squad-row" title="Top-three value concentration: '+pct(top)+'"><span class="rank">'+String(i+1).padStart(2,'0')+'</span><span class="team">'+esc(t.team)+'<small style="display:block">Top three: '+pct(top)+'</small></span><span class="track"><i style="width:'+pct(t.total/max)+'"></i></span><span class="money">'+euro(t.total)+'</span><span class="coverage'+(cov<.7?' low':'')+'">'+pct(cov)+'</span></div>'}).join('')+'<div class="note" style="padding:11px 0 0;border-top:0">All linked clubs shown. Totals cover linked players in the selected league/team scope, not necessarily the whole squad. Right column is linkage coverage.</div>'}
-function renderChart(rows){const host=document.getElementById('chart');const data=rows.filter(function(r){return r.value>0}).sort(function(a,b){return b.value-a.value});if(!data.length){host.innerHTML='<div class="empty">No players in this scope.</div>';return}const W=600,H=340,p={l:50,r:18,t:18,b:35},xMax=Math.max.apply(null,data.map(function(r){return r.n90}).concat([1])),yMax=Math.max.apply(null,data.map(function(r){return r.value}).concat([1])),X=function(v){return p.l+(W-p.l-p.r)*(v/xMax)},Y=function(v){return H-p.b-(H-p.t-p.b)*(Math.sqrt(v)/Math.sqrt(yMax))};let s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Market value versus current season nineties">';[0,.25,.5,.75,1].forEach(function(k){const y=Y(yMax*k*k);s+='<line class="axis" x1="'+p.l+'" x2="'+(W-p.r)+'" y1="'+y+'" y2="'+y+'"/><text class="chart-label" x="'+(p.l-7)+'" y="'+(y+3)+'" text-anchor="end">'+euro(yMax*k*k)+'</text>'});s+='<line class="axis" x1="'+p.l+'" x2="'+(W-p.r)+'" y1="'+(H-p.b)+'" y2="'+(H-p.b)+'"/>';[0,.5,1].forEach(function(k){s+='<text class="chart-label" x="'+X(xMax*k)+'" y="'+(H-12)+'" text-anchor="middle">'+(xMax*k).toFixed(1)+' 90s</text>'});data.forEach(function(r,i){s+='<a href="players.html?player='+encodeURIComponent(r.id)+'"><circle class="dot'+(i<12?' hot':'')+'" cx="'+X(r.n90)+'" cy="'+Y(r.value)+'" r="'+(i<12?4.2:3)+'"><title>'+esc(r.name)+' · '+esc(r.team)+' · '+euro(r.value)+' · '+r.n90.toFixed(1)+' 90s</title></circle></a>';if(i<7)s+='<text class="chart-name" x="'+(X(r.n90)+6)+'" y="'+(Y(r.value)-5)+'">'+esc(r.name.split(' ').slice(-1)[0])+'</text>'});host.innerHTML=s+'</svg><p class="note">All '+data.length+' positive-valued players in the selected scope. Vertical axis uses a square-root scale; labels show euros. Exact values and snapshot context are in the ledger below.</p>'}
-function renderLedger(rows){const a=rows.slice().sort(function(x,y){let av=x[SORT.key],bv=y[SORT.key];if(typeof av==='string')return av.localeCompare(bv)*SORT.dir;return((av||0)-(bv||0))*SORT.dir});document.getElementById('rowCount').textContent=a.length+' players';document.getElementById('ledger').innerHTML=a.map(function(r){return'<tr><td><a class="player-link" href="players.html?player='+encodeURIComponent(r.id)+'">'+esc(r.name)+'</a></td><td>'+esc(r.team)+'</td><td class="hide-sm">'+esc(LEAGUE_NAME[r.league]||r.league)+'</td><td><span class="pill">'+esc(r.role||'—')+'</span></td><td class="num">'+r.n90.toFixed(1)+'</td><td class="num">'+euro(r.value)+'</td><td>'+esc(r.date||'Unavailable')+'</td><td class="num hide-sm">#'+r.valueRank+'</td></tr>'}).join('')}
-function bindSort(){document.querySelectorAll('th[data-sort]').forEach(function(th){th.tabIndex=0;th.setAttribute('aria-sort','none');th.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();th.click()}});th.addEventListener('click',function(){const k=th.dataset.sort;if(SORT.key===k)SORT.dir*=-1;else{SORT.key=k;SORT.dir=(k==='value'||k==='n90'||k==='valueRank')?-1:1}document.querySelectorAll('th[data-sort]').forEach(x=>x.setAttribute('aria-sort',x===th?(SORT.dir>0?'ascending':'descending'):'none'));renderLedger(filteredRows())})})}
+function renderStats(rows){const vals=rows.map(function(r){return r.value}).filter(Boolean),total=vals.reduce(function(a,b){return a+b},0),dates=rows.map(function(r){return r.date}).filter(Boolean).sort();
+  document.getElementById('stPlayers').textContent=rows.length.toLocaleString();document.getElementById('stValue').textContent=euro(total);document.getElementById('stMedian').textContent=euro(median(vals));
+  document.getElementById('stDate').textContent=dates.length?fmtDate(dates[dates.length-1]):'—';document.getElementById('stDate').title='Valuation dates in view: '+valuationDateWords(rows);
+  document.getElementById('stCoverage').textContent=coverageWords();
+  const stamp='Valuation date: '+valuationDateWords(rows)+'. Source: Transfermarkt public estimates (EUR), not fees, salaries or quality scores. Coverage: '+coverageWords()+'.';
+  document.querySelectorAll('[data-stamp]').forEach(function(n){n.textContent=stamp});
+  if(window.FutScout)FutScout.setPopulation(rows.length.toLocaleString()+' linked players · '+leagueLabel(SCOPE))}
+function renderSquads(rows){const denom=squadDenominators();const m={};rows.forEach(function(r){const x=m[r.team]||(m[r.team]={team:r.team,total:0,n:0,values:[]});x.total+=r.value;x.n++;x.values.push(r.value)});const teams=Object.values(m).sort(function(a,b){return b.total-a.total}),max=teams.length?teams[0].total:1;const host=document.getElementById('squads');if(!teams.length){host.innerHTML=emptyHTML('No linked squads in this scope','No club in the selected league and team scope has a player linked to a valuation record. That is missing linkage, not a zero squad value.',true);return}
+  host.innerHTML='<div class="squad-list" tabindex="0" role="region" aria-label="Squad value board, scrollable"><div class="squad-head"><span class="fs-label">#</span><span class="fs-label">Club</span><span class="fs-label bar-h">Share of top total</span><span class="fs-label">Linked value</span><span class="fs-label">Linkage</span></div>'+teams.map(function(t,i){const cov=t.n/(denom[t.team]||t.n),top=t.values.sort(function(a,b){return b-a}).slice(0,3).reduce(function(a,b){return a+b},0)/(t.total||1);return'<div class="squad-row" title="Top-three value concentration: '+pct(top)+'"><span class="rank">'+String(i+1).padStart(2,'0')+'</span><span class="team">'+esc(t.team)+'<small>Top three: '+pct(top)+' of linked value</small></span><span class="fs-bar"><i style="width:'+pct(t.total/max)+'"></i></span><span class="money">'+euro(t.total)+'</span><span class="coverage'+(cov<.7?' low':'')+'">'+pct(cov)+(cov<.7?'<span class="fs-tag partial">low</span>':'')+'</span></div>'}).join('')+'</div>'}
+function renderChart(rows){const host=document.getElementById('chart');const data=rows.filter(function(r){return r.value>0}).sort(function(a,b){return b.value-a.value});if(!data.length){host.innerHTML=emptyHTML('No positive-valued players to plot','No linked player with a valuation above zero matches the current league, team, role and search filters.',true);return}
+  const C={ink:tok(host,'--ink'),muted:tok(host,'--muted'),rule:tok(host,'--rule'),panel:tok(host,'--panel'),series:tok(host,'--blue')},mono=esc(tok(host,'--mono')),body=esc(tok(host,'--body'));
+  const W=CHART_W=Math.max(300,Math.round(host.clientWidth)||600),H=W<480?300:340,p={l:56,r:16,t:26,b:42},xMax=Math.max.apply(null,data.map(function(r){return r.n90}).concat([1])),yMax=Math.max.apply(null,data.map(function(r){return r.value}).concat([1])),X=function(v){return p.l+(W-p.l-p.r)*(v/xMax)},Y=function(v){return H-p.b-(H-p.t-p.b)*(Math.sqrt(v)/Math.sqrt(yMax))};
+  const label='font-family="'+mono+'" font-size="10" fill="'+C.muted+'"',axis='stroke="'+C.rule+'" stroke-width="1"';
+  let s='<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Market value versus current season nineties">';
+  s+='<text class="chart-label" '+label+' x="0" y="11" letter-spacing=".6">EST. MARKET VALUE (EUR, SQUARE-ROOT SCALE)</text>';
+  [0,.25,.5,.75,1].forEach(function(k){const y=Y(yMax*k*k);s+='<line class="axis" '+axis+' x1="'+p.l+'" x2="'+(W-p.r)+'" y1="'+y+'" y2="'+y+'"/><text class="chart-label" '+label+' x="'+(p.l-7)+'" y="'+(y+3)+'" text-anchor="end">'+euro(yMax*k*k)+'</text>'});
+  s+='<line class="axis" stroke="'+C.ink+'" stroke-width="1" x1="'+p.l+'" x2="'+(W-p.r)+'" y1="'+(H-p.b)+'" y2="'+(H-p.b)+'"/>';
+  [0,.5,1].forEach(function(k){s+='<text class="chart-label" '+label+' x="'+X(xMax*k)+'" y="'+(H-p.b+14)+'" text-anchor="'+(k===0?'start':k===1?'end':'middle')+'">'+(xMax*k).toFixed(1)+' 90s</text>'});
+  s+='<text class="chart-label" '+label+' x="'+(W-p.r)+'" y="'+(H-4)+'" text-anchor="end" letter-spacing=".6">CURRENT-SEASON NINETIES</text>';
+  let names='';const boxes=[];
+  data.forEach(function(r,i){const hot=i<12,cx=X(r.n90),cy=Y(r.value);s+='<a href="players.html?player='+encodeURIComponent(r.id)+'"><circle class="dot'+(hot?' hot':'')+'" cx="'+cx+'" cy="'+cy+'" r="'+(hot?4.2:3)+'" fill="'+(hot?C.ink:C.series)+'" fill-opacity="'+(hot?1:.7)+'" stroke="'+C.panel+'" stroke-width="1.2"><title>'+esc(r.name)+' · '+esc(r.team)+' · '+euro(r.value)+' · '+r.n90.toFixed(1)+' 90s</title></circle></a>';
+    if(i<7){/* Name the seven highest values; try four positions around the dot so names do not sit on each other. */
+      const text=r.name.split(' ').slice(-1)[0],tw=text.length*6.6+4,right=cx<=W-p.r-tw-8,opts=[[right,-6],[right,14],[!right,-6],[!right,14]].map(function(o){const x=o[0]?cx+7:cx-7-tw;return{x:x,y:cy+o[1],end:!o[0]}}).filter(function(b){return b.x>=p.l&&b.x+tw<=W});
+      const hit=function(b){return boxes.some(function(q){return b.x<q.x+q.w&&q.x<b.x+tw&&Math.abs(b.y-q.y)<12})},b=opts.filter(function(o){return!hit(o)})[0]||opts[0]||{x:cx+7,y:cy-6,end:false};boxes.push({x:b.x,y:b.y,w:tw});
+      names+='<text class="chart-name" font-family="'+body+'" font-size="11" font-weight="600" fill="'+C.ink+'" stroke="'+C.panel+'" stroke-width="3" paint-order="stroke" x="'+(b.end?b.x+tw:b.x)+'" y="'+b.y+'"'+(b.end?' text-anchor="end"':'')+'>'+esc(text)+'</text>'}});
+  host.innerHTML=s+names+'</svg><p class="fs-note mv-legend"><span><i class="top"></i>Twelve highest values in view (seven named)</span><span><i></i>All other linked players</span></p><p class="fs-note">All '+data.length+' positive-valued players in the selected scope. Vertical axis uses a square-root scale; labels show euros. Exact values and snapshot context are in the ledger below.</p>'}
+function renderLedger(rows){const a=rows.slice().sort(function(x,y){let av=x[SORT.key],bv=y[SORT.key];if(typeof av==='string')return av.localeCompare(bv)*SORT.dir;return((av||0)-(bv||0))*SORT.dir});document.getElementById('rowCount').textContent=a.length.toLocaleString()+' players';
+  if(!a.length){document.getElementById('ledger').innerHTML='<tr class="is-empty"><td colspan="8" class="is-empty">'+emptyHTML('No linked players match these filters','No valuation record matches the current team, role and search filters in '+leagueLabel(SCOPE)+'. Only players linked to a Transfermarkt record appear, so a missing player is not a zero valuation.')+'</td></tr>';return}
+  document.getElementById('ledger').innerHTML=a.map(function(r){const href='players.html?player='+encodeURIComponent(r.id);return'<tr tabindex="0" data-href="'+esc(href)+'"><td><a class="player-link" tabindex="-1" href="'+esc(href)+'">'+esc(r.name)+'</a></td><td>'+esc(r.team)+'</td><td>'+esc(LEAGUE_NAME[r.league]||r.league)+'</td><td><span class="fs-tag">'+esc(r.role||'—')+'</span></td><td class="num">'+r.n90.toFixed(1)+'</td><td class="num">'+euro(r.value)+'</td><td class="fs-num">'+esc(r.date||'Unavailable')+'</td><td class="num">#'+r.valueRank+'</td></tr>'}).join('')}
+function bindSort(){if(SORT_BOUND)return;SORT_BOUND=true;
+  document.querySelectorAll('th[data-sort]').forEach(function(th){th.addEventListener('click',function(){const k=th.dataset.sort;if(SORT.key===k)SORT.dir*=-1;else{SORT.key=k;SORT.dir=(k==='value'||k==='n90'||k==='valueRank')?-1:1}document.querySelectorAll('th[data-sort]').forEach(x=>x.setAttribute('aria-sort',x===th?(SORT.dir>0?'ascending':'descending'):'none'));renderLedger(filteredRows())})});
+  /* Ledger rows open the player fingerprint: click anywhere on the row, or Enter on a focused row. */
+  const body=document.getElementById('ledger');
+  body.addEventListener('click',function(e){const tr=e.target.closest('tr[data-href]');if(!tr||e.target.closest('a'))return;if(String(getSelection())) return;location.href=tr.dataset.href});
+  body.addEventListener('keydown',function(e){if(e.key!=='Enter')return;const tr=e.target.closest('tr[data-href]');if(tr&&e.target===tr){e.preventDefault();location.href=tr.dataset.href}});
+  /* The plot is drawn at its real pixel width so its text stays at token size. */
+  if(window.ResizeObserver)new ResizeObserver(function(){const host=document.getElementById('chart'),w=Math.max(300,Math.round(host.clientWidth)||600);if(ROWS.length&&Math.abs(w-CHART_W)>8)renderChart(filteredRows())}).observe(document.getElementById('chart'))}
+
+/* ---------- Exports: always light, stamped ---------- */
+function exportCard(button,format){const card=button.closest('[data-mv-card]');
+  if(!window.FutScoutExports||!window.FutScoutExports.capture){if(window.FutScout)FutScout.toast('Export tools are still loading. Retry in a moment.');return}
+  /* The shared capture clones the card synchronously, so the card is switched to
+     the light palette (and the plot redrawn from light tokens) only for that
+     clone; nothing light is ever painted on screen. The capture stage itself is
+     marked fs-light as soon as it is attached. */
+  const hasChart=!!card.querySelector('#chart');
+  const watch=new MutationObserver(function(){const stage=document.querySelector('body > .fs-export-stage');if(stage){stage.classList.add('fs-light');watch.disconnect()}});
+  watch.observe(document.body,{childList:true});
+  card.classList.add('fs-light');if(hasChart)renderChart(filteredRows());
+  let done;
+  try{done=window.FutScoutExports.capture(card,format,button)}finally{card.classList.remove('fs-light');if(hasChart)renderChart(filteredRows())}
+  Promise.resolve(done).then(function(){watch.disconnect();if(window.FutScout)FutScout.toast(format.toUpperCase()+' export prepared · light palette, stamped')})}
+function csvCell(v){return'"'+String(v==null?'':v).replace(/"/g,'""')+'"'}
+function exportLedgerCSV(){const rows=filteredRows().slice().sort(function(x,y){let av=x[SORT.key],bv=y[SORT.key];if(typeof av==='string')return av.localeCompare(bv)*SORT.dir;return((av||0)-(bv||0))*SORT.dir});
+  if(!rows.length){if(window.FutScout)FutScout.toast('Nothing to export: no players match these filters');return}
+  const ctx=window.futScoutExportContext(document.getElementById('ledger').closest('[data-mv-card]'));
+  const header='FutScout market values ledger · League: '+leagueLabel(SCOPE)+' · Filters: '+filterWords()+' · Sort: '+ctx.sort+' · Valuation date: '+ctx.valuationDate+' · Source: '+ctx.source+' · Coverage: '+ctx.coverage+' · Data snapshot: '+snapshotWords()+' · Exported: '+new Date().toISOString()+' · Source page: '+location.href;
+  const lines=[csvCell(header),['Player','Club','League','Role','90s','Value (EUR)','Value (display)','Valuation date','League value rank','FutScout player id'].map(csvCell).join(',')].concat(rows.map(function(r){return[r.name,r.team,LEAGUE_NAME[r.league]||r.league,r.role||'',r.n90.toFixed(1),r.value,euro(r.value),r.date||'Unavailable',r.valueRank,r.id].map(csvCell).join(',')}));
+  const url=URL.createObjectURL(new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='futscout-market-values-ledger.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000);
+  if(window.FutScout)FutScout.toast('CSV exported · '+rows.length.toLocaleString()+' players')}
 init();
 </script>
 </body>
