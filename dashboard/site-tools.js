@@ -560,31 +560,71 @@
     }
   }
 
+  /* The stamp every export carries. Known keys lead in a fixed order; anything
+     else a page supplies follows. Snapshot time and export time are separate
+     values on purpose: one is the data, the other is the download. */
+  var STAMP_ORDER = ['entity','subject','workspace','view','scope','league','cohort','population','window','filters','poolNote','valuationDate','source','coverage'];
+  var STAMP_LABEL = {entity:'Entity',subject:'Entity',workspace:'Workspace',view:'View',scope:'Scope',league:'League',cohort:'Cohort',population:'Population',window:'Time window',filters:'Filters',poolNote:'Pool',valuationDate:'Valuation date',source:'Source',coverage:'Coverage'};
+  function stampValue(value) {
+    if (value == null || value === '') return '';
+    if (typeof value === 'object') { try { return JSON.stringify(value); } catch (e) { return String(value); } }
+    return String(value);
+  }
+  function stampRows(metadata, snapshot, exportTime, sourceURL) {
+    var rows = [], seen = {};
+    STAMP_ORDER.forEach(function (key) {
+      var v = stampValue(metadata && metadata[key]);
+      if (v) { rows.push([STAMP_LABEL[key], v]); seen[key] = true; }
+    });
+    Object.keys(metadata || {}).forEach(function (key) {
+      if (seen[key] || key === 'url' || key === 'sourceURL' || key === 'exportedAt') return;
+      var v = stampValue(metadata[key]);
+      if (v) rows.push([key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' '), v]);
+    });
+    if (!rows.length) rows.push(['Scope', 'As labelled in this view; no further provenance supplied by the page']);
+    rows.push(['Data snapshot', snapshot ? snapshot.text + ' · ' + snapshot.age + (snapshot.stale ? ' · STALE' : '') + ' (' + snapshot.snapshot + ')' : 'Not reported']);
+    rows.push(['Exported', exportTime + ' (export time, not data freshness)']);
+    rows.push(['Source page', sourceURL]);
+    return rows;
+  }
+  function stampBlock(label, metadata, snapshot, exportTime, sourceURL) {
+    var block = document.createElement('div');
+    block.className = 'fs-stamp';
+    block.innerHTML = '<div class="fs-stamp-head"><span class="fs-mark">FUTSCOUT<span>_</span></span><span class="fs-stamp-title">' + esc(label) + '</span></div>' +
+      '<dl>' + stampRows(metadata, snapshot, exportTime, sourceURL).map(function (row) {
+        return '<dt>' + esc(row[0]) + '</dt><dd>' + esc(row[1]) + '</dd>';
+      }).join('') + '</dl>';
+    return block;
+  }
+  /* The same lines for CSV and clipboard outputs. */
+  function exportHeaderLines(card) {
+    var metadata = {};
+    try { metadata = typeof window.futScoutExportContext === 'function' ? (window.futScoutExportContext(card) || {}) : {}; } catch (e) {}
+    return stampRows(metadata, snapshotStamp(), new Date().toISOString(), location.href);
+  }
+
   async function captureCard(card, format, button) {
-    var label = exportLabel(card),sourceURL=location.href,exportTime=new Date().toISOString(),clone=card.cloneNode(true),metadata={};try{metadata=JSON.parse(JSON.stringify(card.dataset.exportContext?JSON.parse(card.dataset.exportContext):(typeof window.futScoutExportContext==='function'?window.futScoutExportContext(card):{})))}catch(error){metadata={contextError:'Context unavailable'}}card.querySelectorAll('canvas').forEach(function(source,i){var target=clone.querySelectorAll('canvas')[i];target.width=source.width;target.height=source.height;target.getContext('2d').drawImage(source,0,0)});
+    var label = exportLabel(card),sourceURL=location.href,exportTime=new Date().toISOString(),snapshot=snapshotStamp(),clone=card.cloneNode(true),metadata={};try{metadata=JSON.parse(JSON.stringify(card.dataset.exportContext?JSON.parse(card.dataset.exportContext):(typeof window.futScoutExportContext==='function'?window.futScoutExportContext(card):{})))}catch(error){metadata={contextError:'Context unavailable'}}card.querySelectorAll('canvas').forEach(function(source,i){var target=clone.querySelectorAll('canvas')[i];target.width=source.width;target.height=source.height;target.getContext('2d').drawImage(source,0,0)});
     var control=button&&(button.closest('.fs-card-export')||button);
     if(control)control.classList.add('fs-exporting');
     try {
       await ensureExportLibraries(format);
     } catch (error) {
       if(control)control.classList.remove('fs-exporting');
-      alert('Export unavailable: ' + error.message);
+      toast('Export unavailable: ' + error.message);
       return;
     }
     var stage = document.createElement('div');
-    stage.className = 'fs-export-stage';
+    /* Exports ignore the page theme: the stage re-declares the light tokens. */
+    stage.className = 'fs-export-stage fs-light';
     // The card pixels, metadata and URL were captured before the first await.
     // Immutable metadata captured above.
     // Do not consult live page state after export libraries resolve.
-    var context=Object.entries(metadata||{}).filter(function(pair){return !(['url','sourceURL'].includes(pair[0])&&pair[1]===sourceURL)}).map(function(pair){return pair[0]+': '+(typeof pair[1]==='object'?JSON.stringify(pair[1]):pair[1]);}).join(' · ');
     clone.querySelectorAll('.fs-card-export,.fs-export-bar,.viz-exp,[data-export],input,select').forEach(function (node) { node.remove(); });
     clone.querySelectorAll('button').forEach(function(node){var text=document.createElement('span');text.innerHTML=node.innerHTML;text.className=node.className;text.style.cssText=node.style.cssText;node.replaceWith(text);});
     clone.querySelectorAll('details').forEach(function(node){node.open=true;});
     stage.appendChild(clone);
-    var footer = document.createElement('p');
-    footer.className='fs-export-foot';
-    footer.textContent='FutScout · '+label+' · '+(context ? context+' · ' : 'Scope is as labelled in this view; additional provenance not supplied. · ')+'Source page: '+sourceURL+' · Exported '+exportTime+' (export time, not data freshness).';
-    stage.appendChild(footer);
+    stage.appendChild(stampBlock(label, metadata, snapshot, exportTime, sourceURL));
     document.body.appendChild(stage);
     clone.querySelectorAll('*').forEach(function (node) {
       var style = getComputedStyle(node);
@@ -602,6 +642,8 @@
       var bg = getComputedStyle(stage).backgroundColor;
       var canvas = await window.html2canvas(stage, {backgroundColor: bg, scale: 2, useCORS: true, width:stage.scrollWidth, windowWidth: stage.scrollWidth, height: stage.scrollHeight, windowHeight: stage.scrollHeight,
         onclone: function(doc) {
+          // Always light: the cloned document drops the dark theme entirely.
+          doc.documentElement.setAttribute('data-theme','light'); doc.documentElement.classList.remove('dark');
           // html2canvas 1.4 cannot parse modern color()/oklch() output from color-mix.
           // Let the browser resolve those colours, then serialize an sRGB equivalent.
           var pixel=doc.createElement('canvas'); pixel.width=pixel.height=1;
@@ -625,6 +667,7 @@
         anchor.download = base + '.png';
         anchor.href = canvas.toDataURL('image/png');
         anchor.click();
+        toast('PNG exported \u00B7 light \u00B7 stamped');
       } else {
         if (!window.jspdf || !window.jspdf.jsPDF) throw new Error('PDF library is unavailable');
         var jsPDF = window.jspdf.jsPDF;
@@ -653,9 +696,10 @@
           offset=end;
         }
         pdf.save(base + '.pdf');
+        toast('PDF exported \u00B7 light \u00B7 stamped');
       }
     } catch (error) {
-      alert('Export failed: ' + error.message);
+      toast('Export failed: ' + error.message);
     } finally {
       stage.remove();
       if(control)control.classList.remove('fs-exporting');
@@ -665,10 +709,11 @@
   window.FutScoutExports={capture:captureCard};
   function exportTable(card){
     var rows=Array.from(card.querySelectorAll('table tr')).map(function(row){return Array.from(row.querySelectorAll('th,td')).map(function(cell){return '"'+cell.textContent.trim().replace(/"/g,'""')+'"';}).join(',');});
-    rows.unshift('"FutScout source","'+location.href.replace(/"/g,'""')+'"');
-    var meta=typeof window.futScoutExportContext==='function'?window.futScoutExportContext(card):{};
-    rows.unshift('"Context","'+JSON.stringify(meta).replace(/"/g,'""')+'"');
-    var url=URL.createObjectURL(new Blob(['﻿'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=safeName(exportLabel(card))+'.csv';a.click();setTimeout(function(){URL.revokeObjectURL(url)},1000);
+    /* Header lines: scope, filters, cohort, snapshot time, export time, source. */
+    var head=exportHeaderLines(card).map(function(row){return '"'+String(row[0]).replace(/"/g,'""')+'","'+String(row[1]).replace(/"/g,'""')+'"';});
+    head.unshift('"FutScout","'+exportLabel(card).replace(/"/g,'""')+'"');
+    rows=head.concat([''],rows);
+    var url=URL.createObjectURL(new Blob(['﻿'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=safeName(exportLabel(card))+'.csv';a.click();setTimeout(function(){URL.revokeObjectURL(url)},1000);toast('CSV exported \u00B7 stamped');
   }
 
   function exportable(card) {
@@ -729,6 +774,7 @@
     setScopeValue: setScopeValue,
     setFreshness: setFreshness,
     snapshot: snapshotStamp,
+    exportHeaderLines: exportHeaderLines,
     setPopulation: function (text) { if (mounted) els.pop.textContent = text || ''; },
     toast: toast,
     openPalette: openPalette,
