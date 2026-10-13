@@ -129,6 +129,19 @@
     if (mq.addEventListener) mq.addEventListener('change', onScheme); else if (mq.addListener) mq.addListener(onScheme);
   }
 
+  /* Print is always light, like every other export. */
+  var printRestore;
+  window.addEventListener('beforeprint', function () {
+    if (printRestore !== undefined) return;
+    printRestore = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', 'light'); root.classList.remove('dark');
+  });
+  window.addEventListener('afterprint', function () {
+    if (printRestore === undefined) return;
+    var t = printRestore; printRestore = undefined;
+    applyTheme(t, false);
+  });
+
   /* ---------- Shell markup ---------- */
   function groupMenus() {
     var here = currentGroup(), file = currentFile();

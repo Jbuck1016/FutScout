@@ -177,3 +177,6 @@
   .fs-palette{margin:12px auto auto;max-height:calc(100vh - 24px)}
   .fs-toast{bottom:64px}
 }
+
+/* ---------- Print: chrome never prints ---------- */
+@media print{.fs-shell,.fs-bottom,.fs-toast,.fs-palette,.fs-card-export,.fs-export-bar{display:none!important}}
