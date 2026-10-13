@@ -450,6 +450,9 @@
       paletteReturn = null;
     });
     dialog.addEventListener('keydown', function (event) {
+      /* A search input swallows the first Escape to clear itself; the palette
+         closes on the first press regardless. */
+      if (event.key === 'Escape') { event.preventDefault(); dialog.close(); return; }
       if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
       var rows = Array.prototype.slice.call(dialog.querySelectorAll('a.fs-pal-row:not([hidden])'));
       if (!rows.length) return;
