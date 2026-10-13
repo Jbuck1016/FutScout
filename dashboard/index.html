@@ -9,147 +9,93 @@
 <link rel="stylesheet" href="theme.css?v=pr1">
 <script src="site-tools.js?v=pr1"></script>
 <style>
-/* Canvas, surfaces, lines, text, green and red live in theme.css now, as do
-   the font tokens. What is left is this page's own accent family and the one
-   hue theme.css does not carry. */
-:root{
-  --amber-dim:rgba(154,111,42,.09);
-  
-}
-html.dark{
-  --panel:var(--panel);
-  --line2:var(--rule);
-  --dim:var(--muted);
-  --amber-dim:rgba(226,184,119,.10);
-  --red:var(--accent);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{background:var(--bg);color:var(--text);font-family:var(--f-body);overflow-y:auto;
-  background-image:radial-gradient(circle at 18% -8%,rgba(226,184,119,.05),transparent 46%);}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1240px;margin:0 auto;padding:26px 24px 60px}
+/* Home. Tokens come from theme.css, chrome from shell.css, data panels from
+   components.css (fs-*). What is left here is this page's own layout: the
+   scope summary, the find bar, the destination group rows and a few table
+   details. Every value is a token. */
+*{box-sizing:border-box}
+.wrap{max-width:1240px;margin:0 auto;padding:var(--s5) var(--s6) calc(var(--s6)*2);display:flex;flex-direction:column;gap:var(--s5)}
+.wrap>*{min-width:0}
 
-/* ---- system header ---- */
-.sys{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px}
-.sys-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-.sys-mark{font:700 12px/1 var(--f-mono);color:var(--amber);letter-spacing:.02em}
-.sys-title{font:800 21px/1 var(--f-disp);letter-spacing:-.025em}
-.sys-line{font:500 11px/1.8 var(--f-mono);color:var(--dim);margin-top:9px;
-  display:flex;gap:9px;flex-wrap:wrap;align-items:center}
-.sys-line b{color:var(--text);font-weight:600}
-.sep{color:var(--line2)}
-.dotlive{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;
-  box-shadow:0 0 0 3px rgba(61,220,151,.14)}
+/* ---- title + scope summary ---- */
+.home-head{display:flex;align-items:flex-end;flex-wrap:wrap;gap:var(--s3) var(--s6);padding-bottom:var(--s4);border-bottom:1px solid var(--ink)}
+.home-head-main{flex:1 1 480px;min-width:0}
+.pops{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s5);margin:var(--s2) 0 0;padding:0;list-style:none;font:400 12px/1.4 var(--body);color:var(--muted)}
+.pops li{min-width:0}
+.pops b{font:500 12px/1.4 var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.pops em{font-style:normal;color:var(--ink)}
+.pops .fs-skel{display:inline-block;width:120px;vertical-align:middle}
 
-/* ---- command bar ---- */
-.cmd{position:relative;margin-bottom:14px}
-.cmd-box{display:flex;align-items:center;gap:10px;border:1px solid var(--line2);background:var(--panel);
-  border-radius:var(--radius);padding:0 13px;height:50px;transition:border-color .15s}
-.cmd-box:focus-within{border-color:var(--amber-line);background:var(--panel2)}
-.cmd-caret{font:600 14px/1 var(--f-mono);color:var(--amber)}
-#q{flex:1;background:none;border:none;outline:none;color:var(--text);
-  font:500 14px/1 var(--f-mono);letter-spacing:-.01em}
-#q::placeholder{color:var(--dim2)}
-.kbd{font:600 9.5px/1 var(--f-mono);color:var(--dim);border:1px solid var(--line2);
-  border-radius:var(--radius);padding:4px 6px;background:var(--panel2);white-space:nowrap}
-.res{position:absolute;left:0;right:0;top:54px;background:var(--panel);border:1px solid var(--line2);
-  border-radius:var(--radius);max-height:340px;overflow:auto;z-index:40;display:none;
-  box-shadow:none}
+/* ---- find bar ---- */
+.find{position:relative}
+.find-box{display:flex;align-items:center;gap:var(--s3);height:40px;padding:0 var(--s4);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.find-box:focus-within{border-color:var(--ink);outline:2px solid var(--accent);outline-offset:2px}
+#q{flex:1 1 auto;min-width:0;height:100%;padding:0;background:none;border:0;outline:0;color:var(--ink);font:400 13px/1 var(--body)}
+#q::placeholder{color:var(--muted)}
+.kbd{flex:0 0 auto;padding:3px 6px;border:1px solid var(--rule);border-radius:var(--radius);font:500 10px/1 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.res{position:absolute;left:0;right:0;top:calc(100% + var(--s1));z-index:40;display:none;max-height:340px;overflow:auto;background:var(--panel);border:1px solid var(--ink);border-radius:var(--radius)}
 .res.on{display:block}
-.rgroup{font:600 9px/1 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--dim2);
-  padding:9px 13px 6px;border-bottom:1px solid var(--line)}
+.rgroup{padding:var(--s3) var(--s4) var(--s2);border-bottom:1px solid var(--rule)}
 /* A result goes to another page, so it is a real link: it carries the URL, it
-   opens in a new tab on middle click, and Enter activates it. The reset keeps
-   the row looking exactly as it did as a div. */
-.ritem{display:flex;align-items:center;gap:11px;padding:9px 13px;cursor:pointer;border-bottom:1px solid var(--line);
-  color:inherit;text-decoration:none}
-.ritem:last-child{border-bottom:none}
-.ritem.sel,.ritem:hover{background:var(--amber-dim)}
-.ritem:focus-visible{outline:2px solid var(--amber);outline-offset:-2px;background:var(--amber-dim)}
-.ritem-k{font:600 9px/1 var(--f-mono);color:var(--amber);border:1px solid var(--amber-line);
-  padding:3px 5px;border-radius:2px;min-width:34px;text-align:center}
-.ritem-n{font:600 12.5px/1.2 var(--f-body);flex:1}
-.ritem-m{font:500 10.5px/1 var(--f-mono);color:var(--dim)}
-.res-empty{padding:16px 13px;font:500 11px/1 var(--f-mono);color:var(--dim2)}
+   opens in a new tab on middle click, and Enter activates it. */
+.ritem{display:flex;align-items:center;gap:var(--s4);min-height:var(--tap);padding:var(--s2) var(--s4);border-left:3px solid transparent;border-bottom:1px solid var(--rule2);color:var(--ink);text-decoration:none}
+.ritem:last-child{border-bottom:0}
+.ritem:hover{background:var(--panel2)}
+.ritem.sel{background:var(--bg);border-left-color:var(--accent)}
+.ritem:focus-visible{outline-offset:-2px}
+.ritem .fs-tag{flex:0 0 46px;justify-content:center}
+.ritem-n{flex:1 1 auto;min-width:0;font:600 13px/1.3 var(--body);overflow-wrap:anywhere}
+.ritem-m{flex:0 0 auto;font:400 11px/1.3 var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.res-empty{margin:0;padding:var(--s5) var(--s4);font:400 12px/1.4 var(--body);color:var(--muted)}
 
-/* ---- nav modules ---- */
-.mods{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-@media(max-width:1100px){.mods{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:620px){.mods{grid-template-columns:1fr}}
-.mods.enhanced{display:block;margin:24px 0 30px}
-.nav-cluster{margin:0 0 27px}
-.nav-cluster-head{display:flex;align-items:end;justify-content:space-between;gap:22px;border-top:1px solid var(--line2);padding:14px 1px 13px}
-.nav-cluster-index{display:block;color:var(--amber);font:700 11px/1.2 var(--f-mono);letter-spacing:.14em}
-.nav-cluster-head h2{font:800 clamp(21px,2.2vw,28px)/1.1 var(--f-disp);letter-spacing:-.035em;margin:5px 0 0}
-.nav-cluster-head p{max-width:360px;color:var(--dim);font:500 14px/1.45 var(--f-body);text-align:right}
-.nav-cluster-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.nav-cluster-grid .mod{min-height:154px;display:flex;flex-direction:column}
-.nav-cluster-grid .mod-n{margin-top:auto;padding-top:16px}
-@media(max-width:1100px){.nav-cluster-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:620px){.nav-cluster-grid{grid-template-columns:1fr}.nav-cluster-head{display:block}.nav-cluster-head p{text-align:left;margin-top:7px}.nav-cluster-grid .mod{min-height:0}}
-.mod{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);padding:15px 16px;
-  display:block;transition:border-color .15s,background .15s;position:relative;overflow:hidden}
-.mod:hover{border-color:var(--amber-line);background:var(--panel2)}
-.mod-i{font:600 11px/1.25 var(--f-mono);letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
-.mod-t{font:700 17px/1.1 var(--f-disp);letter-spacing:-.02em;margin:9px 0 6px}
-.mod-d{font:500 14px/1.5 var(--f-body);color:var(--dim);min-height:34px}
-.mod-n{font:600 11px/1 var(--f-mono);color:var(--amber);margin-top:11px;
-  display:flex;align-items:center;justify-content:space-between}
-.mod-arrow{color:var(--dim2);transition:transform .15s}
-.mod:hover .mod-arrow{transform:translateX(3px);color:var(--amber)}
+/* ---- league scope chips ---- */
+.lgstrip{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s2)}
+.lgstrip .fs-label{margin-right:var(--s1)}
+.lgchip small{font:400 11px/1.2 var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.lgchip[aria-pressed="true"] small{color:inherit}
+.lgstrip .fs-skel{width:130px;height:var(--tap)}
 
-/* ---- panels ---- */
-.cols{display:grid;grid-template-columns:1.35fr 1fr;gap:12px}
-@media(max-width:1000px){.cols{grid-template-columns:1fr}}
-.panel{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);overflow:hidden}
-.ph{display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:11px 14px;border-bottom:1px solid var(--line)}
-.ph-t{font:600 9.5px/1 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
-.ph-a{font:500 10px/1 var(--f-mono);color:var(--dim2)}
-.tbl-cap{font:500 10.5px/1.6 var(--f-body);color:var(--dim);padding:10px 14px 9px;border-bottom:1px solid var(--line);background:var(--panel)}
-.seg{display:flex;gap:1px;background:var(--line);border-radius:2px;overflow:hidden}
-.seg button{background:var(--panel2);border:none;color:var(--dim);font:600 9.5px/1 var(--f-mono);
-  padding:6px 9px;cursor:pointer;letter-spacing:.04em}
-.seg button.on{background:var(--amber-dim);color:var(--amber)}
-table{width:100%;border-collapse:collapse;font:500 11.5px/1.4 var(--f-mono)}
-th{text-align:left;font:600 9px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;
-  color:var(--dim2);padding:9px 14px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap}
-th:hover{color:var(--text)}
-th{user-select:none}
-th.sorted{color:var(--amber)}
-td{padding:7.5px 14px;border-bottom:1px solid var(--line)}
-tr:last-child td{border-bottom:none}
-tbody tr{cursor:pointer}
-tbody tr:hover td{background:var(--panel2)}
-.num{text-align:right;font-variant-numeric:tabular-nums}
-.rk{color:var(--dim2);width:26px}
-.nm{font-family:var(--f-body);font-weight:600;font-size:12.5px}
-.tag{font:600 8.5px/1 var(--f-mono);border:1px solid var(--line2);color:var(--dim);
-  padding:2.5px 4.5px;border-radius:2px}
-.bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden;min-width:52px}
-.bar i{display:block;height:100%;background:var(--amber)}
-.foot{margin-top:16px;font:500 10px/1.8 var(--f-mono);color:var(--dim2);
-  border-top:1px solid var(--line);padding-top:12px;display:flex;gap:8px;flex-wrap:wrap}
-.spin{width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--amber);
-  border-radius:50%;animation:sp .7s linear infinite;margin:36px auto}
-@keyframes sp{to{transform:rotate(360deg)}}
-.blink{animation:bl 1.15s step-end infinite}
-@keyframes bl{50%{opacity:0}}
+/* ---- destination groups ---- */
+.groups{display:flex;flex-direction:column;gap:var(--s3)}
+.grp{display:grid;grid-template-columns:72px minmax(0,1fr);gap:var(--s4);align-items:start;padding-top:var(--s3);border-top:1px solid var(--rule)}
+.grp-h{margin:0;padding-top:var(--s3)}
+.grp-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:var(--s3);min-width:0}
+.dest{display:flex;flex-direction:column;gap:var(--s1);min-width:0;padding:var(--s3) var(--s4);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);color:var(--ink);text-decoration:none}
+.dest:hover{background:var(--panel2);border-color:var(--ink)}
+.dest-t{display:flex;align-items:baseline;flex-wrap:wrap;gap:var(--s1) var(--s3);font:500 16px/1.2 var(--display)}
+.dest-d{font:400 11px/1.4 var(--body);color:var(--muted)}
+.dest-n{margin-top:auto;padding-top:var(--s1);font:400 11px/1.3 var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
 
-.lgstrip{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
-.lgchip{font:600 12px/1.2 var(--mono,monospace);color:var(--dim,var(--muted));
-  border:1px solid var(--line2,var(--rule));border-radius:var(--radius);padding:8px 11px;background:var(--panel)}
-.lgchip b{color:var(--text,var(--ink));font-weight:700}
-.lgchip{cursor:pointer;transition:.14s}
-.lgchip:hover{border-color:var(--amber-line,rgba(226,184,119,.32));color:var(--text,var(--ink))}
-.lgchip.on{background:var(--amber-dim,rgba(226,184,119,.10));border-color:var(--amber-line,rgba(226,184,119,.32));
-  color:var(--amber,var(--gold-text))}
-.lgchip:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-/* reference and guide are support material, not the tools; visually secondary */
-.mod.mod-sm{padding:15px 16px}
-.mod.mod-sm .mod-t{font-size:17px}
-.mod.mod-sm .mod-d{font-size:14px;line-height:1.5}
+/* ---- league tables and leaders ---- */
+.intel-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:var(--s2) var(--s4);padding-top:var(--s3);border-top:1px solid var(--ink);scroll-margin-top:var(--s4)}
+.intel-h h2{margin:0;font:600 24px/1.1 var(--display)}
+.intel-h p{margin:0}
+.fs-panel-h .fs-seg{margin-left:auto;overflow-x:auto}
+.tbl-cap{margin:0 0 var(--s3)}
+.tbl-scroll{max-height:372px}
+.fs-table th button{min-height:var(--tap)}
+.fs-table th.is-sorted{color:var(--ink)}
+.fs-table td.rk{width:34px;color:var(--muted)}
+.fs-table td.nm{font-weight:600}
+.fs-table td.nm a{color:inherit;text-decoration:none}
+.fs-table td.nm a:hover{text-decoration:underline}
+.fs-table td.nm small{display:block;font:400 11px/1.3 var(--body);color:var(--muted)}
+.fs-table td.hot{font-weight:500;color:var(--ink)}
+.fs-table td.barc{width:74px}
+.fs-table tbody tr{cursor:pointer}
+.panel-state{margin:0 0 var(--s3)}
+.foot{display:flex;flex-wrap:wrap;gap:var(--s1) var(--s5);margin:0;padding:var(--s4) 0 0;border-top:1px solid var(--rule);list-style:none}
+
+@media (max-width:760px){
+  .wrap{padding:var(--s4) var(--s4) var(--s6)}
+  .find-box{height:44px}
+  .lgstrip{flex-wrap:nowrap;overflow-x:auto;padding-bottom:var(--s1);scrollbar-width:thin}
+  .lgstrip>*{flex:0 0 auto}
+  .grp{grid-template-columns:minmax(0,1fr);gap:var(--s2)}
+  .grp-h{padding-top:0}
+  .grp-cards{grid-template-columns:minmax(0,1fr)}
+  .fs-panel-h .fs-seg{margin-left:0}
+}
 </style>
 <script src="gate.js"></script>
 <meta name="robots" content="noindex,nofollow">
@@ -157,132 +103,87 @@ tbody tr:hover td{background:var(--panel2)}
 <link rel="stylesheet" href="components.css?v=pr1">
 </head>
 <body><script>window.FutScout&&FutScout.mount()</script>
-<div class="wrap">
+<main class="wrap" data-fs-app>
 
-  <div class="sys">
-    <div class="sys-line" id="sysLine">
-      <span class="dotlive"></span> connecting<span class="blink">_</span>
+  <header class="home-head">
+    <div class="home-head-main">
+      <h1 class="fs-title">Football analytics</h1>
+      <ul class="pops" id="sysLine" aria-label="Scope summary: each number is counted from its own population" aria-live="polite">
+        <li><span class="fs-skel line"></span></li><li><span class="fs-skel line"></span></li><li><span class="fs-skel line"></span></li>
+      </ul>
     </div>
+    <a class="fs-btn k" href="#league">League tables and leaders &darr;</a>
+  </header>
+
+  <div class="fs-banner fs-banner-warn" id="pageErr" role="alert" hidden>
+    <span class="fs-banner-label">Error</span>
+    <span class="fs-banner-text" id="pageErrText"></span>
+    <button type="button" class="fs-btn k" id="pageErrRetry">Retry</button>
   </div>
 
-  <div class="cmd">
-    <div class="cmd-box">
-      <span class="cmd-caret">&gt;</span>
-      <input id="q" placeholder="search a player, team or match…" autocomplete="off" spellcheck="false">
-      <span class="kbd" id="kbdHint">/</span>
+  <div class="find cmd">
+    <div class="find-box">
+      <label class="fs-label" for="q">Find</label>
+      <input id="q" type="search" placeholder="Search a player, team or match" autocomplete="off" spellcheck="false" aria-controls="res" aria-describedby="kbdHint">
+      <span class="kbd" id="kbdHint" title="Press / to focus this find bar. Ctrl or Cmd + K opens Go to, which runs the same search.">/</span>
     </div>
-    <div class="res" id="res"></div>
+    <div class="res" id="res" role="region" aria-label="Search results" aria-live="polite"></div>
   </div>
 
-  <div class="lgstrip" id="lgStrip"></div>
-
-  <div class="mods">
-    <a class="mod" href="match.html">
-      <div class="mod-i">01 · match</div>
-      <div class="mod-t">Match analysis</div>
-      <div class="mod-d">Any fixture in the league, event by event. Pass maps, networks, pressure, momentum, shape.</div>
-      <div class="mod-n"><span id="nMatch">…</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod" href="players.html">
-      <div class="mod-i">02 · players</div>
-      <div class="mod-t">Player fingerprints</div>
-      <div class="mod-d">Percentile profiles against role, DNA pillars, pitch maps, scatter, scout ranking.</div>
-      <div class="mod-n"><span id="nPlayer">…</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod" href="teams.html">
-      <div class="mod-i">03 · teams</div>
-      <div class="mod-t">Team profiles</div>
-      <div class="mod-d">Style against the league, build-up and pressing, season maps, rankings, squads.</div>
-      <div class="mod-n"><span id="nTeam">…</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod mod-sm" href="glossary.html">
-      <div class="mod-i">04 · reference</div>
-      <div class="mod-t">Metric reference</div>
-      <div class="mod-d">Every metric defined, how it is calculated, where it sits in the league, and a worked example at each end.</div>
-      <div class="mod-n"><span id="nMetric">…</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod" href="insights.html">
-      <div class="mod-i">05 · insights</div>
-      <div class="mod-t">Scouting insights</div>
-      <div class="mod-d">Recruitment reads generated from the data: standout profiles by pool, key-man risk, and how each side actually plays.</div>
-      <div class="mod-n"><span id="nInsight">…</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod" href="sequences.html">
-      <div class="mod-i">06 · sequences</div>
-      <div class="mod-t">Possession sequences</div>
-      <div class="mod-d">Every possession chain in the league, searchable by shape and pattern, with similarity across teams.</div>
-      <div class="mod-n"><span id="nSeq">…</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod" href="search.html">
-      <div class="mod-i">07 · search</div>
-      <div class="mod-t">Player search</div>
-      <div class="mod-d">Build a shortlist from behavioural traits: position, side, age, foot, and role percentiles within pool.</div>
-      <div class="mod-n"><span id="nSearch">…</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod mod-sm" href="guide.html">
-      <div class="mod-i">08 · guide</div>
-      <div class="mod-t">Field guide</div>
-      <div class="mod-d">How every metric is built, how to read the maps, how to build a shortlist, and where the numbers mislead. With tests.</div>
-      <div class="mod-n"><span>manual</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod" href="model-review.html">
-      <div class="mod-i">09 · private shadow</div>
-      <div class="mod-t">Domestic forecasts</div>
-      <div class="mod-d">Experimental match probabilities, expected goals, evidence, and five-league season simulations.</div>
-      <div class="mod-n"><span>open forecasts</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod" href="model-lab.html">
-      <div class="mod-i">10 · research desk</div>
-      <div class="mod-t">Model laboratory</div>
-      <div class="mod-d">Feature coefficients, candidate trials, holdout validation, match-level drivers, drift, calibration, and live shadow scoring.</div>
-      <div class="mod-n"><span>investigate</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod" href="market-values.html">
-      <div class="mod-i">11 · market intelligence</div>
-      <div class="mod-t">Transfer values</div>
-      <div class="mod-d">Player valuations joined to role, usage, league context, squad totals, coverage, and value-distribution analysis.</div>
-      <div class="mod-n"><span id="nValue">open market desk</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod" href="writing-lab.html">
-      <div class="mod-i">12 · editorial desk</div>
-      <div class="mod-t">Writing lab</div>
-      <div class="mod-d">Paste a WhoScored match, build an article-ready evidence pack, annotate plots, draft, publish, and reopen the complete workspace.</div>
-      <div class="mod-n"><span>start a match</span><span class="mod-arrow">→</span></div>
-    </a>
-    <a class="mod" href="quick-ingest.html">
-      <div class="mod-i">13 · manual publication lane</div>
-      <div class="mod-t">Quick ingest</div>
-      <div class="mod-d">Paste one completed WhoScored match to load it immediately and queue the governed analytics refresh.</div>
-      <div class="mod-n"><span>submit match</span><span class="mod-arrow">→</span></div>
-    </a>
+  <div class="lgstrip" id="lgStrip" role="group" aria-label="League scope">
+    <span class="fs-label">League scope</span><span class="fs-skel"></span><span class="fs-skel"></span><span class="fs-skel"></span>
   </div>
 
-  <div class="cols">
-    <div class="panel">
-      <div class="ph">
-        <span class="ph-t">League</span>
-        <div class="seg" id="tblSeg"></div>
+  <nav class="groups mods" id="groups" aria-label="Destinations by group"></nav>
+
+  <div class="intel-h" id="league">
+    <h2>League tables and leaders</h2>
+    <p class="fs-note" id="intelNote"></p>
+  </div>
+
+  <div class="fs-cols-2 cols">
+    <section class="fs-panel" id="tblPanel" data-export-manual aria-labelledby="tblTitle">
+      <div class="fs-panel-h">
+        <h2 id="tblTitle" data-chart-title>League table</h2>
+        <div class="fs-seg" id="tblSeg" role="group" aria-label="League table view" data-export></div>
       </div>
-      <div id="tblBody"><div class="spin"></div></div>
-    </div>
-    <div class="panel">
-      <div class="ph">
-        <span class="ph-t">Leaders</span>
-        <div class="seg" id="ldSeg"></div>
+      <div id="tblBody"></div>
+      <div class="fs-panel-foot">
+        <span class="fs-note" id="tblFoot"></span>
+        <span class="fs-push" data-export>
+          <button type="button" class="fs-btn k" data-exp="tbl" data-format="png" aria-label="Download the league table as PNG">PNG</button>
+          <button type="button" class="fs-btn k" data-exp="tbl" data-format="pdf" aria-label="Download the league table as PDF">PDF</button>
+          <button type="button" class="fs-btn k" data-exp="tbl" data-format="csv" aria-label="Download the league table data as CSV">CSV</button>
+        </span>
       </div>
-      <div id="ldBody"><div class="spin"></div></div>
-    </div>
+    </section>
+    <section class="fs-panel" id="ldPanel" data-export-manual aria-labelledby="ldTitle">
+      <div class="fs-panel-h">
+        <h2 id="ldTitle" data-chart-title>Player leaders</h2>
+        <div class="fs-seg" id="ldSeg" role="group" aria-label="Leader metric" data-export></div>
+      </div>
+      <div id="ldBody"></div>
+      <div class="fs-panel-foot">
+        <span class="fs-note" id="ldFoot"></span>
+        <span class="fs-push" data-export>
+          <button type="button" class="fs-btn k" data-exp="ld" data-format="png" aria-label="Download the player leaders as PNG">PNG</button>
+          <button type="button" class="fs-btn k" data-exp="ld" data-format="pdf" aria-label="Download the player leaders as PDF">PDF</button>
+          <button type="button" class="fs-btn k" data-exp="ld" data-format="csv" aria-label="Download the player leaders data as CSV">CSV</button>
+        </span>
+      </div>
+    </section>
   </div>
 
-  <div class="foot" id="foot">
-    <span>data · whoscored</span><span class="sep">/</span>
-    <span>xG · empirical model; external validation not established</span><span class="sep">/</span>
-    <span>player percentiles · within role, 3+ nineties</span>
-  </div>
-</div>
+  <ul class="foot fs-note" id="foot">
+    <li>Data · WhoScored</li>
+    <li>xG · empirical model; external validation not established</li>
+    <li>Player percentiles · within role, 3+ nineties</li>
+  </ul>
+</main>
 
 <script>
 const SB='https://xrsilhiffjoulyoqhdmp.supabase.co';
+const FS=window.FutScout||null;
 /* League scope is shared with teams.html and insights.html via localStorage, so a
    choice made on one page carries to the others. */
 var TEAM_LG={}, LG_SCOPE=(function(){try{return localStorage.getItem('leagueScope')||'ALL'}catch(e){return 'ALL'}})();
@@ -300,8 +201,14 @@ let NAMEMAP={};
 function tname(t){return NAMEMAP[t]||TEAM_DISPLAY[t]||t||''}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){
   return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
+function $(id){return document.getElementById(id)}
+function nf(n){return (+n).toLocaleString('en-US')}
 
 let TEAMS=[],PLAYERS=[],MATCHES=[],LEAD={},SEL=-1,HITS=[];
+/* LIVE is the league summary (leagues with event data); null until it loads,
+   false when it could not be read. DIR_OK says whether team -> league
+   membership loaded; without it a single-league scope cannot be applied. */
+let LIVE=null, DIR_OK=false, LOADED=false;
 let TBL='xg', LD='xg_90';
 /* Column sort cycles: best first -> worst first -> back to the view default. */
 let TSORT={col:null,dir:0}, LSORT={col:null,dir:0};
@@ -309,10 +216,6 @@ function cycleSort(state,col){
   if(state.col!==col){state.col=col;state.dir=1;}
   else if(state.dir===1){state.dir=-1;}
   else {state.col=null;state.dir=0;}
-}
-function arrow(state,col,dflt){
-  if(state.col===col)return state.dir===1?' \u2193':' \u2191';
-  return dflt?' \u2193':'';
 }
 
 async function sbAll(t,p){p=p||{};const PG=1000;let all=[],off=0;
@@ -323,8 +226,154 @@ async function sbAll(t,p){p=p||{};const PG=1000;let all=[],off=0;
     if(!Array.isArray(d)||!d.length)break;all=all.concat(d);if(d.length<PG)break;off+=PG;}
   return all;}
 
+/* ---------- destination groups ----------
+   Built from the shell's registry, so the menus, the palette and these cards
+   are one list. This page only adds the blurb and, where one exists, the live
+   counter. */
+const CARD={
+  'match.html':{d:'Any fixture, event by event: pass maps, networks, pressure, momentum, shape.',n:'nMatch'},
+  'sequences.html':{d:'Every possession chain, searchable by shape and pattern, with similarity across teams.',n:'nSeq'},
+  'players.html':{d:'Percentile profiles against role, DNA pillars, pitch maps, scatter, scout ranking.',n:'nPlayer'},
+  'teams.html':{d:'Style against the league, build-up and pressing, season maps, rankings, squads.',n:'nTeam'},
+  'insights.html':{d:'Recruitment reads from the data: standout profiles, key-man risk, how each side plays.',n:'nInsight'},
+  'search.html':{d:'Build a shortlist from behavioural traits: position, side, age, foot, role percentiles.',n:'nSearch'},
+  'market-values.html':{d:'Player valuations joined to role, usage, league context, squad totals and coverage.',n:'nValue',n0:'open market desk'},
+  'model-review.html':{d:'Experimental match probabilities, expected goals, evidence and five-league season simulations.',tag:'Private shadow'},
+  'model-lab.html':{d:'Coefficients, candidate trials, holdout validation, match drivers, drift, calibration, shadow scoring.',tag:'Research desk'},
+  'match-review.html':{d:'One worked match: the forecast evidence as captured, read against the result.'},
+  'writing-lab.html':{d:'Paste a WhoScored match, build an evidence pack, annotate plots, draft, publish, reopen.'},
+  'quick-ingest.html':{d:'Paste one completed WhoScored match to load it and queue the governed analytics refresh.'},
+  'guide.html':{d:'How each metric is built, how to read the maps, how to build a shortlist, where numbers mislead.'},
+  'glossary.html':{d:'Every metric defined: the calculation, the league distribution, a worked example at each end.',n:'nMetric'},
+  'evidence-contracts.html':{d:'Zone, eligibility and measure definitions: the same name is not always the same measure.'},
+  'methodology.html':{d:'How the data is collected, scoped and modelled.'},
+  'validation.html':{d:'Claims graded by the evidence supporting them.'}
+};
+(function renderGroups(){
+  const groups=((FS&&FS.destinations)||[]).filter(function(g){return g[0]!=='Home'});
+  $('groups').innerHTML=groups.map(function(g){
+    const gid='grp-'+g[0].toLowerCase();
+    return '<section class="grp" aria-labelledby="'+gid+'"><h2 class="fs-label grp-h" id="'+gid+'">'+esc(g[0])+'</h2>'+
+      '<div class="grp-cards">'+g[1].map(function(item){
+        const c=CARD[item[1]]||{};
+        return '<a class="dest" href="'+esc(item[1])+'">'+
+          '<span class="dest-t">'+esc(item[0])+(c.tag?' <span class="fs-tag">'+esc(c.tag)+'</span>':'')+'</span>'+
+          (c.d?'<span class="dest-d">'+esc(c.d)+'</span>':'')+
+          (c.n?'<span class="dest-n" id="'+c.n+'">'+esc(c.n0||'…')+'</span>':'')+'</a>';
+      }).join('')+'</div></section>';
+  }).join('');
+})();
+function setCount(id,text,title){const el=$(id);if(!el)return;el.textContent=text;if(title)el.title=title}
+
+/* ---------- page states ---------- */
+function skelRows(n){let h='<div aria-hidden="true">';for(let i=0;i<n;i++)h+='<div class="fs-skel row"></div>';
+  return h+'</div><span class="fs-note" role="status">Loading…</span>'}
+function banner(text,retry){
+  return '<div class="fs-banner fs-banner-warn panel-state" role="alert"><span class="fs-banner-label">Error</span>'+
+    '<span class="fs-banner-text">'+esc(text)+'</span>'+
+    (retry?'<button type="button" class="fs-btn k" data-retry="'+esc(retry)+'">Retry</button>':'')+'</div>';
+}
+function emptyState(title,reason,action){
+  return '<div class="fs-empty"><h3>'+esc(title)+'</h3><p>'+esc(reason)+'</p>'+
+    (action?'<button type="button" class="fs-btn" data-act="'+esc(action[0])+'">'+esc(action[1])+'</button>':'')+'</div>';
+}
+function scopeName(){
+  if(LG_SCOPE==='ALL')return 'All leagues';
+  const l=(LIVE||[]).filter(function(x){return x.league===LG_SCOPE})[0];
+  return l?l.display_name:LG_SCOPE;
+}
+/* Why a single-league scope shows no rows, in words. */
+function noRowsReason(what){
+  if(LG_SCOPE!=='ALL'&&!DIR_OK)return 'Team-to-league membership (v_team_directory) did not load, so '+what+' cannot be filtered to '+scopeName()+'. Nothing is known to be missing from the data itself.';
+  if(LG_SCOPE!=='ALL')return 'No '+what+' are recorded for '+scopeName()+' in this snapshot. Other leagues may still have rows.';
+  return 'The source returned no '+what+' for this view.';
+}
+
+/* ---------- scope: chips + shell SCOPE select, one state ---------- */
+function setScope(v){
+  LG_SCOPE=v;
+  try{localStorage.setItem('leagueScope',LG_SCOPE)}catch(e){}
+  paintChips();
+  if(FS)FS.setScopeValue(LG_SCOPE);
+  renderSummary();
+  if(LOADED){renderTable();loadLeaders();}
+}
+function paintChips(){
+  document.querySelectorAll('#lgStrip .lgchip').forEach(function(x){
+    x.classList.toggle('on',x.dataset.lg===LG_SCOPE);
+    x.setAttribute('aria-pressed',String(x.dataset.lg===LG_SCOPE));});
+}
+function renderChips(){
+  const strip=$('lgStrip');
+  if(!LIVE){
+    strip.innerHTML='<span class="fs-label">League scope</span><span class="fs-note">League list not available: the league summary did not load. Scope stays '+esc(scopeName())+'.</span>';
+    if(FS)FS.registerScope({options:[{value:LG_SCOPE,label:scopeName()}],value:LG_SCOPE,disabled:true,
+      title:'The league list did not load on this page, so the scope cannot be changed here. The scope you chose is kept.'});
+    return;
+  }
+  strip.innerHTML='<span class="fs-label">League scope</span>'+
+    '<button type="button" class="fs-btn lgchip'+(LG_SCOPE==='ALL'?' on':'')+'" data-lg="ALL" aria-pressed="'+(LG_SCOPE==='ALL')+'">All leagues</button>'+
+    LIVE.map(function(l){
+      return '<button type="button" class="fs-btn lgchip'+(LG_SCOPE===l.league?' on':'')+'" data-lg="'+esc(l.league)+'" aria-pressed="'+(LG_SCOPE===l.league)+'"'+
+        ' title="'+esc(l.display_name)+': '+l.matches+' matches with event data and '+l.teams+' clubs, both from the league summary">'+
+        '<b>'+esc(l.display_name)+'</b> <small>'+l.matches+' event-complete · '+l.teams+' clubs</small></button>'}).join('');
+  const opts=[{value:'ALL',label:'All leagues'}].concat(LIVE.map(function(l){return{value:l.league,label:l.display_name}}));
+  if(LG_SCOPE!=='ALL'&&!LIVE.some(function(l){return l.league===LG_SCOPE}))
+    opts.push({value:LG_SCOPE,label:LG_SCOPE+' (no event data)'});
+  if(FS)FS.registerScope({options:opts,value:LG_SCOPE,onChange:setScope});
+}
+$('lgStrip').onclick=function(ev){
+  var c=ev.target.closest('.lgchip'); if(!c)return;
+  setScope(c.dataset.lg);
+};
+
+/* ---------- scope summary ----------
+   Every number names the population it was counted from. The sources disagree
+   (matches with event rows vs played fixtures; season rows vs profiled
+   players) and that is shown, not reconciled. */
+function renderSummary(){
+  const one=LG_SCOPE!=='ALL', items=[];
+  function item(n,label,src,title){items.push('<li title="'+esc(title)+'"><b>'+esc(n)+'</b> <em>'+esc(label)+'</em> · '+esc(src)+'</li>')}
+  if(LIVE){
+    const rows=one?LIVE.filter(function(l){return l.league===LG_SCOPE}):LIVE;
+    const tot=function(k){return rows.reduce(function(a,l){return a+(+l[k]||0)},0)};
+    item(one?rows.length+' of '+LIVE.length:String(LIVE.length),'league'+(LIVE.length===1&&!one?'':'s'),'with event data',
+      'Leagues with at least one match carrying event rows. Source: v_league_summary.');
+    item(nf(tot('matches')),'event-complete matches','league summary',
+      'Distinct matches that have event rows, summed over the leagues in scope. Source: v_league_summary.matches.');
+    item(nf(tot('teams')),'teams','league summary',
+      'Teams appearing in those event rows. Source: v_league_summary.teams.');
+    item(nf(tot('players_profiled')),'players profiled','league summary',
+      'Players in the search index, per league. Source: v_league_summary.players_profiled.');
+  }else if(LIVE===false){
+    items.push('<li><em>Leagues and event-complete matches</em> · not reported: the league summary did not load</li>');
+  }
+  if(LOADED){
+    if(!one){
+      item(nf(MATCHES.length),'played fixtures','fixture list',
+        'Fixtures with a recorded score. Source: v_league_matches. This is a different population from event-complete matches and the two are not expected to agree.');
+      item(nf(PLAYERS.length),'players','season rows',
+        'Players with a season row, whatever their minutes. Source: mv_player_season. A different population from players profiled.');
+    }else if(DIR_OK){
+      const fx=MATCHES.filter(function(m){return (lgOfTeam(m.home_team)||lgOfTeam(m.away_team))===LG_SCOPE}).length;
+      const un=MATCHES.filter(function(m){return !lgOfTeam(m.home_team)&&!lgOfTeam(m.away_team)}).length;
+      item(nf(fx),'played fixtures mapped to this league','fixture list'+(un?'; '+nf(un)+' fixtures across all leagues have no league mapping and are not counted':''),
+        'Fixtures with a recorded score whose home or away team maps to this league through v_team_directory. Source: v_league_matches.'+(un?' '+un+' fixtures across all leagues could not be mapped to any league and are not counted here.':''));
+      item(nf(PLAYERS.filter(function(p){return teamInScope(p.team)}).length),'players','season rows',
+        'Players with a season row whose team maps to this league through v_team_directory. Source: mv_player_season.');
+    }else{
+      items.push('<li><em>Played fixtures and season-row players</em> · not split by league: team-to-league membership did not load</li>');
+    }
+  }
+  if(!items.length)return;
+  $('sysLine').innerHTML=items.join('')+'<li>current seasons</li>';
+  $('intelNote').textContent='Scope: '+scopeName()+'. Rows open the team or player page.';
+}
+
 /* ---------- boot ---------- */
 async function init(){
+  $('pageErr').hidden=true;
+  $('tblBody').innerHTML=skelRows(9);$('ldBody').innerHTML=skelRows(9);
   try{
     const r=await Promise.all([
       sbAll('mv_team_all',{select:'team,matches,goals_pg,goals_against_pg,possession_pct,field_tilt,ppda,def_height,shots_pg,shots_against_pg,passes_per_seq'}),
@@ -338,55 +387,33 @@ async function init(){
     try{
       const dres=await fetch(SB+'/rest/v1/v_team_directory?select=team,league',{headers:HD});
       (await dres.json()||[]).forEach(function(d){TEAM_LG[d.team]=d.league});
+      DIR_OK=Object.keys(TEAM_LG).length>0;
     }catch(e){}
     const rm={};r[2].forEach(function(x){rm[x.player_id]=x.pool});
     PLAYERS=r[1].map(function(p){return{id:p.player_id,name:p.player_name,team:p.team,
       n90:+p.nineties,pool:rm[p.player_id]||''}}).sort(function(a,b){return b.n90-a.n90});
     MATCHES=r[3];
+    LOADED=true;
 
-    const evts=TEAMS.reduce(function(a,t){return a+(+t.matches||0)},0);
     (async function(){
       try{
         const u=new URL(SB+'/rest/v1/v_league_summary');
         u.searchParams.set('select','league,display_name,matches,teams,players_profiled');
         const rr=await fetch(u,{headers:HD}); const ls=(await rr.json())||[];
-        const live=ls.filter(function(l){return l.matches>0});
-        const tot=function(k){return live.reduce(function(a,l){return a+(+l[k]||0)},0)};
-        document.getElementById('sysLine').innerHTML=
-          '<span class="dotlive"></span> live'+
-          '<span class="sep">/</span> <b>'+live.length+'</b> league'+(live.length===1?'':'s')+
-          '<span class="sep">/</span> <b>'+tot('matches')+'</b> matches'+
-          '<span class="sep">/</span> <b>'+tot('teams')+'</b> teams'+
-          '<span class="sep">/</span> <b>'+PLAYERS.length+'</b> players'+
-          '<span class="sep">/</span> current seasons';
-        document.getElementById('lgStrip').innerHTML =
-          '<button type="button" class="lgchip'+(LG_SCOPE==='ALL'?' on':'')+'" data-lg="ALL" aria-pressed="'+(LG_SCOPE==='ALL')+'">All leagues</button>'+
-          live.map(function(l){
-            return '<button type="button" class="lgchip'+(LG_SCOPE===l.league?' on':'')+'" data-lg="'+esc(l.league)+'" aria-pressed="'+(LG_SCOPE===l.league)+'">'+
-              '<b>'+esc(l.display_name)+'</b> '+l.matches+' matches \u00b7 '+l.teams+' clubs</button>'}).join('');
-        document.getElementById('lgStrip').onclick=function(ev){
-          var c=ev.target.closest('.lgchip'); if(!c)return;
-          LG_SCOPE=c.dataset.lg;
-          try{localStorage.setItem('leagueScope',LG_SCOPE)}catch(e){}
-          document.querySelectorAll('#lgStrip .lgchip').forEach(function(x){
-            x.classList.toggle('on',x.dataset.lg===LG_SCOPE);
-            x.setAttribute('aria-pressed',String(x.dataset.lg===LG_SCOPE));});
-          if(typeof renderTable==='function')renderTable();
-          if(typeof loadLeaders==='function')loadLeaders();
-        };
+        LIVE=ls.filter(function(l){return l.matches>0});
       }catch(e){
-        document.getElementById('sysLine').innerHTML=
-          '<span class="dotlive"></span> live <span class="sep">/</span> <b>'+MATCHES.length+
-          '</b> matches <span class="sep">/</span> current seasons';
+        LIVE=false;
       }
+      renderChips();renderSummary();
     })();
-    document.getElementById('nMatch').textContent=MATCHES.length+' fixtures';
-    document.getElementById('nPlayer').textContent=PLAYERS.length+' players';
-    document.getElementById('nTeam').textContent=TEAMS.length+' clubs';
+    renderSummary();
+    setCount('nMatch',nf(MATCHES.length)+' played fixtures','Fixtures with a recorded score. Source: v_league_matches.');
+    setCount('nPlayer',nf(PLAYERS.length)+' players · season rows','Players with a season row. Source: mv_player_season.');
+    setCount('nTeam',nf(TEAMS.length)+' clubs','Teams with a season aggregate. Source: mv_team_all.');
     sbAll('metric_defs',{select:'key'}).then(function(defs){
-      document.getElementById('nMetric').textContent=defs.length+' metrics';
+      setCount('nMetric',defs.length+' metrics','Metric definitions. Source: metric_defs.');
     }).catch(function(){
-      document.getElementById('nMetric').textContent='metric reference';
+      setCount('nMetric','metric reference');
     });
     // insights + sequences counters (head requests, non-blocking)
     (async function(){
@@ -394,59 +421,77 @@ async function init(){
         const uv=new URL(SB+'/rest/v1/v_player_market_values_latest'); uv.searchParams.set('select','player_id');
         const rv=await fetch(uv,{headers:Object.assign({},HD,{'Range':'0-0','Range-Unit':'items','Prefer':'count=exact'})});
         const cv=rv.headers.get('content-range'); const nv=cv?cv.split('/')[1]:null;
-        if(nv) document.getElementById('nValue').textContent=(+nv).toLocaleString()+' linked values';
+        if(nv) setCount('nValue',(+nv).toLocaleString()+' linked values','Players with a latest linked valuation. Source: v_player_market_values_latest.');
       }catch(e){}
       try{
         const u=new URL(SB+'/rest/v1/insights'); u.searchParams.set('select','id');
         const r=await fetch(u,{headers:Object.assign({},HD,{'Range':'0-0','Range-Unit':'items','Prefer':'count=exact'})});
         const cr=r.headers.get('content-range'); const n=cr?cr.split('/')[1]:null;
-        if(n) document.getElementById('nInsight').textContent=n+' reads';
-      }catch(e){}
+        if(n) setCount('nInsight',n+' reads','Generated insight cards. Source: insights.');
+        else setCount('nInsight','count not reported');
+      }catch(e){setCount('nInsight','count not reported')}
       try{
         const u2=new URL(SB+'/rest/v1/v_league_sequences'); u2.searchParams.set('select','seq_uid');
         const r2=await fetch(u2,{headers:Object.assign({},HD,{'Range':'0-0','Range-Unit':'items','Prefer':'count=exact'})});
         const cr2=r2.headers.get('content-range'); const n2=cr2?cr2.split('/')[1]:null;
-        if(n2) document.getElementById('nSeq').textContent=(+n2).toLocaleString()+' chains';
-      }catch(e){}
+        if(n2) setCount('nSeq',(+n2).toLocaleString()+' chains','Possession chains. Source: v_league_sequences.');
+        else setCount('nSeq','count not reported');
+      }catch(e){setCount('nSeq','count not reported')}
       try{
         const u3=new URL(SB+'/rest/v1/player_search'); u3.searchParams.set('select','player_id');
         const r3=await fetch(u3,{headers:Object.assign({},HD,{'Range':'0-0','Range-Unit':'items','Prefer':'count=exact'})});
         const cr3=r3.headers.get('content-range'); const n3=cr3?cr3.split('/')[1]:null;
-        if(n3) document.getElementById('nSearch').textContent=n3+' players';
-      }catch(e){}
+        if(n3) setCount('nSearch',nf(n3)+' players · search index','Players in the search index. Source: player_search. A different population from season rows.');
+        else setCount('nSearch','count not reported');
+      }catch(e){setCount('nSearch','count not reported')}
     })();
 
     renderSegs();renderTable();loadLeaders();
   }catch(e){
-    document.getElementById('sysLine').innerHTML='<span style="color:var(--red)">connection failed: '+esc(e.message)+'</span>';
-    document.querySelectorAll('.loading').forEach(function(node){node.textContent='Data unavailable. Reload to retry.';node.setAttribute('role','status');});
-    ['tblBody','ldBody'].forEach(function(id){var node=document.getElementById(id);if(node)node.innerHTML='<div role="status">Data unavailable. <button onclick="location.reload()">Retry</button></div>';});
+    LOADED=false;
+    $('pageErrText').textContent='Could not load league data: '+e.message+'. Nothing was changed. Destinations and the find bar still work.';
+    $('pageErr').hidden=false;
+    $('sysLine').innerHTML='<li>Scope summary not available: the league data request failed.</li>';
+    $('lgStrip').innerHTML='<span class="fs-label">League scope</span><span class="fs-note">Not available until the league data loads. Scope stays '+esc(LG_SCOPE==='ALL'?'All leagues':LG_SCOPE)+'.</span>';
+    ['tblBody','ldBody'].forEach(function(id){
+      $(id).innerHTML=emptyState('Nothing to show yet','The league data request failed ('+e.message+'), so there is no table to draw. This is a load failure, not an empty league.',['retry','Retry']);});
+    ['nMatch','nPlayer','nTeam','nMetric','nInsight','nSeq','nSearch'].forEach(function(id){setCount(id,'count not loaded')});
   }
 }
+$('pageErrRetry').onclick=function(){init()};
 
-/* ---------- command bar ---------- */
-const qEl=document.getElementById('q'), resEl=document.getElementById('res');
+/* ---------- find bar ----------
+   One search: FutScout.entitySearch, the same call the GO TO palette makes. */
+const qEl=$('q'), resEl=$('res');
+let FIND_SEQ=0;
+const GROUPS={player:'Players',team:'Teams',match:'Matches'};
 function search(v){
-  v=v.toLowerCase().trim();
-  if(!v){resEl.classList.remove('on');HITS=[];return}
-  const t=TEAMS.filter(function(x){return tname(x.team).toLowerCase().indexOf(v)>=0})
-    .slice(0,5).map(function(x){return{k:'TEAM',n:tname(x.team),m:x.matches+' matches',
-      href:'teams.html?team='+encodeURIComponent(x.team)}});
-  const p=PLAYERS.filter(function(x){return (x.name||'').toLowerCase().indexOf(v)>=0})
-    .slice(0,7).map(function(x){return{k:x.pool||'PL',n:x.name,m:tname(x.team)+' · '+x.n90.toFixed(1)+'×90',
-      href:'players.html?player='+encodeURIComponent(x.id)}});
-  const m=MATCHES.filter(function(x){
-      return (tname(x.home_team)+' '+tname(x.away_team)).toLowerCase().indexOf(v)>=0})
-    .slice(0,4).map(function(x){return{k:'MTCH',
-      n:tname(x.home_team)+' '+x.home_score+'–'+x.away_score+' '+tname(x.away_team),
-      m:String(x.date).slice(0,10), href:'match.html?game='+encodeURIComponent(x.game_id)}});
-  HITS=p.concat(t,m);SEL=HITS.length?0:-1;
-  if(!HITS.length){resEl.innerHTML='<div class="res-empty">no match for "'+esc(v)+'"</div>';resEl.classList.add('on');return}
-  let h='';
-  if(p.length){h+='<div class="rgroup">players</div>'+p.map(function(x,i){return row(x,i)}).join('')}
-  if(t.length){h+='<div class="rgroup">teams</div>'+t.map(function(x,i){return row(x,p.length+i)}).join('')}
-  if(m.length){h+='<div class="rgroup">matches</div>'+m.map(function(x,i){return row(x,p.length+t.length+i)}).join('')}
-  resEl.innerHTML=h;resEl.classList.add('on');
+  v=v.trim();
+  const seq=++FIND_SEQ;
+  if(!v){resEl.classList.remove('on');resEl.innerHTML='';HITS=[];SEL=-1;return}
+  if(!FS||!FS.entitySearch){
+    HITS=[];SEL=-1;
+    resEl.innerHTML='<p class="res-empty">Search is unavailable: the shared search did not load. Use the destination cards below.</p>';
+    resEl.classList.add('on');return}
+  if(!HITS.length){resEl.innerHTML='<p class="res-empty">Searching players, teams and matches…</p>';resEl.classList.add('on')}
+  FS.entitySearch(v).then(function(list){
+    if(seq!==FIND_SEQ)return;
+    HITS=list||[];SEL=HITS.length?0:-1;
+    if(!HITS.length){
+      resEl.innerHTML='<p class="res-empty">No player, team or match name contains “'+esc(v)+'”. The search matches part of a name, across all leagues.</p>';
+      resEl.classList.add('on');return}
+    let h='',last=null;
+    HITS.forEach(function(x,i){
+      if(x.kind!==last){h+='<div class="rgroup fs-label">'+esc(GROUPS[x.kind]||x.kind)+'</div>';last=x.kind}
+      h+=row(x,i);});
+    resEl.innerHTML=h;resEl.classList.add('on');
+  }).catch(function(e){
+    if(seq!==FIND_SEQ)return;
+    HITS=[];SEL=-1;
+    resEl.innerHTML='<p class="res-empty">Search is unavailable right now: the player, team and match lists did not load'+
+      (e&&e.message?' ('+esc(e.message)+')':'')+'. Type again to retry; the destination cards still work.</p>';
+    resEl.classList.add('on');
+  });
 }
 /* The tag on the left of a result is a role pool for players, and TEAM or MTCH
    for the other two groups. Read out as-is, "CB Miles Robinson" says nothing
@@ -456,9 +501,9 @@ const KIND={TEAM:'team page for',MTCH:'match report for',
   AM:'attacking midfielder',W:'wide forward',ST:'striker'};
 function row(x,i){
   return '<a class="ritem'+(i===SEL?' sel':'')+'" data-i="'+i+'" href="'+esc(x.href)+'"'+
-    ' aria-label="Open '+esc(KIND[x.k]||'player')+' '+esc(x.n)+'">'+
-    '<span class="ritem-k">'+esc(x.k)+'</span><span class="ritem-n">'+esc(x.n)+'</span>'+
-    '<span class="ritem-m">'+esc(x.m)+'</span></a>';
+    ' aria-label="Open '+esc(KIND[x.tag]||'player')+' '+esc(x.name)+'">'+
+    '<span class="fs-tag ritem-k">'+esc(x.tag)+'</span><span class="ritem-n">'+esc(x.name)+'</span>'+
+    '<span class="ritem-m">'+esc(x.meta)+'</span></a>';
 }
 function go(i){if(HITS[i])location.href=HITS[i].href}
 function moveSel(d){
@@ -476,14 +521,14 @@ qEl.addEventListener('keydown',function(e){
   else if(e.key==='Escape'){this.value='';search('');this.blur()}
 });
 document.addEventListener('keydown',function(e){
-  if(e.key==='/' && document.activeElement!==qEl && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||'')){
+  if(e.key==='/' && !e.ctrlKey && !e.metaKey && !e.altKey && document.activeElement!==qEl && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||'')){
     e.preventDefault();qEl.focus();
   }
 });
 document.addEventListener('click',function(e){
   if(!e.target.closest('.cmd'))resEl.classList.remove('on');
 });
-if(navigator.platform.toLowerCase().indexOf('mac')>=0)document.getElementById('kbdHint').textContent='⌘K';
+qEl.addEventListener('focus',function(){if(resEl.innerHTML)resEl.classList.add('on')});
 
 /* ---------- league table ---------- */
 const COL={
@@ -508,20 +553,27 @@ const TBLS=[
   {k:'def',  l:'Defence', sort:'goals_against_pg', cols:['goals_against_pg','shots_against_pg','ppda'],
    cap:'Ranked by goals conceded per game, fewest first.'}
 ];
+function tblCfg(){return TBLS.filter(function(t){return t.k===TBL})[0]}
 function renderSegs(){
-  document.getElementById('tblSeg').innerHTML=TBLS.map(function(t){
-    return '<button class="'+(TBL===t.k?'on':'')+'" onclick="TBL=\''+t.k+'\';TSORT={col:null,dir:0};renderSegs();renderTable()">'+t.l+'</button>'}).join('');
-  document.getElementById('ldSeg').innerHTML=LDS.map(function(l){
-    return '<button class="'+(LD===l.k?'on':'')+'" onclick="LD=\''+l.k+'\';LSORT={col:null,dir:0};renderSegs();loadLeaders()">'+l.l+'</button>'}).join('');
+  $('tblSeg').innerHTML=TBLS.map(function(t){
+    return '<button type="button" aria-pressed="'+(TBL===t.k)+'" data-tbl="'+t.k+'">'+t.l+'</button>'}).join('');
+  $('ldSeg').innerHTML=LDS.map(function(l){
+    return '<button type="button" aria-pressed="'+(LD===l.k)+'" data-ld="'+l.k+'" title="'+esc(l.d)+'">'+l.l+'</button>'}).join('');
 }
+$('tblSeg').onclick=function(ev){const b=ev.target.closest('button[data-tbl]');if(!b)return;
+  TBL=b.dataset.tbl;TSORT={col:null,dir:0};renderSegs();renderTable()};
+$('ldSeg').onclick=function(ev){const b=ev.target.closest('button[data-ld]');if(!b)return;pickLd(b.dataset.ld)};
+function pickLd(k){LD=k;LSORT={col:null,dir:0};renderSegs();loadLeaders()}
 function fmtCol(v,c){
-  if(v==null)return'\u2014';
+  if(v==null)return'—';
   const m=COL[c]||{};
   return (+v).toFixed(m.dp==null?1:m.dp)+(m.suf||'');
 }
 function sortTbl(c){cycleSort(TSORT,c);renderTable()}
-function renderTable(){
-  const cfg=TBLS.filter(function(t){return t.k===TBL})[0];
+/* The rows the league table shows, in the order it shows them. The export
+   reads the same list. */
+function tableRows(){
+  const cfg=tblCfg();
   const active=TSORT.col||cfg.sort;
   const low=(COL[active]||{}).low;
   // dir 1 = best first (which for an inverted metric means lowest)
@@ -530,39 +582,51 @@ function renderTable(){
     let d=(+b[active])-(+a[active]);
     if(low)d=-d;
     return dir===1?d:-d;});
+  /* aria-sort describes the order of the values themselves: best first on a
+     lower-is-better column runs ascending. */
+  return{cfg:cfg,active:active,low:low,dir:dir,rows:rows,order:((dir===1)===!low)?'descending':'ascending'};
+}
+function renderTable(){
+  const t=tableRows(), cfg=t.cfg, active=t.active, low=t.low, rows=t.rows;
+  $('tblTitle').textContent='League table · '+cfg.l;
+  const inAll=TEAMS.length;
+  $('tblFoot').textContent=rows.length+' of '+inAll+' teams with a season aggregate (mv_team_all) · '+scopeName();
+  if(!rows.length){
+    $('tblBody').innerHTML=emptyState('No teams in this view',noRowsReason('teams'),LG_SCOPE!=='ALL'?['all','Show all leagues']:null);
+    return;
+  }
   const vals=rows.map(function(r){return Math.abs(+r[active])});
   const mx=Math.max.apply(null,vals)||1, mn=Math.min.apply(null,vals);
   const cap=TSORT.col
     ? ('Sorted by '+((COL[TSORT.col]||{}).l||TSORT.col)+', '+
        (TSORT.dir===1?((COL[TSORT.col]||{}).low?'lowest first':'highest first')
                      :((COL[TSORT.col]||{}).low?'highest first':'lowest first'))+
-       '. Click the header again to reverse, a third time to reset.')
+       '. Press the header again to reverse, a third time to reset.')
     : cfg.cap;
-  let h='<div class="tbl-cap">'+cap+'</div>'+
-    '<div style="max-height:372px;overflow:auto"><table><thead><tr>'+
-    '<th class="rk">#</th><th>Club</th>'+
+  let h='<p class="fs-note tbl-cap">'+esc(cap)+'</p>'+
+    '<div class="fs-table-wrap tbl-scroll" tabindex="0" role="region" aria-label="League table, scrollable"><table class="fs-table"><thead><tr>'+
+    '<th class="num" scope="col">#</th><th scope="col">Club</th>'+
     cfg.cols.map(function(c){
       const m=COL[c]||{};
-      return '<th class="num'+(c===active?' sorted':'')+'" onclick="sortTbl(\''+c+'\')" title="'+esc(m.d||'')+
-             (m.low?' \u00B7 lower is better':'')+' \u00B7 click to sort">'+esc(m.l||c)+
-             arrow(TSORT,c,c===cfg.sort)+'</th>';
+      return '<th scope="col" class="num'+(c===active?' is-sorted':'')+'" aria-sort="'+(c===active?t.order:'none')+'"'+
+             ' title="'+esc(m.d||'')+(m.low?' · lower is better':'')+'">'+
+             '<button type="button" data-sort="'+c+'" aria-label="Sort by '+esc(m.l||c)+': '+esc(m.d||'')+'">'+esc(m.l||c)+'</button></th>';
     }).join('')+
-    '<th style="width:74px" title="Bar length is the ranked column relative to the league range"></th>'+
+    '<th scope="col" class="barc" title="Bar length is the ranked column relative to the range of the teams shown"><span class="fs-note">Range</span></th>'+
     '</tr></thead><tbody>';
   rows.forEach(function(r,i){
     const v=Math.abs(+r[active]);
     const frac=mx===mn?1:( low ? (mx-v)/(mx-mn) : (v-mn)/(mx-mn) );
-    h+='<tr onclick="location.href=\'teams.html?team='+encodeURIComponent(r.team)+'\'">'+
+    const href='teams.html?team='+encodeURIComponent(r.team);
+    h+='<tr data-href="'+esc(href)+'">'+
       '<td class="rk num">'+(i+1)+'</td>'+
-      '<td class="nm">'+esc(tname(r.team))+'</td>'+
+      '<td class="nm"><a href="'+esc(href)+'">'+esc(tname(r.team))+'</a></td>'+
       cfg.cols.map(function(c){
-        const hot=(c===active);
-        return '<td class="num"'+(hot?' style="color:var(--amber);font-weight:600"':'')+'>'+
-               fmtCol(r[c],c)+'</td>';
+        return '<td class="num'+(c===active?' hot':'')+'">'+fmtCol(r[c],c)+'</td>';
       }).join('')+
-      '<td><div class="bar"><i style="width:'+Math.round(6+frac*94)+'%"></i></div></td></tr>';
+      '<td class="barc"><span class="fs-bar" aria-hidden="true"><i style="width:'+Math.round(6+frac*94)+'%"></i></span></td></tr>';
   });
-  document.getElementById('tblBody').innerHTML=h+'</tbody></table></div>';
+  $('tblBody').innerHTML=h+'</tbody></table></div>';
 }
 
 /* ---------- leaders ---------- */
@@ -573,59 +637,172 @@ const LDS=[
  {k:'key_pass_90',    l:'Key P',   d:'Passes that created a shot, per 90'},
  {k:'padj_def_90',    l:'Defence', d:'Defensive actions per 90, adjusted for how much possession the team concedes'}
 ];
+function ldMeta(k){return LDS.filter(function(l){return l.k===(k||LD)})[0]||{}}
 function sortLd(c){cycleSort(LSORT,c);loadLeaders()}
+/* LD_OK is the last metric that actually loaded; a failed switch falls back to
+   it so the last good table stays on screen under the error. */
+let LD_SEQ=0, LD_OK=null;
+function leaderRows(){
+  let rows=(LEAD[LD]||[]).filter(function(r){return teamInScope(r.team)}).slice();
+  if(LSORT.col){
+    const c=LSORT.col;
+    rows.sort(function(a,b){
+      let av,bv;
+      if(c==='name'){av=(a.name||'').toLowerCase();bv=(b.name||'').toLowerCase()}
+      else if(c==='team'){av=tname(a.team).toLowerCase();bv=tname(b.team).toLowerCase()}
+      else if(c==='pool'){av=a.pool||'';bv=b.pool||''}
+      else {av=a.v;bv=b.v}
+      if(av<bv)return LSORT.dir===1?1:-1;
+      if(av>bv)return LSORT.dir===1?-1:1;
+      return 0;});
+  }
+  return rows;
+}
 async function loadLeaders(){
-  document.getElementById('ldBody').innerHTML='<div class="spin"></div>';
+  const want=LD, seq=++LD_SEQ;
+  if(!LEAD[want])$('ldBody').innerHTML=skelRows(9);
   try{
-    if(!LEAD[LD]){
-      const rows=await sbAll('mv_player_percentiles',{metric:'eq.'+LD,select:'player_id,pool,value,pct'});
+    if(!LEAD[want]){
+      const rows=await sbAll('mv_player_percentiles',{metric:'eq.'+want,select:'player_id,pool,value,pct'});
       const pm={};PLAYERS.forEach(function(p){pm[p.id]=p});
-      LEAD[LD]=rows.map(function(r){const p=pm[r.player_id]||{};
+      LEAD[want]=rows.map(function(r){const p=pm[r.player_id]||{};
         return{id:r.player_id,name:p.name,team:p.team,pool:r.pool,v:+r.value,pct:+r.pct}})
         .filter(function(r){return r.name}).sort(function(a,b){return b.v-a.v});
     }
-    let rows=LEAD[LD].filter(function(r){return teamInScope(r.team)}).slice();
-    if(LSORT.col){
-      const c=LSORT.col;
-      rows.sort(function(a,b){
-        let av,bv;
-        if(c==='name'){av=(a.name||'').toLowerCase();bv=(b.name||'').toLowerCase()}
-        else if(c==='team'){av=tname(a.team).toLowerCase();bv=tname(b.team).toLowerCase()}
-        else if(c==='pool'){av=a.pool||'';bv=b.pool||''}
-        else {av=a.v;bv=b.v}
-        if(av<bv)return LSORT.dir===1?1:-1;
-        if(av>bv)return LSORT.dir===1?-1:1;
-        return 0;});
+    if(seq!==LD_SEQ)return;
+    LD_OK=want;
+    renderLeaders('');
+  }catch(e){
+    if(seq!==LD_SEQ)return;
+    const name=ldMeta(want).l||want;
+    if(LD_OK&&LD_OK!==want&&LEAD[LD_OK]){
+      LD=LD_OK;renderSegs();
+      renderLeaders(banner('Could not load '+name+' leaders: '+e.message+'. Nothing changed; the table below is still '+(ldMeta(LD_OK).l||LD_OK)+'.',want));
+    }else{
+      $('ldTitle').textContent='Player leaders · '+name;
+      $('ldFoot').textContent='';
+      $('ldBody').innerHTML=banner('Could not load '+name+' leaders: '+e.message+'. Nothing else on the page changed.',want);
     }
-    rows=rows.slice(0,12);
-    const mx=Math.max.apply(null,rows.map(function(r){return r.v}))||1;
-    const meta=LDS.filter(function(l){return l.k===LD})[0]||{};
-    let h='<div class="tbl-cap">'+esc(meta.d||'')+'. Top 12 '+(LG_SCOPE==='ALL'?'across all leagues':'in the selected league')+', any role.</div>'+
-      '<div style="max-height:372px;overflow:auto"><table><thead><tr>'+
-      '<th class="rk">#</th>'+
-      '<th onclick="sortLd(\'name\')" title="Click to sort">Player'+arrow(LSORT,'name',false)+'</th>'+
-      '<th onclick="sortLd(\'pool\')" title="Role pool the player is ranked in \u00B7 click to sort">Role'+arrow(LSORT,'pool',false)+'</th>'+
-      '<th class="num'+(!LSORT.col||LSORT.col==='v'?' sorted':'')+'" onclick="sortLd(\'v\')" title="Click to sort">'+
-      esc(meta.l||'')+arrow(LSORT,'v',!LSORT.col)+'</th>'+
-      '<th style="width:64px"></th></tr></thead><tbody>';
-    rows.forEach(function(r,i){
-      h+='<tr onclick="location.href=\'players.html?player='+encodeURIComponent(r.id)+'\'">'+
-        '<td class="rk num">'+(i+1)+'</td>'+
-        '<td class="nm">'+esc(r.name)+'<div style="font:500 9.5px/1.4 var(--f-mono);color:var(--dim2)">'+
-        esc(tname(r.team))+'</div></td>'+
-        '<td><span class="tag">'+esc(r.pool)+'</span></td>'+
-        '<td class="num" style="color:var(--amber);font-weight:600">'+r.v.toFixed(r.v<1?3:2)+'</td>'+
-        '<td><div class="bar"><i style="width:'+Math.round(r.v/mx*100)+'%"></i></div></td></tr>';
-    });
-    document.getElementById('ldBody').innerHTML=h+'</tbody></table></div>';
-  }catch(e){document.getElementById('ldBody').innerHTML='<div class="res-empty">'+esc(e.message)+'</div>'}
+  }
+}
+function renderLeaders(prefix){
+  const meta=ldMeta();
+  const all=leaderRows(), rows=all.slice(0,12);
+  $('ldTitle').textContent='Player leaders · '+(meta.l||'');
+  $('ldFoot').textContent=(rows.length<all.length?'Top '+rows.length+' of ':'')+nf(all.length)+' players with a value and a season row · '+scopeName()+' · any role';
+  if(!rows.length){
+    $('ldBody').innerHTML=prefix+emptyState('No players in this view',noRowsReason('players with a value for '+(meta.l||'this metric')),LG_SCOPE!=='ALL'?['all','Show all leagues']:null);
+    return;
+  }
+  const mx=Math.max.apply(null,rows.map(function(r){return r.v}))||1;
+  function th(col,label,title,cls){
+    const on=LSORT.col===col||(col==='v'&&!LSORT.col);
+    /* dir 1 sorts high to low (Z to A on text), as it always has. */
+    const order=on?((LSORT.col?LSORT.dir:1)===1?'descending':'ascending'):'none';
+    return '<th scope="col" class="'+(cls||'')+(on?' is-sorted':'')+'" aria-sort="'+order+'" title="'+esc(title)+'">'+
+      '<button type="button" data-sort="'+col+'" aria-label="Sort by '+esc(label)+'">'+esc(label)+'</button></th>';
+  }
+  let h=prefix+'<p class="fs-note tbl-cap">'+esc(meta.d||'')+'. Top 12 '+(LG_SCOPE==='ALL'?'across all leagues':'in the selected league')+', any role.</p>'+
+    '<div class="fs-table-wrap tbl-scroll" tabindex="0" role="region" aria-label="Player leaders, scrollable"><table class="fs-table"><thead><tr>'+
+    '<th class="num" scope="col">#</th>'+
+    th('name','Player','Sort by player name')+
+    th('pool','Role','Role pool the player is ranked in')+
+    th('v',meta.l||'',meta.d||'','num')+
+    '<th scope="col" class="barc" title="Bar length is the value relative to the highest value shown"><span class="fs-note">Vs top</span></th></tr></thead><tbody>';
+  rows.forEach(function(r,i){
+    const href='players.html?player='+encodeURIComponent(r.id);
+    h+='<tr data-href="'+esc(href)+'">'+
+      '<td class="rk num">'+(i+1)+'</td>'+
+      '<td class="nm"><a href="'+esc(href)+'">'+esc(r.name)+'</a><small>'+esc(tname(r.team))+'</small></td>'+
+      '<td><span class="fs-tag">'+esc(r.pool)+'</span></td>'+
+      '<td class="num hot">'+r.v.toFixed(r.v<1?3:2)+'</td>'+
+      '<td class="barc"><span class="fs-bar" aria-hidden="true"><i style="width:'+Math.max(0,Math.round(r.v/mx*100))+'%"></i></span></td></tr>';
+  });
+  $('ldBody').innerHTML=h+'</tbody></table></div>';
 }
 
+/* Rows, sort headers, retries and empty-state actions, by delegation. */
+function panelClick(sorter){
+  return function(ev){
+    const s=ev.target.closest('button[data-sort]');
+    if(s){sorter(s.dataset.sort);
+      const again=this.querySelector('button[data-sort="'+s.dataset.sort+'"]');if(again)again.focus();return}
+    const rt=ev.target.closest('button[data-retry]');
+    if(rt){pickLd(rt.dataset.retry);return}
+    const act=ev.target.closest('button[data-act]');
+    if(act){if(act.dataset.act==='all')setScope('ALL');else init();return}
+    if(ev.target.closest('a'))return;
+    const tr=ev.target.closest('tr[data-href]');
+    if(tr)location.href=tr.dataset.href;
+  };
+}
+$('tblBody').addEventListener('click',panelClick(sortTbl));
+$('ldBody').addEventListener('click',panelClick(sortLd));
+
+/* ---------- exports ----------
+   PNG and PDF go through the shared capture, which renders on its own
+   fs-light stage and stamps snapshot, export time and source; this page
+   supplies entity, scope and population. CSV is written here so it can carry
+   its scope and snapshot line and the full, uncapped row list. */
+function snapText(){
+  const s=FS&&FS.snapshot&&FS.snapshot();
+  return s?s.text+' ('+s.age+(s.stale?', marked stale':'')+'; '+s.snapshot+')':'not reported to this page';
+}
+window.futScoutExportContext=function(card){
+  const ctx={};
+  if(card&&card.id==='ldPanel'){
+    const m=ldMeta(), all=leaderRows();
+    ctx.entity='Player leaders, '+(m.l||LD)+' ('+(m.d||'')+')';
+    ctx.scope=scopeName();
+    ctx.population='Top '+Math.min(12,all.length)+' of '+all.length+' players with a value and a season row, any role';
+  }else{
+    const t=tableRows();
+    ctx.entity='League table, '+t.cfg.l+' view';
+    ctx.scope=scopeName();
+    ctx.population=t.rows.length+' of '+TEAMS.length+' teams with a season aggregate';
+    ctx['sorted by']=((COL[t.active]||{}).l||t.active)+', '+t.order;
+  }
+  return ctx;
+};
+function csvCell(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'}
+function exportCsv(which){
+  let title,head,rows,note='';
+  if(which==='ld'){
+    const m=ldMeta(), all=leaderRows();
+    title='Player leaders, '+(m.l||LD);
+    note='All '+all.length+' players in scope, in the on-screen order (the screen shows the top 12)';
+    head=['Rank','Player','Team','Role pool',(m.l||LD)+' per 90'];
+    rows=all.map(function(r,i){return[i+1,r.name,tname(r.team),r.pool,r.v]});
+  }else{
+    const t=tableRows();
+    title='League table, '+t.cfg.l+' view';
+    note=t.rows.length+' teams, sorted by '+((COL[t.active]||{}).l||t.active)+' '+t.order;
+    head=['Rank','Club'].concat(t.cfg.cols.map(function(c){return (COL[c]||{}).l||c}));
+    rows=t.rows.map(function(r,i){return[i+1,tname(r.team)].concat(t.cfg.cols.map(function(c){return r[c]==null?'':r[c]}))});
+  }
+  if(!rows.length){if(FS)FS.toast('Nothing to export: no rows in this scope');return}
+  const line='FutScout · '+title+' · League scope: '+scopeName()+' · Data snapshot: '+snapText()+
+    ' · '+note+' · Exported: '+new Date().toISOString()+' · Source: '+location.href;
+  const out=[csvCell(line),head.map(csvCell).join(',')].concat(rows.map(function(r){return r.map(csvCell).join(',')}));
+  const url=URL.createObjectURL(new Blob(['﻿'+out.join('\r\n')],{type:'text/csv;charset=utf-8'}));
+  const a=document.createElement('a');
+  a.href=url;a.download='futscout-'+title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.csv';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url)},1000);
+  if(FS)FS.toast('CSV exported · '+rows.length+' rows');
+}
+document.addEventListener('click',function(ev){
+  const b=ev.target.closest('button[data-exp]');if(!b)return;
+  const card=$(b.dataset.exp==='ld'?'ldPanel':'tblPanel');
+  if(b.dataset.format==='csv'){exportCsv(b.dataset.exp);return}
+  if(!card.querySelector('table')){if(FS)FS.toast('Nothing to export: no rows in this scope');return}
+  if(!window.FutScoutExports){if(FS)FS.toast('Export unavailable: shared export code did not load');return}
+  window.FutScoutExports.capture(card,b.dataset.format,b);
+  if(FS)FS.toast(b.dataset.format.toUpperCase()+' export started');
+});
+
+renderSegs();
 init();
-</script>
-<script>
-function toggleTheme(b){var d=document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',d?'dark':'light')}catch(e){}b.innerHTML=d?'&#9728;':'&#9789;';}
-(function(){var b=document.getElementById('themeBtn');if(b)b.innerHTML=document.documentElement.classList.contains('dark')?'&#9728;':'&#9789;';})();
 </script>
 </body>
 </html>
