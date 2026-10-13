@@ -9,125 +9,131 @@
 <link rel="stylesheet" href="theme.css?v=pr1">
 <script src="site-tools.js?v=pr1"></script>
 <style>
-/* Light palette and font tokens are in theme.css, under both name sets. What
-   is left is this page's own accent tints, its amber family, and the hues
-   theme.css does not carry. The light accent itself is now the shared brand
-   accent, so the tints move with it. */
-:root{
-  --amber-dim:rgba(156,107,30,.10);
-  
-  --accent-glow:rgba(156,107,30,.28);
-  --nb:var(--blue);
-}
-/* The one token this page has to hold back from theme.css. Here --accent is
-   data ink, not chrome: seqTrace() paints every pass arrow with it. Taking the
-   shared brand accent turned all 12 sequence plots red, and it would have read
-   as a signal rather than as the neutral trace colour it is. Canvas, surfaces,
-   lines and text still come from theme.css. */
-html:not(.dark){}
-html.dark{
-  --panel:var(--panel);
-  --line2:var(--rule);
-  --dim:var(--muted);
-  --amber-dim:rgba(226,184,119,.10);
-  --red:var(--accent);
-}
-html.dark{--accent-dim:rgba(216,179,132,.12);
- --bg2:var(--panel);--surface:rgba(255,255,255,.035);
- --border2:var(--rule);--text2:var(--ink);
- --above:var(--p80);--below:var(--p20);--shadow:0 1px 3px rgba(0,0,0,.35);--nb:var(--blue)}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--body)}
+/* Tokens, faces and the legacy aliases are in theme.css; chrome is in shell.css;
+   panels, cards, rows and the tray are the fs-* components in components.css.
+   What is left here is this page's layout and its pitch ink. Every value is a
+   token.
+
+   Trace colour is carried by `color` on the trace group and picked up with
+   currentColor, so one rule per role decides the ink: a candidate card draws in
+   --ink, the picked sequence in --accent, overlays in --blue, --purple, --p60. */
+*{box-sizing:border-box}
+html,body{height:100%}
 body{display:flex;flex-direction:column;overflow:hidden}
-/* Header base is in shell.css. These are this page's differences from it. */
-.hdr{height:auto;min-height:52px;flex-wrap:wrap;padding-block:8px}.hdr-logo{flex-shrink:0;font:800 13px/1 var(--body);color:var(--bg)}.hdr #tabs{flex:1;min-width:0}
-.tab{text-decoration:none}
-.lnk{background:var(--surface);border:1px solid var(--border);color:var(--text2);font:500 11px/1 var(--body);padding:6px 12px;border-radius:var(--radius);cursor:pointer;text-decoration:none;white-space:nowrap}
-.lnk:hover{background:var(--surface2);color:var(--text)}
-.lnk.acc{background:var(--accent-dim);border-color:var(--accent-glow);color:var(--accent)}
-select.lnk{background:var(--bg3);color:var(--text);appearance:none;
-  background-image:linear-gradient(45deg,transparent 50%,var(--text3) 50%),linear-gradient(135deg,var(--text3) 50%,transparent 50%);
-  background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:30px!important}
-select.lnk:focus{border-color:var(--accent);outline:none}
-select option{background:var(--bg2);color:var(--text)}
-.main{flex:1;overflow-y:auto;padding:13px 18px}
-.empty{height:100%;display:grid;place-items:center;color:var(--text3);font:500 13px/1 var(--body)}
-.sect{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;box-shadow:var(--shadow)}
-.sect-h{font:700 10px/1.35 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.viz-eyebrow{font:700 8.5px/1 var(--f-body);letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
-.viz-title{font:700 16px/1.1 var(--f-display);letter-spacing:-.02em;color:var(--text);margin-bottom:6px}
-.viz-sub{font:500 10px/1.45 var(--f-body);color:var(--text3);margin:0 0 7px;max-width:88ch}
-.viz-leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);font:500 10px/1 var(--body);color:var(--text3)}
-.viz-leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
-.viz-leg b{font-weight:700;color:var(--text2)}
-.foot{margin-top:12px;font:500 10px/1.6 var(--body);color:var(--text3)}
-.spin{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;margin:40px auto}
-@keyframes sp{to{transform:rotate(360deg)}}
-.ctrl{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
-.ctrl .fld{display:flex;flex-direction:column;gap:5px;min-width:190px}
-.kpi-l{font:700 9px/1 var(--f-body);letter-spacing:.13em;text-transform:uppercase;color:var(--text3)}
-.seg{display:flex;gap:3px;background:var(--surface);border-radius:var(--radius);padding:3px}
-.seg button{background:none;border:none;color:var(--text3);font:600 11px/1 var(--body);padding:7px 13px;border-radius:var(--radius);cursor:pointer}
-.seg button.on{color:var(--text);background:var(--bg3);box-shadow:var(--shadow)}
-.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:10px}
-/* Every card is a control: one picks a sequence to compare against, the other
-   overlays a comparison on the picked one. Real buttons, reset so the card is
-   drawn exactly as it was as a div. */
-.scard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 10px 7px;cursor:pointer;box-shadow:var(--shadow);
-  display:block;width:100%;font:inherit;color:inherit;text-align:left}
-.scard:hover{border-color:var(--accent-glow);background:var(--surface)}
-.scard.pick{border-left:3px solid var(--accent)}
-.scard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.scard-t{font:700 12px/1.15 var(--body);color:var(--accent);letter-spacing:-.01em}
-.scard-m{font:500 9.5px/1.35 var(--body);color:var(--text3);margin:2px 0 6px}
-.scard-s{display:flex;justify-content:space-between;gap:6px;margin-top:5px;font:500 9.5px/1 var(--body);color:var(--text3)}
-.scard-s b{font-family:var(--mono);color:var(--text2);font-weight:700}
-.pbox{width:100%;aspect-ratio:111.5 / 74}
-.pill{display:inline-block;font:700 8px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:var(--radius);background:var(--accent-dim);color:var(--accent)}
-.pill.nb{background:rgba(90,160,255,.14);color:var(--nb)}
-.back{background:var(--surface);border:1px solid var(--border);color:var(--text2);font:600 10px/1 var(--body);padding:6px 11px;border-radius:var(--radius);cursor:pointer}
-.back:hover{color:var(--text);background:var(--surface2)}
-.ov-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.ov-stat{flex:1;min-width:96px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px}
-.ov-stat .l{font:700 8px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
-.ov-stat .v{font:700 16px/1 var(--mono);margin-top:5px;font-variant-numeric:tabular-nums}
-.split{display:grid;grid-template-columns:1.35fr .65fr;gap:12px;align-items:start}
-@media(max-width:1000px){.split{grid-template-columns:1fr}}
-@media(max-width:1024px){
-  .hdr{height:auto;min-height:52px;flex-wrap:wrap;padding:9px 12px;gap:8px}
-  .tabs{order:4;flex:1 1 100%;min-width:0;max-width:100%;margin-left:0;overflow-x:auto}
-  .tabs .tab{flex-shrink:0}
-  .tbtn{margin-left:auto}
-  .ctrl .fld{min-width:0;flex:1 1 100%}
-  .main{min-width:0;padding:12px}
+.sq-page{flex:1 1 auto;min-height:0;min-width:0;overflow-x:hidden;overflow-y:auto;padding:var(--s5) var(--s6) var(--s6)}
+.sq-page>.fs-details{margin-bottom:var(--s5)}
+.sq-explain{max-width:78ch}
+.sq-explain p,.sq-explain li{font:400 13px/1.45 var(--body);color:var(--ink);margin:0 0 var(--s4)}
+.sq-explain ul{margin:0 0 var(--s4);padding-left:var(--s6)}
+.sq-explain li{margin-bottom:var(--s2)}
+.sq-explain h4{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:var(--s5) 0 var(--s3)}
+.sq-explain b{font-weight:600}
+.sq-explain .caveat{border-left:3px solid var(--gold);padding-left:var(--s4);color:var(--muted);margin-bottom:0}
+
+/* Controls row */
+.sq-ctrl{display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--s4) var(--s5);margin-bottom:var(--s5)}
+.sq-ctrl .fs-field{flex:0 0 auto}
+.sq-ctrl .sq-sel{flex:0 1 250px}
+.sq-pool{flex:1 1 280px;min-width:0;margin:0;padding:var(--s1) 0 var(--s1) var(--s4);border-left:3px solid var(--gold);font:400 11px/1.4 var(--body);color:var(--muted)}
+.sq-pool .fs-label{display:block;margin-bottom:var(--s1)}
+.sq-gap{margin-top:var(--s4)}
+.sq-right{margin-left:auto}
+
+/* Candidate card internals (the card itself is fs-cand) */
+.sq-cand-t{font:600 13px/1.2 var(--body);overflow-wrap:anywhere}
+.sq-cand-m{font:400 11px/1.4 var(--body);color:var(--muted);overflow-wrap:anywhere}
+.sq-cand-s{display:flex;flex-wrap:wrap;gap:0 var(--s3);font:400 11px/1.4 var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.sq-cand-s b{font-weight:500;color:var(--ink)}
+.sq-skel-card{height:196px}
+
+/* Selected state: candidates 280 | pitch | nearest + tray 300 */
+.sq-cols{display:grid;grid-template-columns:280px minmax(0,1fr) 300px;gap:var(--s5);align-items:start}
+.sq-side{display:flex;flex-direction:column;gap:var(--s5);min-width:0}
+.sq-c-cands .fs-cands{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s2);position:relative}
+.sq-c-cands .fs-cand{padding:var(--s2);gap:var(--s1)}
+.sq-c-cands .fs-cand:is(.picked,[aria-pressed="true"]){padding:calc(var(--s2) - 1px)}
+.sq-c-cands .sq-cand-t{font-size:12px}
+.sq-c-pitch .fs-pitchbox-head h2{overflow-wrap:anywhere}
+section.sq-c-tray{margin-top:0;padding:var(--s4);background:var(--panel);border:1px solid var(--rule);border-top-color:var(--ink);border-radius:var(--radius);min-width:0}
+.sq-c-tray .fs-tray-row>span{flex:1 1 auto;min-width:0}
+.sq-c-tray small{display:block;font:400 11px/1.3 var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.sq-tbl small{display:block;font:400 11px/1.3 var(--body);color:var(--muted)}
+.sq-tray-actions{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s2)}
+.sq-near-list{border-top:1px solid var(--rule);margin-top:var(--s3)}
+.sq-near-t{display:flex;align-items:baseline;gap:var(--s2);overflow-wrap:anywhere}
+.sq-near-t .fs-swatch{align-self:center}
+.fs-near[aria-disabled="true"]{color:var(--muted)}
+.sq-tbl{margin-top:var(--s4)}
+.sq-tbl td:first-child{min-width:170px}
+.sq-tbl .fs-swatch{display:inline-block;margin-right:var(--s2)}
+.sq-actions{margin-top:var(--s3)}
+.sq-actions .fs-table-wrap{max-height:320px}
+.sq-actions tr.is-inferred td{color:var(--muted);font-style:italic}
+
+/* One column on the app's own width (site-tools toggles .narrow at 900px) and
+   always on a phone. Order: candidates, pitch, tray, nearest matches. */
+.narrow .sq-cols{grid-template-columns:minmax(0,1fr)}
+.narrow .sq-side{display:contents}
+.narrow .sq-c-cands{order:1}
+.narrow .sq-c-pitch{order:2}
+.narrow .sq-c-tray{order:3}
+.narrow .sq-c-near{order:4}
+.narrow .sq-c-cands .fs-cands{display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;padding-bottom:var(--s2)}
+.narrow .sq-c-cands .fs-cand{flex:0 0 138px}
+@media (max-width:760px){
+  .sq-page{padding:var(--s4)}
+  .sq-cols{grid-template-columns:minmax(0,1fr)}
+  .sq-side{display:contents}
+  .sq-c-cands{order:1}
+  .sq-c-pitch{order:2}
+  .sq-c-tray{order:3}
+  .sq-c-near{order:4}
+  .sq-c-cands .fs-cands{display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;padding-bottom:var(--s2)}
+  .sq-c-cands .fs-cand{flex:0 0 138px}
+  .sq-ctrl .fs-field,.sq-ctrl .sq-sel{flex:1 1 100%}
+  .sq-ctrl .fs-seg{display:flex}
+  .sq-ctrl .fs-seg>button{flex:1 1 0;min-height:var(--tap)}
+  .sq-right{margin-left:0}
 }
-@media(max-width:500px){.sgrid{grid-template-columns:1fr}}
 
-.tbtn{cursor:pointer;border:1px solid var(--line2);background:var(--panel2);border-radius:var(--radius);
-  width:30px;height:26px;display:grid;place-items:center;color:var(--dim);font-size:13px;
-  margin-left:auto;flex-shrink:0}
-.tbtn:hover{color:var(--amber);border-color:var(--amber-line)}
+/* Pitch ink */
+.sq-svg{display:block;width:100%;height:auto}
+.sq-ground{fill:var(--pitch)}
+.sq-line{fill:none;stroke:var(--pitchline);stroke-width:.32}
+.sq-spot{fill:var(--pitchline)}
+.sq-t{color:var(--ink)}
+.sq-t.c0,.fs-cand:is(.picked,[aria-pressed="true"]) .sq-t{color:var(--accent)}
+.sq-t.c1{color:var(--blue)}
+.sq-t.c2{color:var(--purple)}
+.sq-t.c3{color:var(--p60)}
+.sq-seg{fill:none;stroke:currentColor;stroke-linecap:round}
+.sq-head,.sq-node,.sq-shot{fill:currentColor}
+.sq-shot{stroke:var(--pitch);stroke-width:.3}
+.sq-inf{fill:none;stroke:currentColor;stroke-width:.4;stroke-dasharray:.45 1.05;stroke-linecap:round}
+.sq-start{fill:var(--pitch);stroke:currentColor;stroke-width:.5}
+.sq-after{opacity:.35}
+.sq-num-bg{fill:var(--panel);stroke:currentColor;stroke-width:.2;r:1.55px}
+.sq-num{fill:var(--ink);font:500 1.9px/1 var(--mono);text-anchor:middle;dominant-baseline:central}
+/* The same numbers on a one-column pitch are a third the size, so they grow. */
+.narrow .sq-num-bg{r:2.2px}
+.narrow .sq-num{font-size:2.8px}
+@media (max-width:760px){.sq-num-bg{r:2.2px}.sq-num{font-size:2.8px}}
 
-/* Selects: the open option list is drawn by the browser on a white base, so a
-   translucent surface colour plus light text renders as white on white. Force an
-   opaque background and colour the options explicitly. */
-select{background-color:var(--bg2,var(--panel,var(--panel)));color:var(--text,var(--ink))}
-select option,select optgroup{background-color:var(--bg2,var(--panel,var(--panel)));color:var(--text,var(--ink))}
+/* Legend */
+.sq-legend{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s5);margin:var(--s3) 0 0;padding:0;list-style:none;font:400 11px/1.4 var(--body);color:var(--muted)}
+.sq-legend li{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.sq-legend b{font-weight:600;color:var(--ink)}
+.sq-legend .sq-key{flex:0 0 auto;width:22px;height:8px}
+.sq-legend .sq-key .sq-inf{stroke-width:1.8;stroke-dasharray:1.6 3.4}
+.sq-key .sq-start{stroke-width:1.4;fill:var(--panel)}
+.sq-key .sq-shot{stroke:none}
 
-.explain{margin:14px 18px 0;border:1px solid var(--line);background:var(--panel);border-radius:var(--radius)}
-.explain summary{cursor:pointer;padding:11px 15px;font:700 11.5px/1 var(--f-mono,monospace);
-  letter-spacing:.04em;color:var(--accent,var(--gold-text));list-style:none}
-.explain summary::-webkit-details-marker{display:none}
-.explain summary:before{content:'\25B8 ';display:inline-block;transition:transform .15s}
-.explain[open] summary:before{transform:rotate(90deg)}
-.explain-body{padding:2px 16px 14px;border-top:1px solid var(--line);max-width:820px}
-.explain-body p{font:400 13px/1.65 var(--f-body,inherit);color:var(--text2,var(--muted));margin:11px 0}
-.explain-body h4{font:700 10px/1 var(--f-mono,monospace);letter-spacing:.14em;text-transform:uppercase;
-  color:var(--accent,var(--gold-text));margin:16px 0 4px}
-.explain-body ul{margin:8px 0;padding-left:19px}
-.explain-body li{font:400 12.5px/1.6 var(--f-body,inherit);color:var(--text2,var(--muted));margin-bottom:5px}
-.explain-body b{color:var(--text,var(--ink));font-weight:700}
-.explain-body .caveat{border-left:2px solid var(--line2);padding-left:11px;color:var(--text3,var(--blue));font-size:12.5px}
+/* Export surface: built off screen, always light, removed after capture. */
+.sq-export-wrap{position:fixed;left:-20000px;top:0;width:1064px}
+.sq-export{background:var(--panel);color:var(--ink)}
+.sq-export .fs-pitchbox,.sq-export .fs-panel{border:0;padding:0}
+.sq-export .sq-actions .fs-table-wrap{max-height:none}
+.sq-export-note{margin:var(--s4) 0 0;font:400 11px/1.4 var(--body);color:var(--muted)}
 </style>
 <script src="gate.js"></script>
 <meta name="robots" content="noindex,nofollow">
@@ -136,9 +142,10 @@ select option,select optgroup{background-color:var(--bg2,var(--panel,var(--panel
 </head>
 <body><script>window.FutScout&&FutScout.mount()</script>
 <div class="fs-slots" hidden><span id="hdrSub" data-fs-slot="pop">loading&hellip;</span><div class="tabs" id="tabs" data-fs-slot="tabs"></div></div><script>window.FutScout&&FutScout.adopt()</script>
-<details class="explain" id="explain">
+<main class="sq-page" data-fs-app>
+<details class="fs-details" id="explain">
   <summary>What a sequence is, and how to read these</summary>
-  <div class="explain-body">
+  <div class="fs-details-body sq-explain">
     <p><b>A sequence is one unbroken spell of possession by one team.</b> It begins when a
     side takes control of the ball and ends when they lose it, the game stops, or a set piece
     intervenes. Coverage varies by competition and season; the current query selects up to twelve candidates.
@@ -158,8 +165,8 @@ select option,select optgroup{background-color:var(--bg2,var(--panel,var(--panel
       <li>Arrows are passes; small dots are events with no destination, such as a touch, a
       take-on or a shot.</li>
       <li><b>Dotted segments</b> are movement the feed does not record as an event, usually a
-      carry or a flick. The ball moved, we just cannot see how.</li>
-      <li>A <b>star</b> marks the shot. Anything drawn faintly after it is a rebound or second
+      carry or a flick. The ball moved, we just cannot see how, so the segment is inferred.</li>
+      <li>A <b>diamond</b> marks the shot. Anything drawn faintly after it is a rebound or second
       phase, not part of the original move.</li>
       <li><b>xT</b> is the threat the possession added by moving the ball into more dangerous
       areas. No league-average benchmark is supplied by this view; compare the displayed
@@ -169,23 +176,25 @@ select option,select optgroup{background-color:var(--bg2,var(--panel,var(--panel
     <h4>What the type filter means</h4>
     <p>Possessions are tagged by how they started and how they travelled: from deep, won high,
     patient build, over the top, switches of play, wide combinations, hold-up play. Picking a
-    type shows the highest-threat examples of that pattern across the league, which is the
+    type shows the highest-threat examples of that pattern in the current data pool, which is the
     quickest way to see what a route actually looks like when it works.</p>
 
     <h4>Finding similar possessions</h4>
-    <p>Click any card and the tool finds the closest matches anywhere in the league, comparing
-    fourteen standardised features: where it started and ended, how far it travelled
-    vertically and laterally, how many passes, how long they were, the threat generated and
-    how much of it happened in the attacking third. Distance is the measure, so lower is a
-    closer match. It is comparing <b>shape</b>, not teams, which is why a Miami move can match
-    a Vancouver one.</p>
+    <p>Select any card and the tool lists the closest matches in the current data pool under
+    Nearest matches, comparing fourteen standardised features: where it started and ended, how
+    far it travelled vertically and laterally, how many passes, how long they were, the threat
+    generated and how much of it happened in the attacking third. Distance is the measure, so
+    lower is a closer match. It is comparing <b>shape</b>, not teams and not quality, which is
+    why a Miami move can match a Vancouver one. Select a nearest match to overlay it on the
+    picked sequence; the compare tray holds up to three overlays.</p>
 
     <p class="caveat">One honest limit: sequences describe the team in possession. The
     opponent&rsquo;s shape, and any pressure that forced a decision, is invisible in event
     data. A possession that looks laboured may have been the only option available.</p>
   </div>
 </details>
-<div class="main" id="main"><div class="empty">Loading&hellip;</div></div>
+<div id="main"><section class="fs-panel" aria-busy="true"><div class="fs-skel title"></div><div class="fs-skel block sq-gap"></div></section></div>
+</main>
 <script>
 const SB='https://xrsilhiffjoulyoqhdmp.supabase.co';
 const AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc2lsaGlmZmpvdWx5b3FoZG1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2Nzc5NDAsImV4cCI6MjEwMDI1Mzk0MH0.3_ccOJi0SBKOwHGxhJL3fsWCSSLoxZumzt-KH4wO8OU';
@@ -201,9 +210,6 @@ const TYPES=[['ended_shot','Produces a shot'],['ended_goal','Produces a goal'],[
  ['high_build','High build'],['low_build','Low build'],['structured','Structured'],['has_switch','Switch of play'],
  ['wide_triangles','Wide triangles'],['hold_up','Hold-up'],['very_short','Very short'],['long_ball','Long'],
  ['ends_opp_half','Ends opp half'],['end_around_box','Around the box'],['finds_central','Finds central'],['finds_wide','Finds wide']];
-
-let TEAMS=[],MATCHES={},MODE='type',TAG='ended_shot',TEAMSEL=null,CANDS=[],PICK=null,NB=[],OVERLAY=null,SIM_ERROR=null;
-
 async function sbAll(t,p){p=p||{};const PG=1000;let all=[],off=0;
   while(true){const u=new URL(SB+'/rest/v1/'+t);
     Object.keys(p).forEach(function(k){u.searchParams.set(k,p[k])});
@@ -226,104 +232,123 @@ async function sbRpc(fn,body){
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){
   return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
 
+/* Neither top_sequences_by_type nor similar_sequences returns the pool's
+   league/season coverage or its eligible N, so the note is always the verbatim
+   unavailable wording. Nothing here estimates either figure. */
+const POOL_NOTE='Pool league/season coverage and eligible N: not available from this endpoint';
+const TRAY_NOTE='Distance is a shape metric for the current pool, not a quality judgement. The pool population is not reported.';
+const NEAR_SHOWN=7,TRAY_MAX=3;
+const ROLE=['Picked','Overlay 1','Overlay 2','Overlay 3'];
+
+let TEAMS=[],MATCHES={},MODE='type',TAG='ended_shot',TEAMSEL=null,CANDS=[],PICK=null,NB=[],SIM_ERROR=null;
+/* OVERLAYS is positional: slot 0 draws in --blue, 1 in --purple, 2 in --p60.
+   A slot keeps its colour when another overlay is removed. */
+let OVERLAYS=[null,null,null],NB_LOADING=false,NEAR_ALL=false;
+/* What the loaded data belongs to, so Back/Forward can redraw without refetching
+   when only the overlays or the list/selected view changed. */
+let LIST_KEY=null,LIST_TITLE='',NB_FOR=null;const NB_CACHE={};
+const OPEN_DETAILS=new Set();
+
+function listKey(){return MODE+'|'+(MODE==='type'?TAG:TEAMSEL)}
+function typeLabel(){return (TYPES.filter(function(t){return t[0]===TAG})[0]||['',TAG])[1]}
+function listTitle(){return 'Top sequences · '+(MODE==='type'?typeLabel():tname(TEAMSEL))}
+function toast(text){if(window.FutScout&&FutScout.toast)FutScout.toast(text)}
+function scroller(){return document.querySelector('.sq-page')}
+
 /* ----- pitch ----- */
 function PX(x){return x*1.05}
 function PY(y){return (100-y)*0.68}
 function pitchMarks(){
-  const st='fill="none" stroke="var(--border2)" stroke-width="0.32"';
-  return '<rect x="0" y="0" width="105" height="68" '+st+'/>'+
-    '<line x1="52.5" y1="0" x2="52.5" y2="68" stroke="var(--border2)" stroke-width="0.32"/>'+
-    '<circle cx="52.5" cy="34" r="9.15" '+st+'/>'+
-    '<circle cx="52.5" cy="34" r="0.45" fill="var(--border2)"/>'+
-    '<rect x="0" y="13.84" width="16.5" height="40.32" '+st+'/>'+
-    '<rect x="88.5" y="13.84" width="16.5" height="40.32" '+st+'/>'+
-    '<rect x="0" y="24.84" width="5.5" height="18.32" '+st+'/>'+
-    '<rect x="99.5" y="24.84" width="5.5" height="18.32" '+st+'/>'+
-    '<rect x="-1.3" y="30.34" width="1.3" height="7.32" '+st+'/>'+
-    '<rect x="105" y="30.34" width="1.3" height="7.32" '+st+'/>';
+  return '<rect class="sq-ground" x="0" y="0" width="105" height="68"/>'+
+    '<rect class="sq-line" x="0" y="0" width="105" height="68"/>'+
+    '<line class="sq-line" x1="52.5" y1="0" x2="52.5" y2="68"/>'+
+    '<circle class="sq-line" cx="52.5" cy="34" r="9.15"/>'+
+    '<circle class="sq-spot" cx="52.5" cy="34" r="0.45"/>'+
+    '<rect class="sq-line" x="0" y="13.84" width="16.5" height="40.32"/>'+
+    '<rect class="sq-line" x="88.5" y="13.84" width="16.5" height="40.32"/>'+
+    '<rect class="sq-line" x="0" y="24.84" width="5.5" height="18.32"/>'+
+    '<rect class="sq-line" x="99.5" y="24.84" width="5.5" height="18.32"/>'+
+    '<rect class="sq-line" x="-1.3" y="30.34" width="1.3" height="7.32"/>'+
+    '<rect class="sq-line" x="105" y="30.34" width="1.3" height="7.32"/>';
 }
-function arrow(x1,y1,x2,y2,c,w,op){
+function arrow(x1,y1,x2,y2,w){
   const X1=PX(x1),Y1=PY(y1),X2=PX(x2),Y2=PY(y2);
   const dx=X2-X1,dy=Y2-Y1,len=Math.sqrt(dx*dx+dy*dy)||1;
   const ux=dx/len,uy=dy/len,ah=Math.min(1.8,len*0.5),nx=-uy,ny=ux;
   const bx=X2-ux*ah,by=Y2-uy*ah;
-  return '<line x1="'+X1.toFixed(2)+'" y1="'+Y1.toFixed(2)+'" x2="'+X2.toFixed(2)+'" y2="'+Y2.toFixed(2)+
-    '" stroke="'+c+'" stroke-width="'+w+'" stroke-opacity="'+op+'" stroke-linecap="round"/>'+
-    '<path d="M'+X2.toFixed(2)+' '+Y2.toFixed(2)+'L'+(bx+nx*ah*0.55).toFixed(2)+' '+(by+ny*ah*0.55).toFixed(2)+
-    'L'+(bx-nx*ah*0.55).toFixed(2)+' '+(by-ny*ah*0.55).toFixed(2)+'Z" fill="'+c+'" fill-opacity="'+Math.min(1,op+0.2)+'"/>';
+  return '<line class="sq-seg" x1="'+X1.toFixed(2)+'" y1="'+Y1.toFixed(2)+'" x2="'+X2.toFixed(2)+'" y2="'+Y2.toFixed(2)+
+    '" stroke-width="'+w+'"/>'+
+    '<path class="sq-head" d="M'+X2.toFixed(2)+' '+Y2.toFixed(2)+'L'+(bx+nx*ah*0.55).toFixed(2)+' '+(by+ny*ah*0.55).toFixed(2)+
+    'L'+(bx-nx*ah*0.55).toFixed(2)+' '+(by-ny*ah*0.55).toFixed(2)+'Z"/>';
 }
-function star(cx,cy,r,c){
-  let p='';for(let k=0;k<10;k++){const ang=-Math.PI/2+k*Math.PI/5,rr=(k%2)?r*0.42:r;
-    p+=(cx+rr*Math.cos(ang)).toFixed(2)+','+(cy+rr*Math.sin(ang)).toFixed(2)+' ';}
-  return '<polygon points="'+p.trim()+'" fill="'+c+'"/>';
+/* The ending shot. A diamond, so it cannot be mistaken for an action node. */
+function diamond(cx,cy,r){
+  return '<polygon class="sq-shot" points="'+cx.toFixed(2)+','+(cy-r).toFixed(2)+' '+(cx+r*0.82).toFixed(2)+','+cy.toFixed(2)+' '+
+    cx.toFixed(2)+','+(cy+r).toFixed(2)+' '+(cx-r*0.82).toFixed(2)+','+cy.toFixed(2)+'"/>';
 }
 const SHOT_T={SavedShot:1,MissedShots:1,ShotOnPost:1,Goal:1};
 
-/* A faint dotted link for movement the feed does not record as an event:
-   a carry, a flick, or the receiver moving before he plays it. */
-function link(x1,y1,x2,y2,c,op){
-  return '<line x1="'+PX(x1).toFixed(2)+'" y1="'+PY(y1).toFixed(2)+
-    '" x2="'+PX(x2).toFixed(2)+'" y2="'+PY(y2).toFixed(2)+
-    '" stroke="'+c+'" stroke-width="0.3" stroke-opacity="'+(op*0.45).toFixed(2)+
-    '" stroke-dasharray="0.9 1.2" stroke-linecap="round"/>';
+/* A dotted link for movement the feed does not record as an event: a carry, a
+   flick, or the receiver moving before he plays it. Inferred, never an event. */
+function link(x1,y1,x2,y2){
+  return '<line class="sq-inf" x1="'+PX(x1).toFixed(2)+'" y1="'+PY(y1).toFixed(2)+
+    '" x2="'+PX(x2).toFixed(2)+'" y2="'+PY(y2).toFixed(2)+'"/>';
 }
 /* An event with a location but no destination (BallTouch, take-on, shot). */
-function node(x,y,c,op){
-  return '<circle cx="'+PX(x).toFixed(2)+'" cy="'+PY(y).toFixed(2)+
-    '" r="0.7" fill="'+c+'" fill-opacity="'+(op*0.8).toFixed(2)+'"/>';
+function node(x,y){
+  return '<circle class="sq-node" cx="'+PX(x).toFixed(2)+'" cy="'+PY(y).toFixed(2)+'" r="0.7"/>';
 }
+/* The gap rule shared by the drawing and the action table: a recorded action
+   that starts more than 1.5 units from where the previous one ended is joined by
+   an inferred segment. */
+function gapFrom(prev,p){
+  if(!prev)return false;
+  const d=Math.sqrt((p.x-prev.x)*(p.x-prev.x)+(p.y-prev.y)*(p.y-prev.y));
+  return d>1.5;
+}
+function endOf(p){return (p.ex!=null&&p.ey!=null)?{x:p.ex,y:p.ey}:{x:p.x,y:p.y}}
 
 /* draw one sequence trajectory. path = [{x,y,ex,ey,t}]
    Roughly 15% of events carry no end coordinate, which previously broke the chain
-   into unrelated clusters. Those are now drawn as nodes and joined with a dotted
-   link, so one possession reads as one possession. */
-function seqTrace(path,c,shot,w,op,numberActions){
-  let inner='';const pts=path||[];
-  if(!pts.length)return inner;
-
+   into unrelated clusters. Those are drawn as nodes and joined with a dotted
+   link, so one possession reads as one possession.
+   slot: null = neutral card ink, 0 = picked, 1..3 = overlay. */
+function seqTrace(path,slot,shot,w,numberActions){
+  const pts=path||[];
+  if(!pts.length)return '';
   let shotIdx=-1;
   pts.forEach(function(p,i){if(SHOT_T[p.t])shotIdx=i});
 
-  let px=null,py=null;
+  let main='',after='',nums='',prev=null;
   pts.forEach(function(p,i){
+    let g='';
+    if(gapFrom(prev,p))g+=link(prev.x,prev.y,p.x,p.y);
+    if(p.ex!=null&&p.ey!=null)g+=arrow(p.x,p.y,p.ex,p.ey,w);
+    else g+=node(p.x,p.y);
+    prev=endOf(p);
     // anything after the shot is a rebound or second phase, so fade it
-    const o=(shotIdx>=0&&i>shotIdx)?op*0.3:op;
-    if(px!=null){
-      const d=Math.sqrt((p.x-px)*(p.x-px)+(p.y-py)*(p.y-py));
-      if(d>1.5)inner+=link(px,py,p.x,p.y,c,o);
-    }
-    if(p.ex!=null&&p.ey!=null){
-      inner+=arrow(p.x,p.y,p.ex,p.ey,c,w,o);
-      px=p.ex;py=p.ey;
-    }else{
-      inner+=node(p.x,p.y,c,o);
-      px=p.x;py=p.y;
-    }
+    if(shotIdx>=0&&i>shotIdx)after+=g;else main+=g;
     if(numberActions){
-      const lx=(p.ex!=null?p.ex:p.x),ly=(p.ey!=null?p.ey:p.y);
-      inner+='<circle cx="'+PX(lx).toFixed(2)+'" cy="'+PY(ly).toFixed(2)+'" r="1.05" fill="var(--bg2)" fill-opacity=".88"/>'+
-        '<text x="'+PX(lx).toFixed(2)+'" y="'+(PY(ly)+.38).toFixed(2)+'" text-anchor="middle" fill="'+c+'" font-size="1.15" font-weight="800">'+(i+1)+'</text>';
+      nums+='<circle class="sq-num-bg" cx="'+PX(prev.x).toFixed(2)+'" cy="'+PY(prev.y).toFixed(2)+'" r="1.55"/>'+
+        '<text class="sq-num" x="'+PX(prev.x).toFixed(2)+'" y="'+PY(prev.y).toFixed(2)+'">'+(i+1)+'</text>';
     }
   });
-
-  inner+='<circle cx="'+PX(pts[0].x).toFixed(2)+'" cy="'+PY(pts[0].y).toFixed(2)+
-    '" r="1.35" fill="var(--bg2)" stroke="'+c+'" stroke-width="0.5"/>';
-
+  let marks='<circle class="sq-start" cx="'+PX(pts[0].x).toFixed(2)+'" cy="'+PY(pts[0].y).toFixed(2)+'" r="1.35"/>';
   if(shot){
-    // put the star on the shot itself, not on whatever happened afterwards
-    const sp=(shotIdx>=0)?pts[shotIdx]:pts[pts.length-1];
-    const sx=(sp.ex!=null?sp.ex:sp.x),sy=(sp.ey!=null?sp.ey:sp.y);
-    inner+=star(PX(sx),PY(sy),2.1,c);
+    // put the diamond on the shot itself, not on whatever happened afterwards
+    const sp=endOf((shotIdx>=0)?pts[shotIdx]:pts[pts.length-1]);
+    marks+=diamond(PX(sp.x),PY(sp.y),2.1);
   }
-  return inner;
+  return '<g class="sq-t'+(slot==null?'':' c'+slot)+'">'+main+(after?'<g class="sq-after">'+after+'</g>':'')+marks+nums+'</g>';
 }
-function pitchSVG(inner,h){
-  return '<div class="pbox"'+(h?' style="aspect-ratio:auto;height:'+h+'"':'')+'>'+
-    '<svg role="img" aria-label="Sequence trajectory. Attack is left to right." viewBox="-3 -3 111.5 74" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%;display:block">'+
-    pitchMarks()+inner+'<text x="42" y="71.2" fill="var(--text3)" font-size="2.7" font-weight="700" letter-spacing=".35">ATTACKING</text>'+
-    '<line x1="59" y1="70.2" x2="67" y2="70.2" stroke="var(--text3)" stroke-width="0.35"/>'+
-    '<path d="M67.8 70.2L66.2 69.35L66.2 71.05Z" fill="var(--text3)"/></svg></div>';
+function pitchSVG(inner,label){
+  return '<svg class="sq-svg" role="img" aria-label="'+esc(label||'Sequence trajectory.')+' Attack is left to right." viewBox="-1.7 -1.6 108.4 71.2" preserveAspectRatio="xMidYMid meet">'+
+    pitchMarks()+inner+'</svg>';
 }
+function keySvg(inner,cls){
+  return '<svg class="sq-key" viewBox="0 0 22 8" aria-hidden="true"><g class="sq-t'+(cls?' '+cls:'')+'">'+inner+'</g></svg>';
+}
+function keyLine(cls){return keySvg('<line class="sq-seg" x1="1" y1="4" x2="21" y2="4" stroke-width="2"/>',cls)}
 
 /* ----- labels ----- */
 function matchLabel(gid,team){
@@ -331,6 +356,28 @@ function matchLabel(gid,team){
   const home=m.home_team===team;
   const opp=home?m.away_team:m.home_team;
   return esc(tname(opp))+' ('+(home?'H':'A')+')';
+}
+/* Plain text, not HTML: team v opponent (H/A), minute. */
+function fixtureText(s){
+  const m=MATCHES[s.game_id];let out=tname(s.team);
+  if(m){const home=m.home_team===s.team;out+=' v '+tname(home?m.away_team:m.home_team)+' ('+(home?'H':'A')+')'}
+  else out+=' · fixture not in the match view';
+  if(s.start_min!=null)out+=' · '+s.start_min+"'";
+  return out;
+}
+function endsText(s){return s.ended_goal?'goal':(s.ended_shot?'shot':'open play')}
+function countText(v){return v==null||v===''?'—':String(v)}
+/* match.html reads ?game=<numeric id> and looks the fixture up in the same
+   v_league_matches view this page loaded, so a link is only offered when both
+   hold. Anything else would open on "Match not found". */
+function matchHref(s){
+  return (s&&MATCHES[s.game_id]&&/^\d+$/.test(String(s.game_id)))?'match.html?game='+encodeURIComponent(s.game_id):'';
+}
+function matchLink(s,text,short){
+  const href=matchHref(s);
+  if(href)return '<a class="fs-link" href="'+href+'">'+esc(text||'Open match')+'</a>';
+  const why=MATCHES[s.game_id]?'the match page only opens numeric fixture ids, and this one is '+s.game_id:'fixture not in the match view';
+  return '<span class="fs-missing" title="'+esc(why)+'">No match link'+(short?'':' · '+esc(why))+'</span>';
 }
 function tabsHtml(){
   return ''; // Cross-page links are owned by the shared site-tools registry.
@@ -347,30 +394,53 @@ async function init(){
     // team list from the style view (guaranteed to have sequence data)
     TEAMS=(await sbAll('team_sequence_agg',{select:'team',order:'team.asc'})).map(function(x){return x.team});
     TEAMSEL=TEAMS[0];
-    document.getElementById('hdrSub').textContent='Available competitions \u00B7 pick a sequence, then find the nearest matches in the current data pool';
+    document.getElementById('hdrSub').textContent='Current data pool · coverage and eligible N not reported';
     restoreSequenceState();
-  }catch(e){document.getElementById('main').innerHTML='<div class="empty">Failed to load: '+esc(e.message)+'</div>'}
+  }catch(e){
+    document.getElementById('hdrSub').textContent='';
+    document.getElementById('main').innerHTML=banner('Failed to load: '+e.message+'. Nothing on the page changed.','<button type="button" class="fs-btn" onclick="location.reload()">Reload</button>');
+  }
+}
+
+function banner(text,action){
+  return '<div class="fs-banner fs-banner-warn" role="alert"><span class="fs-banner-label">Error</span>'+
+    '<span class="fs-banner-text">'+esc(text)+'</span>'+(action||'')+'</div>';
 }
 
 function controls(){
-  let typeSel='<select aria-label="Sequence type" class="lnk" onchange="TAG=this.value;loadCandidates()">'+
+  const typeSel='<label for="sqSel">Type</label><select id="sqSel" data-fk="sel" aria-label="Sequence type" onchange="TAG=this.value;loadCandidates()">'+
     TYPES.map(function(t){return '<option value="'+t[0]+'"'+(TAG===t[0]?' selected':'')+'>'+t[1]+'</option>'}).join('')+'</select>';
-  let teamSel='<select aria-label="Sequence team" class="lnk" onchange="TEAMSEL=this.value;loadCandidates()">'+
+  const teamSel='<label for="sqSel">Team</label><select id="sqSel" data-fk="sel" aria-label="Sequence team" onchange="TEAMSEL=this.value;loadCandidates()">'+
     TEAMS.map(function(t){return '<option value="'+esc(t)+'"'+(TEAMSEL===t?' selected':'')+'>'+esc(tname(t))+'</option>'}).join('')+'</select>';
-  return '<div class="ctrl">'+
-    '<div class="fld" style="min-width:auto"><span class="kpi-l">Browse by</span>'+
-      '<div class="seg"><button aria-pressed="'+(MODE==='type')+'" class="'+(MODE==='type'?'on':'')+'" onclick="MODE=\'type\';loadCandidates()">Sequence type</button>'+
-      '<button aria-pressed="'+(MODE==='team')+'" class="'+(MODE==='team'?'on':'')+'" onclick="MODE=\'team\';loadCandidates()">Team</button></div></div>'+
-    (MODE==='type'?'<div class="fld"><span class="kpi-l">Type</span>'+typeSel+'</div>'
-                  :'<div class="fld"><span class="kpi-l">Team</span>'+teamSel+'</div>')+
+  return '<div class="sq-ctrl">'+
+    '<div class="fs-field"><span class="fs-label" id="sqBrowseLbl">Browse by</span>'+
+      '<div class="fs-seg seg" role="group" aria-labelledby="sqBrowseLbl">'+
+      '<button type="button" data-fk="mode-type" aria-pressed="'+(MODE==='type')+'" onclick="MODE=\'type\';loadCandidates()">Sequence type</button>'+
+      '<button type="button" data-fk="mode-team" aria-pressed="'+(MODE==='team')+'" onclick="MODE=\'team\';loadCandidates()">Team</button></div></div>'+
+    '<div class="fs-field sq-sel">'+(MODE==='type'?typeSel:teamSel)+'</div>'+
+    '<p class="sq-pool" role="note"><span class="fs-label">Pool</span>'+esc(POOL_NOTE)+'</p>'+
     '</div>';
 }
 
+/* Replace the app's content, keeping keyboard focus on the same control and
+   keeping any opened action table open. */
+function paint(html){
+  const main=document.getElementById('main'),active=document.activeElement;
+  const key=(active&&main.contains(active))?active.getAttribute('data-fk'):null;
+  main.querySelectorAll('details[data-uid]').forEach(function(d){
+    if(d.open)OPEN_DETAILS.add(d.getAttribute('data-uid'));else OPEN_DETAILS.delete(d.getAttribute('data-uid'))});
+  main.innerHTML=html;
+  if(key){const next=main.querySelector('[data-fk="'+key+'"]');if(next)next.focus({preventScroll:true})}
+  const picked=main.querySelector('.sq-c-cands .picked');
+  if(picked){const box=picked.parentNode;if(box.scrollWidth>box.clientWidth)box.scrollLeft=Math.max(0,picked.offsetLeft-8)}
+}
+function skeleton(n,cls){let h='';for(let i=0;i<n;i++)h+='<div class="fs-skel '+cls+'"></div>';return h}
+
 async function loadCandidates(restoring=false){if(!restoring){sequenceRestoreGeneration++;restoringSequence=false}
   const request=++sequenceGeneration;
-  PICK=null;NB=[];OVERLAY=null;
-  const main=document.getElementById('main');
-  main.innerHTML=controls()+'<div class="sect"><div class="spin"></div></div>';
+  PICK=null;NB=[];NB_FOR=null;NB_LOADING=false;OVERLAYS=[null,null,null];
+  paint(controls()+'<section class="fs-panel" aria-busy="true"><div class="fs-panel-h"><h2>'+esc(listTitle())+'</h2>'+
+    '<span class="fs-note">Loading candidates…</span></div><div class="fs-cands">'+skeleton(12,'sq-skel-card')+'</div></section>');
   try{
     let rows;
     if(MODE==='type'){
@@ -381,56 +451,116 @@ async function loadCandidates(restoring=false){if(!restoring){sequenceRestoreGen
         select:'seq_uid,team,game_id,start_min,path,ended_shot,ended_goal,n_pass,xt_sum'});
     }
     if(request!==sequenceGeneration)return;
-    CANDS=rows;
+    CANDS=rows;LIST_KEY=listKey();LIST_TITLE=listTitle();
     renderBrowse();
-  }catch(e){if(request===sequenceGeneration)main.innerHTML=controls()+'<div class="empty">Error: '+esc(e.message)+' <button onclick="loadCandidates()">Retry</button></div>'}
+  }catch(e){
+    if(request!==sequenceGeneration)return;
+    /* The request failed, so nothing was replaced: the last list that did load
+       stays on screen under its own title. */
+    let h=controls()+banner('Could not load '+listTitle()+' ('+e.message+'). Nothing on the page changed.',
+      '<button type="button" class="fs-btn" data-fk="retry" onclick="loadCandidates()">Retry</button>');
+    if(CANDS.length&&LIST_TITLE)h+='<div class="sq-gap">'+listPanel(LIST_TITLE+' · last list that loaded')+'</div>';
+    paint(h);
+  }
 }
 let sequenceGeneration=0,sequenceRestoreGeneration=0;function seqMetric(v,n=3){return v==null||v===''||!Number.isFinite(Number(v))?'unavailable':Number(v).toFixed(n)}
-function actionTrace(s){return '<details class="sect"><summary>Ordered action data · '+esc(tname(s.team))+' · '+(s.path||[]).length+' actions</summary><p>Coordinates use the provider’s 0–100 pitch; attack increases x. Dotted links between recorded actions are unobserved movement, not confirmed carries.</p><ol>'+(s.path||[]).map(function(p){return '<li>'+esc(p.t||'Action')+': ('+esc(p.x)+', '+esc(p.y)+') → '+(p.ex==null||p.ey==null?'end coordinate unavailable':'('+esc(p.ex)+', '+esc(p.ey)+')')+'</li>'}).join('')+'</ol></details>'}
+
+/* Ordered action rows for one sequence, with the inferred segments in place. */
+function actionRows(s){
+  const rows=[];let prev=null;
+  (s.path||[]).forEach(function(p,i){
+    if(gapFrom(prev,p))rows.push({inferred:true,x:prev.x,y:prev.y,ex:p.x,ey:p.y});
+    rows.push({step:i+1,t:p.t||'Action',x:p.x,y:p.y,ex:p.ex,ey:p.ey});
+    prev=endOf(p);
+  });
+  return rows;
+}
+function actionTrace(s,role){
+  const uid=s.seq_uid==null?'':String(s.seq_uid),rows=actionRows(s);
+  const n=(s.path||[]).length,inferred=rows.length-n;
+  let h='<details class="fs-details sq-actions"'+(uid?' data-uid="'+esc(uid)+'"':'')+(uid&&OPEN_DETAILS.has(uid)?' open':'')+'>'+
+    '<summary>Ordered action data · '+esc((role?role+' · ':'')+tname(s.team))+' · '+n+' actions</summary>'+
+    '<div class="fs-details-body"><p class="fs-note">Coordinates use the provider’s 0–100 pitch; attack increases x. '+
+    'Rows marked Inferred · no event are the dotted links between recorded actions: unobserved movement, not confirmed carries'+
+    (inferred?' ('+inferred+' in this sequence).':'.')+'</p>'+
+    '<div class="fs-table-wrap sq-gap"><table class="fs-table"><thead><tr><th class="num">#</th><th>Action</th><th class="num">x</th><th class="num">y</th><th class="num">End x</th><th class="num">End y</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    if(r.inferred)h+='<tr class="is-inferred"><td class="num">·</td><td>Inferred · no event</td>';
+    else h+='<tr><td class="num">'+r.step+'</td><td>'+esc(r.t)+'</td>';
+    h+='<td class="num">'+esc(r.x)+'</td><td class="num">'+esc(r.y)+'</td>'+
+      (r.ex==null||r.ey==null?'<td colspan="2"><span class="fs-missing">end coordinate unavailable</span></td>'
+                             :'<td class="num">'+esc(r.ex)+'</td><td class="num">'+esc(r.ey)+'</td>')+'</tr>';
+  });
+  h+='</tbody></table></div>'+
+    (uid?'<div class="fs-panel-foot"><span class="fs-note">'+rows.length+' rows</span><span class="fs-push"><button type="button" class="fs-btn k" data-export data-fk="csv-'+esc(uid)+'" onclick="copyActionsCsv(\''+esc(uid)+'\')">Copy CSV</button></span></div>':'')+
+    '</div></details>';
+  return h;
+}
 
 function cardHtml(s,opts){
   opts=opts||{};
-  const shot=s.ended_shot;
-  const inner=seqTrace(s.path,opts.color||'var(--accent)',shot,0.5,0.85);
-  const dist=(s.dist!=null)?'<span>dist <b>'+(+s.dist).toFixed(2)+'</b></span>':'<span>'+(s.ended_goal?'goal':(shot?'shot':'open play'))+'</span>';
+  const shot=s.ended_shot,n=(s.path||[]).length;
+  const inner=seqTrace(s.path,null,shot,0.6);
   /* The card shows a team, a match, a minute and a pitch trace. Read out, that
      is a pile of numbers with no verb, so the label says what activating it
      does and which sequence it is. */
   const ml=matchLabel(s.game_id,s.team);
   const who=esc(tname(s.team))+(ml?' versus '+ml:'')+
     (s.start_min!=null?', minute '+s.start_min:'');
-  return '<button type="button" class="scard'+(opts.pick?' pick':'')+'"'+
-    (opts.pick?' aria-current="true"':'')+
+  return '<button type="button" class="fs-cand scard'+(opts.pick?' picked':'')+'" aria-pressed="'+(opts.pick?'true':'false')+'"'+
+    (opts.fk?' data-fk="'+opts.fk+'"':'')+
     ' aria-label="'+esc(opts.action||'Open')+' the '+who+' sequence"'+
     ' onclick="'+opts.onclick+'">'+
-    '<div class="scard-t">'+esc(tname(s.team))+'</div>'+
-    '<div class="scard-m">'+matchLabel(s.game_id,s.team)+(s.start_min!=null?' \u00B7 '+s.start_min+"'":'')+'</div>'+
-    pitchSVG(inner)+
-    '<div class="scard-s"><span>xT <b>'+seqMetric(s.xt_sum)+'</b></span><span>'+s.n_pass+' passes</span>'+dist+'</div></button>';
+    '<span class="sq-cand-t">'+esc(tname(s.team))+'</span>'+
+    '<span class="sq-cand-m">'+(ml?'v '+ml:'Fixture not in the match view')+(s.start_min!=null?' · '+s.start_min+"'":'')+'</span>'+
+    pitchSVG(inner,'Sequence trajectory.')+
+    '<small>Attack → · '+n+' actions · '+endsText(s)+'</small>'+
+    '<span class="sq-cand-s"><span>xT <b>'+seqMetric(s.xt_sum)+'</b></span><span>passes <b>'+countText(s.n_pass)+'</b></span></span></button>';
+}
+function candGrid(){
+  let h='<div class="fs-cands">';
+  CANDS.forEach(function(s,i){
+    h+=cardHtml(s,{action:'Find sequences similar to',fk:'cand-'+i,pick:!!(PICK&&s===PICK),onclick:'pickCard('+i+')'});
+  });
+  return h+'</div>';
+}
+function exportButtons(id,label){
+  return '<span class="fs-push" data-export>'+
+    '<button type="button" class="fs-btn k" aria-label="Download '+esc(label)+' as PNG" onclick="exportPanel(\''+id+'\',\'png\',this)">PNG</button> '+
+    '<button type="button" class="fs-btn k" aria-label="Download '+esc(label)+' as PDF" onclick="exportPanel(\''+id+'\',\'pdf\',this)">PDF</button></span>';
+}
+function listPanel(title){
+  return '<section class="fs-panel" id="sqList"><div class="fs-panel-h"><h2>'+esc(title)+'</h2>'+
+    '<span class="fs-note">Sorted by xT · '+CANDS.length+' shown, up to twelve · select one to find its nearest matches</span></div>'+
+    candGrid()+
+    '<div class="fs-panel-foot"><span class="fs-note">Cards show recorded actions only; a dotted segment joins two of them where the feed has no event, and a diamond marks the shot.</span>'+
+    exportButtons('sqList','the candidate list')+'</div></section>';
 }
 
 function renderBrowse(){
-  const main=document.getElementById('main');
-  const title=(MODE==='type')?('Top sequences \u2014 '+(TYPES.filter(function(t){return t[0]===TAG})[0]||['',''])[1])
-                             :('Top sequences \u2014 '+tname(TEAMSEL));
-  let h=controls()+'<div class="sect"><div class="sect-h"><span>'+esc(title)+'</span>'+
-    '<span style="color:var(--text3);font-weight:500;text-transform:none;letter-spacing:0">Sorted by xT \u00B7 select one to compare</span></div>'+
-    '<div class="sgrid">';
-  CANDS.forEach(function(s,i){
-    h+=cardHtml(s,{action:'Find sequences similar to',onclick:'choosePick('+i+')'});
-  });
-  h+='</div></div><div class="foot">Each card is one open-play possession, drawn start (hollow ring) to finish, attacking left to right. '+
-     'A star marks the shot. Dotted segments are movement the feed does not record as an event, such as a carry or a flick. Pick one and the tool finds the most similar sequences across the current data pool.</div>';
-  main.innerHTML=h;
+  PICK=null;OVERLAYS=[null,null,null];NB=[];NB_FOR=null;NB_LOADING=false;SIM_ERROR=null;sequenceGeneration++;
+  if(!CANDS.length){
+    paint(controls()+'<div class="fs-empty"><h2>No sequences returned</h2>'+
+      '<p>The endpoint returned zero open-play sequences for '+esc(MODE==='type'?typeLabel():tname(TEAMSEL))+
+      '. That describes the current data pool, whose coverage is not reported; it does not show that none exist.</p>'+
+      '<button type="button" class="fs-btn" data-fk="retry" onclick="loadCandidates()">Reload this list</button></div>');
+  }else paint(controls()+listPanel(listTitle()));
+  saveSequenceState();
+}
+function backToList(){userAction();renderBrowse();const s=scroller();if(s)s.scrollTop=0}
+function userAction(){sequenceRestoreGeneration++;restoringSequence=false}
+function pickCard(i){
+  if(PICK&&CANDS[i]===PICK&&!SIM_ERROR)return;
+  const fromList=!PICK;
+  choosePick(i);
+  if(fromList){const s=scroller();if(s)s.scrollTop=0}
 }
 
 async function choosePick(i,restoring=false){if(!restoring){sequenceRestoreGeneration++;restoringSequence=false}
   const request=++sequenceGeneration;
   if(!CANDS[i])return;
-  PICK=CANDS[i];OVERLAY=null;SIM_ERROR=null;
-  const main=document.getElementById('main');
-  main.innerHTML=controls()+'<div class="sect"><div class="spin"></div>'+
-    '<div style="text-align:center;color:var(--text3);font:500 11px/1 var(--body)">Finding similar sequences\u2026</div></div>';
+  PICK=CANDS[i];OVERLAYS=[null,null,null];SIM_ERROR=null;NB=[];NB_FOR=null;NB_LOADING=true;NEAR_ALL=false;
+  drawSelected();
   try{
     const hits=await sbRpc('similar_sequences',{p_seq:PICK.seq_uid,p_n:12});
     if(request!==sequenceGeneration)return;
@@ -441,94 +571,302 @@ async function choosePick(i,restoring=false){if(!restoring){sequenceRestoreGener
     const pm={};paths.forEach(function(p){pm[p.seq_uid]=p});
     NB=hits.map(function(h){return Object.assign({},pm[h.seq_uid]||{},{dist:h.dist})})
            .filter(function(x){return x.path});
+    NB_LOADING=false;NB_FOR=PICK.seq_uid;NB_CACHE[PICK.seq_uid]=NB;
     renderPick();
   }catch(e){
     if(request!==sequenceGeneration)return;
-    NB=[];SIM_ERROR=String(e.message||e);
+    NB=[];NB_LOADING=false;SIM_ERROR=String(e.message||e);
     renderPick();
   }
 }
 
-function renderPick(){
-  const main=document.getElementById('main');
-  const shot=PICK.ended_shot;
-  const big=pitchSVG(seqTrace(PICK.path,'var(--accent)',shot,0.7,0.95,true));
-  let h=controls()+
-    '<div class="split"><div class="sect">'+
-      '<div class="sect-h"><span>Picked sequence</span><button class="back" onclick="renderBrowse()">\u2190 back to list</button></div>'+
-      '<span class="pill">'+esc(tname(PICK.team))+'</span> '+
-      '<span style="font:500 10px/1.4 var(--body);color:var(--text3)">'+matchLabel(PICK.game_id,PICK.team)+
-        (PICK.start_min!=null?' \u00B7 '+PICK.start_min+"'":'')+'</span>'+
-      big+actionTrace(PICK)+
-      '<div class="ov-stats">'+
-        ovStat('xT',seqMetric(PICK.xt_sum))+ovStat('Passes',PICK.n_pass)+
-        ovStat('Ends',PICK.ended_goal?'goal':(shot?'shot':'open play'))+
-      '</div></div>'+
-    '<div class="sect"><div class="sect-h"><span>How to read it</span></div>'+
-      '<div class="viz-sub">This is the sequence you picked. The cards on the right are the '+NB.length+
-      ' most similar open-play sequences across the current data pool, by trajectory shape, length, zones and threat. Pool league/season coverage and eligible N are unavailable. '+
-      'Lower distance is a closer match. Click any of them to overlay the two on one pitch.</div>'+
-      '<div class="viz-leg"><span><i style="background:var(--accent)"></i><b>Picked</b></span>'+
-      '<span><i style="background:var(--nb)"></i><b>Comparison</b></span>'+
-      '<span>\u2605 ended in a shot</span></div></div></div>';
-  if(SIM_ERROR)h+='<div class="empty" role="alert">Similarity search is temporarily unavailable ('+esc(SIM_ERROR)+'). Your selected sequence is still shown. <button class="back" onclick="choosePick(CANDS.indexOf(PICK))">Retry search</button></div>';
-  h+='<div class="sect" style="margin-top:12px"><div class="sect-h"><span>Nearest matches</span>'+
-     '<span style="color:var(--text3);font-weight:500;text-transform:none;letter-spacing:0">across other matches &amp; teams</span></div><div class="sgrid">';
-  NB.forEach(function(s,i){h+=cardHtml(s,{action:'Overlay',color:'var(--nb)',onclick:'openOverlay('+i+')'})});
-  h+='</div></div>';
-  main.innerHTML=h;
+/* ----- overlays ----- */
+function overlaySlot(uid){for(let k=0;k<OVERLAYS.length;k++)if(OVERLAYS[k]&&OVERLAYS[k].seq_uid===uid)return k+1;return 0}
+function overlayCount(){return OVERLAYS.filter(Boolean).length}
+function toggleOverlay(i){
+  const s=NB[i];if(!s)return;
+  userAction();
+  const slot=overlaySlot(s.seq_uid);
+  if(slot)OVERLAYS[slot-1]=null;
+  else{
+    const free=OVERLAYS.indexOf(null);
+    if(free<0){toast('The tray holds three overlays. Remove one to add another.');return}
+    OVERLAYS[free]=s;
+  }
+  renderPick();
 }
-function ovStat(l,v){return '<div class="ov-stat"><div class="l">'+l+'</div><div class="v">'+v+'</div></div>'}
+/* Kept under its old name: activating a nearest match overlays it. */
+function openOverlay(i){if(NB[i]&&!overlaySlot(NB[i].seq_uid))toggleOverlay(i)}
+function removeOverlay(slot){
+  const s=OVERLAYS[slot-1];if(!s)return;
+  userAction();OVERLAYS[slot-1]=null;renderPick();
+  const row=document.querySelector('[data-fk="near-'+NB.indexOf(s)+'"]');if(row)row.focus({preventScroll:true});
+}
+function clearOverlays(){
+  if(!overlayCount())return;
+  userAction();OVERLAYS=[null,null,null];renderPick();
+}
+function showAllNearest(all){NEAR_ALL=!!all;drawSelected()}
 
-function openOverlay(i){
-  OVERLAY=NB[i];
-  const main=document.getElementById('main');
-  const inner=seqTrace(PICK.path,'var(--accent)',PICK.ended_shot,0.7,0.9)+
-              seqTrace(OVERLAY.path,'var(--nb)',OVERLAY.ended_shot,0.7,0.9);
-  let h=controls()+
-    '<div class="sect"><div class="sect-h"><span>Overlay</span>'+
-      '<button class="back" onclick="renderPick()">\u2190 back to matches</button></div>'+
-    '<div class="viz-eyebrow">Two sequences, one pitch</div>'+
-    '<div class="viz-title">'+esc(tname(PICK.team))+' vs '+esc(tname(OVERLAY.team))+' \u00B7 dist '+(+OVERLAY.dist).toFixed(2)+'</div>'+
-    '<div class="viz-sub">The picked sequence in amber, its nearest match in blue, both drawn start to finish attacking left to right.</div>'+
-    pitchSVG(inner,'min(60vh,520px)')+actionTrace(PICK)+actionTrace(OVERLAY)+
-    '<div class="viz-leg">'+
-      '<span><i style="background:var(--accent)"></i><b>'+esc(tname(PICK.team))+'</b> \u00B7 '+matchLabel(PICK.game_id,PICK.team)+(PICK.start_min!=null?' '+PICK.start_min+"'":'')+'</span>'+
-      '<span><i style="background:var(--nb)"></i><b>'+esc(tname(OVERLAY.team))+'</b> \u00B7 '+matchLabel(OVERLAY.game_id,OVERLAY.team)+(OVERLAY.start_min!=null?' '+OVERLAY.start_min+"'":'')+'</span>'+
-    '</div>'+
-    '<div class="ov-stats">'+
-      ovStat('xT \u2014 picked',seqMetric(PICK.xt_sum))+ovStat('xT \u2014 match',seqMetric(OVERLAY.xt_sum))+
-      ovStat('Passes',PICK.n_pass+' / '+OVERLAY.n_pass)+ovStat('Distance',(+OVERLAY.dist).toFixed(2))+
-    '</div></div>'+
-    '<div class="sect" style="margin-top:12px"><div class="sect-h"><span>Nearest matches</span></div><div class="sgrid">';
-  NB.forEach(function(s,i){h+=cardHtml(s,{action:'Overlay',color:'var(--nb)',pick:(s.seq_uid===OVERLAY.seq_uid),onclick:'openOverlay('+i+')'})});
-  h+='</div></div>';
-  main.innerHTML=h;
-  window.scrollTo(0,0);
+function legendHtml(){
+  let h='<ul class="sq-legend" aria-label="Pitch legend">'+
+    '<li>'+keyLine('c0')+'<span><b>Picked</b> · '+esc(fixtureText(PICK))+' · actions numbered in order</span></li>';
+  OVERLAYS.forEach(function(s,k){
+    if(s)h+='<li>'+keyLine('c'+(k+1))+'<span><b>'+ROLE[k+1]+'</b> · '+esc(fixtureText(s))+' · distance '+seqMetric(s.dist,2)+'</span></li>';
+  });
+  h+='<li>'+keySvg('<circle class="sq-start" cx="11" cy="4" r="3"/>')+'<span>Start of the sequence</span></li>'+
+    '<li>'+keySvg('<line class="sq-inf" x1="1" y1="4" x2="21" y2="4"/>')+'<span>Unobserved movement · inferred, no event</span></li>'+
+    '<li>'+keySvg('<polygon class="sq-shot" points="11,0.4 14.4,4 11,7.6 7.6,4"/>')+'<span>Ended in a shot</span></li>'+
+    '</ul>';
+  return h;
+}
+function compareTable(){
+  function row(s,slot){
+    return '<tr><td><i class="fs-swatch s'+slot+'"></i>'+ROLE[slot]+'<small>'+esc(fixtureText(s))+'</small></td>'+
+      '<td class="num">'+seqMetric(s.xt_sum)+'</td><td class="num">'+countText(s.n_pass)+'</td>'+
+      '<td class="num">'+(s.path||[]).length+'</td><td>'+endsText(s)+'</td>'+
+      '<td class="num">'+(slot?seqMetric(s.dist,2):'—')+'</td><td>'+matchLink(s,'Open match',true)+'</td></tr>';
+  }
+  let h='<div class="fs-table-wrap sq-tbl"><table class="fs-table"><thead><tr><th>Sequence</th><th class="num">xT</th><th class="num">Passes</th>'+
+    '<th class="num">Actions</th><th>Ends</th><th class="num">Distance</th><th>Match</th></tr></thead><tbody>'+row(PICK,0);
+  OVERLAYS.forEach(function(s,k){if(s)h+=row(s,k+1)});
+  return h+'</tbody></table></div>';
+}
+function pitchPanel(){
+  const shot=PICK.ended_shot,n=overlayCount();
+  let inner='';
+  OVERLAYS.forEach(function(s,k){if(s)inner+=seqTrace(s.path,k+1,s.ended_shot,0.7)});
+  inner+=seqTrace(PICK.path,0,shot,0.8,true);
+  let h='<section class="fs-pitchbox sq-c-pitch" id="sqPitch">'+
+    '<div class="fs-pitchbox-head"><h2>'+esc(tname(PICK.team))+'</h2><span class="fs-chip acc">Picked</span>'+
+      '<span class="fs-note">'+(matchLabel(PICK.game_id,PICK.team)?'v '+matchLabel(PICK.game_id,PICK.team):'Fixture not in the match view')+
+      (PICK.start_min!=null?' · '+PICK.start_min+"'":'')+(n?' · '+n+' overlay'+(n>1?'s':''):'')+'</span></div>'+
+    pitchSVG(inner,'Picked sequence'+(n?' with '+n+' overlaid nearest match'+(n>1?'es':''):'')+'.')+
+    legendHtml()+
+    '<p class="fs-orient">Attack left to right → · every sequence is drawn in its own team’s attacking direction</p>'+
+    '<p class="fs-pitch-caption">Recorded actions only. Dotted segments join two recorded actions where the feed has no event; they are inferred, not confirmed carries. '+
+      'Anything drawn faintly after the diamond is a rebound or second phase.</p>'+
+    compareTable()+
+    actionTrace(PICK,ROLE[0]);
+  OVERLAYS.forEach(function(s,k){if(s)h+=actionTrace(s,ROLE[k+1])});
+  h+='<div class="fs-pitchbox-foot">'+matchLink(PICK,'Open match · '+fixtureText(PICK))+exportButtons('sqPitch','the selected sequence pitch')+'</div></section>';
+  return h;
+}
+function nearRow(s,i){
+  const slot=overlaySlot(s.seq_uid),full=!slot&&overlayCount()>=TRAY_MAX;
+  return '<button type="button" class="fs-near" data-fk="near-'+i+'" aria-pressed="'+(slot?'true':'false')+'"'+(full?' aria-disabled="true"':'')+
+    ' aria-label="'+(slot?'Remove the overlay of':'Overlay')+' the '+esc(fixtureText(s))+' sequence, distance '+seqMetric(s.dist,2)+'"'+
+    ' onclick="toggleOverlay('+i+')">'+
+    '<span class="fs-num">'+(i+1)+'</span>'+
+    '<span><span class="sq-near-t">'+(slot?'<i class="fs-swatch s'+slot+'"></i>':'')+'<span>'+esc(fixtureText(s))+'</span></span>'+
+      '<small>xT '+seqMetric(s.xt_sum)+' · '+countText(s.n_pass)+' passes · '+endsText(s)+(slot?' · '+ROLE[slot].toLowerCase():'')+'</small></span>'+
+    '<span class="fs-num">'+seqMetric(s.dist,2)+'</span></button>';
+}
+function nearPanel(){
+  let h='<section class="fs-panel sq-c-near" id="sqNear"'+(NB_LOADING?' aria-busy="true"':'')+'><div class="fs-panel-h"><h2>Nearest matches</h2></div>';
+  if(NB_LOADING){
+    return h+'<p class="fs-note">Finding similar sequences…</p><div class="sq-near-list">'+skeleton(NEAR_SHOWN,'row')+'</div></section>';
+  }
+  if(SIM_ERROR){
+    return h+banner('Similarity search is temporarily unavailable ('+SIM_ERROR+'). Nothing on the page changed; your selected sequence is still shown.',
+      '<button type="button" class="fs-btn" data-fk="retry" onclick="choosePick(CANDS.indexOf(PICK))">Retry search</button>')+'</section>';
+  }
+  if(!NB.length){
+    return h+'<div class="fs-empty"><h3>No neighbours returned</h3><p>The similarity search returned no sequences with a drawable path for this pick. '+
+      'That describes the current data pool, whose population is not reported.</p>'+
+      '<button type="button" class="fs-btn" data-fk="retry" onclick="choosePick(CANDS.indexOf(PICK))">Search again</button></div></section>';
+  }
+  /* Seven rows by default. An overlay that sits further down the returned list
+     (from a deep link, say) keeps the whole list open so its row is visible. */
+  const deep=OVERLAYS.some(function(s){return s&&NB.indexOf(s)>=NEAR_SHOWN});
+  const all=NEAR_ALL||deep,shown=all?NB.length:Math.min(NEAR_SHOWN,NB.length);
+  h+='<p class="fs-note">The sequences closest in shape to the picked one, in other matches, by trajectory, length, zones and threat. '+
+    'Lower distance is a closer shape. Select a row to overlay it on the pitch and again to remove it; the tray holds three.</p>'+
+    '<div class="sq-near-list">';
+  for(let i=0;i<shown;i++)h+=nearRow(NB[i],i);
+  h+='</div><div class="fs-panel-foot"><span class="fs-note">Showing '+shown+' of '+NB.length+' returned</span>';
+  if(NB.length>NEAR_SHOWN&&!deep)h+='<button type="button" class="fs-btn" data-fk="near-all" aria-expanded="'+(all?'true':'false')+'" onclick="showAllNearest('+(all?'false':'true')+')">'+
+    (all?'Show nearest '+NEAR_SHOWN:'Show all '+NB.length)+'</button>';
+  return h+exportButtons('sqNear','the nearest matches list')+'</div></section>';
+}
+function trayPanel(){
+  const n=overlayCount();
+  let h='<section class="fs-tray sq-c-tray" id="sqTray" aria-label="Compare tray"><span class="fs-label">Compare tray · '+n+' of '+TRAY_MAX+'</span>';
+  if(!n)h+='<p class="fs-note">Empty. Select a nearest match to overlay it on the picked sequence.</p>';
+  OVERLAYS.forEach(function(s,k){
+    if(s)h+='<div class="fs-tray-row"><i class="fs-swatch s'+(k+1)+'"></i><span>'+esc(fixtureText(s))+'<small>distance '+seqMetric(s.dist,2)+'</small></span>'+
+      '<button type="button" class="fs-btn" data-fk="rm-'+(k+1)+'" aria-label="Remove the overlay of the '+esc(fixtureText(s))+' sequence" onclick="removeOverlay('+(k+1)+')">Remove</button></div>';
+  });
+  h+='<div class="sq-tray-actions"><button type="button" class="fs-btn k" data-fk="tray-png"'+(n?'':' disabled')+' onclick="exportPanel(\'sqPitch\',\'png\',this)">Export overlay PNG</button>'+
+    '<button type="button" class="fs-btn" data-fk="tray-clear"'+(n?'':' disabled')+' onclick="clearOverlays()">Clear</button></div>'+
+    '<p class="fs-note">'+esc(TRAY_NOTE)+'</p><p class="fs-note">'+esc(POOL_NOTE)+'.</p></section>';
+  return h;
+}
+function drawSelected(){
+  paint(controls()+'<div class="sq-cols">'+
+    '<section class="fs-panel sq-c-cands"><div class="fs-panel-h"><h2>Candidates</h2>'+
+      '<button type="button" class="fs-btn sq-right" data-fk="back" onclick="backToList()">← Back to list</button></div>'+
+      '<p class="fs-note">'+esc(LIST_TITLE||listTitle())+'. The outlined card is the picked sequence; select another to switch.</p>'+
+      '<div class="sq-gap">'+candGrid()+'</div></section>'+
+    pitchPanel()+
+    '<div class="sq-side">'+nearPanel()+trayPanel()+'</div></div>');
+}
+function renderPick(){drawSelected();saveSequenceState()}
+
+/* ----- copy and export ----- */
+function csvCell(v){v=v==null?'':String(v);return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+function snapshotText(){
+  const s=window.FutScout&&FutScout.snapshot?FutScout.snapshot():null;
+  return s?(s.snapshot+(s.text?' ('+s.text+')':'')):'not reported';
+}
+function scopeText(){
+  return 'Browse by '+(MODE==='type'?'sequence type: '+typeLabel():'team: '+tname(TEAMSEL))+
+    '; up to twelve open-play candidates ordered by xT';
+}
+function findSequence(uid){
+  if(PICK&&String(PICK.seq_uid)===uid)return {s:PICK,slot:0};
+  for(let k=0;k<OVERLAYS.length;k++)if(OVERLAYS[k]&&String(OVERLAYS[k].seq_uid)===uid)return {s:OVERLAYS[k],slot:k+1};
+  return null;
+}
+function actionsCsv(s,slot){
+  const lines=['# FutScout · Possession sequences · ordered action data',
+    '# mode: '+(MODE==='type'?'Sequence type':'Team')+' · '+(MODE==='type'?'type: '+typeLabel():'team: '+tname(TEAMSEL))+
+      ' · league: not reported by this endpoint · data snapshot: '+snapshotText(),
+    '# sequence: '+s.seq_uid+' · '+fixtureText(s)+' · role: '+ROLE[slot].toLowerCase()+
+      (slot?' · distance to picked: '+seqMetric(s.dist,2):''),
+    '# '+POOL_NOTE,
+    'sequence_uid,role,step,action,x,y,end_x,end_y'];
+  actionRows(s).forEach(function(r){
+    lines.push([s.seq_uid,ROLE[slot].toLowerCase(),r.inferred?'':r.step,r.inferred?'Inferred · no event':r.t,
+      r.x,r.y,r.ex==null?'':r.ex,r.ey==null?'':r.ey].map(csvCell).join(','));
+  });
+  return lines.join('\r\n');
+}
+async function copyActionsCsv(uid){
+  const found=findSequence(String(uid));if(!found)return;
+  const text=actionsCsv(found.s,found.slot),rows=actionRows(found.s).length;
+  let ok=false;
+  try{await navigator.clipboard.writeText(text);ok=true}catch(e){
+    const area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');
+    area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();
+    try{ok=document.execCommand('copy')}catch(err){ok=false}
+    area.remove();
+  }
+  toast(ok?'Copied '+rows+' rows as CSV':'Copy failed: clipboard unavailable');
+}
+/* PNG and PDF go through the shared capture. It rasterises an inline SVG as a
+   standalone image, where neither the page stylesheet nor a custom property
+   exists, so the export surface is built off screen under .fs-light (always the
+   light palette) and every SVG node gets its resolved paint written inline
+   before the shared code clones it. */
+const SVG_PAINT=['fill','stroke','color','opacity','fill-opacity','stroke-opacity','stroke-width','stroke-dasharray','stroke-linecap','font-family','font-size','font-weight','text-anchor','dominant-baseline','r'];
+function exportPanel(id,format,button){
+  const source=document.getElementById(id);
+  if(!source||!window.FutScoutExports){toast('Export unavailable');return}
+  const wrap=document.createElement('div'),surface=document.createElement('div'),clone=source.cloneNode(true);
+  wrap.className='sq-export-wrap';surface.className='fs-light sq-export';
+  clone.removeAttribute('id');
+  clone.querySelectorAll('[id]').forEach(function(n){n.removeAttribute('id')});
+  surface.appendChild(clone);
+  const note=document.createElement('p');note.className='sq-export-note';
+  note.textContent=POOL_NOTE+'. '+TRAY_NOTE+' Scope: '+scopeText()+'. Data snapshot: '+snapshotText()+'.';
+  surface.appendChild(note);wrap.appendChild(surface);document.body.appendChild(wrap);
+  surface.querySelectorAll('svg *').forEach(function(n){
+    const cs=getComputedStyle(n);let css='';
+    SVG_PAINT.forEach(function(p){const v=cs.getPropertyValue(p);if(v)css+=p+':'+v+';'});
+    n.setAttribute('style',css);
+  });
+  /* capture() clones the surface and reads the export context before its first
+     await, so the off-screen copy can go as soon as the call returns. */
+  window.FutScoutExports.capture(surface,format,button);
+  wrap.remove();
 }
 
 let restoringSequence=false;
-function sequenceState(){return {v:1,mode:MODE,tag:TAG,team:TEAMSEL,pick:PICK&&PICK.seq_uid,overlay:OVERLAY&&OVERLAY.seq_uid};}
+/* The URL contract is unchanged: {v:1,mode,tag,team,pick,overlay}. `overlay`
+   is still one sequence id (the first overlay). `overlays` is added only when
+   one id cannot describe the tray: more than one overlay, or an overlay that is
+   not in the first slot. It is positional, null for an empty slot. */
+function sequenceState(){
+  const ids=OVERLAYS.map(function(s){return s?s.seq_uid:null}),first=ids.filter(Boolean)[0]||null;
+  const state={v:1,mode:MODE,tag:TAG,team:TEAMSEL,pick:PICK&&PICK.seq_uid,overlay:first};
+  if(ids.filter(Boolean).length>1||(first&&ids[0]!==first))state.overlays=ids;
+  return state;
+}
 function saveSequenceState(){if(restoringSequence)return;const u=new URL(location.href);u.searchParams.set('state',JSON.stringify(sequenceState()));if(u.href!==location.href)history.pushState({},'',u);}
-async function restoreSequenceState(){const generation=++sequenceRestoreGeneration;let s;try{s=JSON.parse(new URLSearchParams(location.search).get('state')||'null')}catch(e){}restoringSequence=true;MODE='type';TAG='ended_shot';TEAMSEL=TEAMS[0]||'';PICK=null;OVERLAY=null;NB=[];try{if(s&&s.v===1){MODE=s.mode==='team'?'team':'type';TAG=TYPES.some(function(t){return t[0]===s.tag})?s.tag:'ended_shot';if(TEAMS.includes(s.team))TEAMSEL=s.team;}await loadCandidates(true);if(generation!==sequenceRestoreGeneration)return;if(s&&s.pick){let index=CANDS.findIndex(function(c){return c.seq_uid===s.pick});if(index<0){const rows=await sbAll('v_league_sequences',{seq_uid:'eq.'+s.pick,select:'seq_uid,team,game_id,start_min,path,ended_shot,ended_goal,n_pass,xt_sum',limit:'1'});if(generation!==sequenceRestoreGeneration)return;if(rows[0]){CANDS.push(rows[0]);index=CANDS.length-1}}if(index>=0){await choosePick(index,true);if(generation!==sequenceRestoreGeneration)return;if(s.overlay){const n=NB.findIndex(function(c){return c.seq_uid===s.overlay});if(n>=0)openOverlay(n)}}}}catch(e){if(generation!==sequenceRestoreGeneration)return;document.getElementById('main').innerHTML=controls()+'<div class="empty">Could not restore this sequence. <button onclick="loadCandidates()">Browse available sequences</button></div>'}finally{if(generation===sequenceRestoreGeneration)restoringSequence=false}}
-const originalBrowse=renderBrowse;renderBrowse=function(){PICK=null;OVERLAY=null;sequenceGeneration++;originalBrowse();saveSequenceState()};
-const originalPick=renderPick;renderPick=function(){OVERLAY=null;originalPick();saveSequenceState()};
-const originalOverlay=openOverlay;openOverlay=function(i){originalOverlay(i);saveSequenceState()};
+function applyOverlayState(s){
+  OVERLAYS=[null,null,null];
+  if(!s)return;
+  function find(uid){return uid==null?null:(NB.filter(function(c){return c.seq_uid===uid})[0]||null)}
+  if(Array.isArray(s.overlays))s.overlays.slice(0,TRAY_MAX).forEach(function(uid,k){OVERLAYS[k]=find(uid)});
+  else if(s.overlay)OVERLAYS[0]=find(s.overlay);
+}
+async function restoreSequenceState(){
+  const generation=++sequenceRestoreGeneration;
+  let s;try{s=JSON.parse(new URLSearchParams(location.search).get('state')||'null')}catch(e){}
+  restoringSequence=true;
+  MODE='type';TAG='ended_shot';TEAMSEL=TEAMS[0]||'';
+  if(s&&s.v===1){
+    MODE=s.mode==='team'?'team':'type';
+    TAG=TYPES.some(function(t){return t[0]===s.tag})?s.tag:'ended_shot';
+    if(TEAMS.includes(s.team))TEAMSEL=s.team;
+  }
+  try{
+    const sameList=LIST_KEY!==null&&LIST_KEY===listKey();
+    /* Same list, and this pick's neighbours were already returned in this
+       session: only the view or the overlays differ, so redraw from memory
+       instead of asking again. A pick chosen by hand always asks again. */
+    const known=(sameList&&s&&s.pick&&NB_CACHE[s.pick])?CANDS.filter(function(c){return c.seq_uid===s.pick})[0]:null;
+    if(known){
+      sequenceGeneration++;
+      PICK=known;NB=NB_CACHE[s.pick];NB_FOR=s.pick;NB_LOADING=false;SIM_ERROR=null;
+      applyOverlayState(s);drawSelected();return;
+    }
+    if(sameList&&!(s&&s.pick)){renderBrowse();return}
+    if(!sameList){
+      PICK=null;OVERLAYS=[null,null,null];NB=[];
+      await loadCandidates(true);
+      if(generation!==sequenceRestoreGeneration||LIST_KEY!==listKey())return;
+    }
+    if(s&&s.pick){
+      let index=CANDS.findIndex(function(c){return c.seq_uid===s.pick});
+      if(index<0){
+        const rows=await sbAll('v_league_sequences',{seq_uid:'eq.'+s.pick,select:'seq_uid,team,game_id,start_min,path,ended_shot,ended_goal,n_pass,xt_sum',limit:'1'});
+        if(generation!==sequenceRestoreGeneration)return;
+        if(rows[0]){CANDS.push(rows[0]);index=CANDS.length-1}
+      }
+      if(index>=0){
+        await choosePick(index,true);
+        if(generation!==sequenceRestoreGeneration)return;
+        if(overlayRequested(s)){applyOverlayState(s);if(overlayCount())drawSelected()}
+      }else if(sameList)renderBrowse();
+    }
+  }catch(e){
+    if(generation!==sequenceRestoreGeneration)return;
+    paint(controls()+banner('Could not restore this sequence ('+(e.message||e)+').',
+      '<button type="button" class="fs-btn" data-fk="retry" onclick="loadCandidates()">Browse available sequences</button>'));
+  }finally{if(generation===sequenceRestoreGeneration)restoringSequence=false}
+}
+function overlayRequested(s){return !!(s&&(s.overlay||(Array.isArray(s.overlays)&&s.overlays.some(Boolean))))}
 window.addEventListener('popstate',restoreSequenceState);
-window.futScoutExportContext=function(){return {workspace:'Possession sequences',mode:MODE,type:TAG,team:TEAMSEL,picked:PICK&&PICK.seq_uid,comparison:OVERLAY&&OVERLAY.seq_uid,candidatesShown:CANDS.length,selection:'Up to twelve candidates ordered by xT; nearest twelve by trajectory distance',population:'Current API data pool; league/season coverage and eligible pool N unavailable; no league-average baseline supplied'};};
-init();
 
-function paintThemeBtn(){var b=document.getElementById('themeBtn');
-  if(b) b.textContent=document.documentElement.classList.contains('dark')?'\u2600':'\u263e';}
-(function(){var b=document.getElementById('themeBtn');
-  if(!b) return;
-  b.addEventListener('click',function(){
-    var d=document.documentElement.classList.toggle('dark');
-    try{localStorage.setItem('theme',d?'dark':'light')}catch(e){}
-    paintThemeBtn();
-  });
-  paintThemeBtn();
-})();
+/* Flat, human-readable strings: the shared capture prints them into the stamp
+   under every PNG and PDF. */
+window.futScoutExportContext=function(card){
+  const over=OVERLAYS.map(function(s,k){return s?ROLE[k+1]+': '+fixtureText(s)+', distance '+seqMetric(s.dist,2):''}).filter(Boolean);
+  return {
+    workspace:'Possession sequences',
+    entity:PICK?'Picked sequence '+PICK.seq_uid+': '+fixtureText(PICK):'Candidate list: '+listTitle(),
+    scope:scopeText(),
+    overlays:over.length?over.join('; '):'none',
+    selection:PICK?(NB.length+' nearest sequences returned, ordered by trajectory distance to the picked sequence'):(CANDS.length+' candidates shown'),
+    poolNote:POOL_NOTE,
+    distanceNote:TRAY_NOTE,
+    baseline:'No league-average baseline supplied',
+    snapshot:'Data snapshot '+snapshotText()
+  };
+};
+init();
 </script>
 </body>
 </html>
