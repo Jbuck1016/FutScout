@@ -8,6 +8,9 @@
    fill change alone.
 --------------------------------------------------------------------------- */
 
+/* The hidden attribute always wins over a component's display value. */
+[class^="fs-"][hidden],[class*=" fs-"][hidden]{display:none!important}
+
 /* ---------- Layout: rail + canvas ---------- */
 .fs-body{display:flex;align-items:stretch;flex:1 1 auto;min-height:0;min-width:0}
 .fs-rail{flex:0 0 var(--rail);width:var(--rail);min-width:0;padding:var(--s4);background:var(--panel);border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:var(--s4);overflow:auto}
