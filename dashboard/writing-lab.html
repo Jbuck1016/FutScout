@@ -11,47 +11,190 @@
 <link rel="stylesheet" href="theme.css?v=pr1">
 <script src="site-tools.js?v=pr1"></script>
 <style>
-:root{--muted:var(--pitchline);--sheet:var(--ink);--red:var(--accent);--green:var(--p60);--shadow:0 18px 60px rgba(13,18,25,.18)}
-html.dark{--muted:var(--muted);--sheet:var(--panel);--red:var(--accent);--green:var(--p60);--shadow:0 22px 70px rgba(0,0,0,.38)}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--display);min-height:100vh;background-image:linear-gradient(rgba(120,110,90,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(120,110,90,.045) 1px,transparent 1px);background-size:32px 32px}
-button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}.mono{font-family:var(--mono)}.shell{max-width:1580px;margin:auto;padding:22px 28px 40px}
-.mast{border-top:4px solid var(--red);display:flex;justify-content:space-between;gap:24px;padding:18px 0 20px;align-items:flex-end}.kicker{font:500 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--red)}h1{font:700 clamp(38px,6vw,82px)/.84 var(--display);margin:8px 0 5px;letter-spacing:-.055em}.deck{color:var(--muted);max-width:720px;font-size:15px;line-height:1.5}.mast-actions{display:flex;gap:7px;align-items:center}.ghost,.solid{border:1px solid var(--line);background:var(--sheet);padding:9px 13px;font:500 10px/1 var(--mono);text-transform:uppercase;letter-spacing:.05em;text-decoration:none}.solid{background:var(--red);border-color:var(--red);color:white}.ghost:hover{border-color:var(--gold)}
-.new-strip{display:grid;grid-template-columns:1fr 190px 110px auto;gap:8px;background:var(--sheet);border:1px solid var(--line);box-shadow:var(--shadow);padding:13px;margin-bottom:14px}.field,select,textarea{width:100%;background:transparent;border:1px solid var(--line);padding:11px 12px;outline:none}.field:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 20%,transparent)}select{background-color:var(--panel);color:var(--ink)}select option,select optgroup{background-color:var(--panel);color:var(--ink)}
-.workspace{display:grid;grid-template-columns:260px minmax(0,1fr) 390px;min-height:720px;border:1px solid var(--line);background:var(--sheet);box-shadow:var(--shadow)}.rail{border-right:1px solid var(--line);padding:16px;min-width:0}.rail-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}.eyebrow{font:500 9px/1 var(--mono);text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}.count{font:500 10px/1 var(--mono);color:var(--gold)}.project{display:block;width:100%;text-align:left;background:transparent;border:0;border-top:1px solid var(--line);padding:13px 4px}.project:last-child{border-bottom:1px solid var(--line)}.project.on{color:var(--red)}.project-title{font:700 16px/1.15 var(--display)}.project-meta{font:400 9px/1.4 var(--mono);color:var(--muted);margin-top:5px}.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:5px}.status-dot.ready{background:var(--green)}.status-dot.error{background:var(--red)}
-.evidence{padding:18px 20px;min-width:0;overflow:hidden}.empty{height:100%;display:grid;place-items:center;text-align:center;color:var(--muted)}.empty strong{display:block;font:700 28px/1 var(--display);color:var(--ink);margin-bottom:10px}.match-head{display:grid;grid-template-columns:1fr auto;align-items:start;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:16px}.scoreline{font:700 clamp(26px,4vw,52px)/.95 var(--display);letter-spacing:-.035em}.scoreline b{color:var(--red);padding:0 7px}.match-meta{text-align:right;font:500 9px/1.55 var(--mono);text-transform:uppercase;color:var(--muted)}.state{display:inline-flex;align-items:center;gap:6px;font:500 9px/1 var(--mono);text-transform:uppercase;padding:6px 8px;border:1px solid var(--line);margin-top:7px}.pulse{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 1.6s infinite}.ready .pulse{background:var(--green);animation:none}.error .pulse{background:var(--red);animation:none}@keyframes pulse{50%{opacity:.25}}
-.section-h{display:flex;justify-content:space-between;align-items:end;margin:20px 0 9px}.section-h h2{font:700 22px/1 var(--display);margin:0}.section-h span{font:500 8px/1 var(--mono);text-transform:uppercase;color:var(--muted)}.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.team-card{border:1px solid var(--line);padding:12px}.team-card h3{margin:0 0 10px;font:700 15px/1 var(--display)}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.metric{border-top:1px dotted var(--line);padding-top:7px}.metric b{display:block;font:700 20px/1 var(--display)}.metric small{font:500 7px/1.2 var(--mono);text-transform:uppercase;color:var(--muted)}
-.stories{display:grid;gap:7px}.story{display:grid;grid-template-columns:25px 1fr auto;gap:10px;border:1px solid var(--line);padding:11px;align-items:start}.story-rank{font:500 10px/1 var(--mono);color:var(--red)}.story h3{font:700 16px/1.1 var(--display);margin:0 0 3px}.story p{font-size:12px;line-height:1.4;color:var(--muted);margin:0}.story-value{font:600 10px/1 var(--mono);color:var(--green);white-space:nowrap}.story input{accent-color:var(--red)}
-.viz-tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.viz-tools select{width:auto;min-width:150px;padding:8px}.seg{display:flex;border:1px solid var(--line)}.seg button{border:0;border-right:1px solid var(--line);background:transparent;padding:8px 10px;font:500 9px/1 var(--mono)}.seg button:last-child{border:0}.seg button.on{background:var(--ink);color:var(--sheet)}.pitch-wrap{border:1px solid var(--line);background:color-mix(in srgb,var(--green) 8%,var(--sheet));padding:8px}.pitch{display:block;width:100%;aspect-ratio:105/68}.plot-note{font:400 9px/1.45 var(--mono);color:var(--muted);margin-top:6px}
-.desk{border-left:1px solid var(--line);display:flex;flex-direction:column;min-width:0}.desk-tabs{display:flex;border-bottom:1px solid var(--line)}.desk-tabs button{flex:1;background:transparent;border:0;border-right:1px solid var(--line);padding:12px 5px;font:500 9px/1 var(--mono);text-transform:uppercase}.desk-tabs button.on{color:var(--red);box-shadow:inset 0 -2px var(--red)}.desk-body{padding:16px;overflow:auto;flex:1}.label{display:block;font:500 8px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}.label:first-child{margin-top:0}textarea{resize:vertical;min-height:125px;font:400 15px/1.55 var(--display)}.draft{min-height:460px}.brief{font-size:14px;line-height:1.55;white-space:pre-wrap}.savebar{padding:10px 16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font:500 9px/1 var(--mono);color:var(--muted)}.saved{color:var(--green)}.errorbox{border:1px solid color-mix(in srgb,var(--red) 55%,var(--line));padding:12px;color:var(--red);font:500 10px/1.5 var(--mono);margin-top:12px}.loading-lines{display:grid;gap:7px}.loading-lines i{display:block;height:9px;background:linear-gradient(90deg,var(--line),transparent,var(--line));background-size:200% 100%;animation:shimmer 1.3s linear infinite}.loading-lines i:nth-child(2){width:78%}.loading-lines i:nth-child(3){width:63%}@keyframes shimmer{to{background-position:-200% 0}}
-@media(max-width:1100px){.workspace{grid-template-columns:220px 1fr}.desk{grid-column:1/-1;border-left:0;border-top:1px solid var(--line);min-height:500px}.new-strip{grid-template-columns:1fr 170px 100px}.new-strip button{grid-column:1/-1}.draft{min-height:300px}}
-@media(max-width:720px){.shell{padding:14px}.mast{align-items:flex-start}.deck{font-size:13px}.mast-actions{flex-direction:column}.new-strip{grid-template-columns:1fr}.workspace{display:block}.rail{border-right:0;border-bottom:1px solid var(--line);max-height:250px;overflow:auto}.team-grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(3,1fr)}.match-head{grid-template-columns:1fr}.match-meta{text-align:left;margin-top:8px}.desk{min-height:560px}}
+/* Writing lab. Rail on the chrome ground; the canvas is editorial (paper ground
+   and the serif reading face from [data-fs-canvas="editorial"] in theme.css).
+   Every value here is a token. The classes the page script writes (.ghost,
+   .solid, .state, .project ...) are styled here to the fs-btn / fs-tag /
+   fs-dir-row specs so the save, recovery and submission code stays untouched. */
+*{box-sizing:border-box}
+body{display:flex;flex-direction:column;min-height:100vh}
+.wl{flex:1 1 auto}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed}
+
+/* Buttons written by the page script */
+.ghost,.solid{appearance:none;display:inline-flex;align-items:center;justify-content:center;min-height:var(--tap);padding:5px 10px;background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:var(--radius);font:400 12px/1.2 var(--body);text-decoration:none;white-space:nowrap}
+.ghost:hover{background:var(--panel2)}
+.solid{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.plot-actions .ghost{border-color:var(--ink);font:500 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+:is(.ghost,.solid):disabled,.plot-actions .ghost:disabled{color:var(--muted);background:var(--panel2);border-color:var(--rule)}
+
+/* Rail: new workspace, saved matches */
+.new-strip{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:var(--s3);padding-bottom:var(--s4);border-bottom:1px solid var(--rule)}
+.new-strip>:is(.fs-label,.wl-url,button){grid-column:1/-1}
+.rail-h{display:flex;justify-content:space-between;align-items:baseline}
+.rail .eyebrow{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.count{font:400 11px/1 var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+#projects{border-top:1px solid var(--rule);min-height:0}
+.project{display:flex;flex-direction:column;gap:var(--s1);width:100%;padding:var(--s3);background:none;border:0;border-left:3px solid transparent;border-bottom:1px solid var(--rule2);color:var(--ink);text-align:left}
+.project:hover{background:var(--panel2)}
+.project.on{border-left-color:var(--accent);background:var(--bg)}
+.project-title{font:600 13px/1.3 var(--body)}
+.project-meta{font:400 11px/1.4 var(--mono);color:var(--muted)}
+#projects>.project-meta{padding:var(--s3) 0}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:var(--s1)}
+.status-dot.ready{background:var(--ink)}
+.status-dot.error{background:var(--p0)}
+.wl-skel{display:grid;gap:var(--s2);padding-top:var(--s3)}
+
+/* Canvas */
+.wl-canvas{display:flex;flex-direction:column;gap:var(--s5)}
+.wl-head{display:flex;align-items:flex-end;flex-wrap:wrap;gap:var(--s3) var(--s6)}
+.wl-head h1{margin:var(--s2) 0 0}
+.kicker{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.deck{flex:1 1 320px;max-width:65ch;margin:0;font:400 12px/1.4 var(--body);color:var(--muted)}
+.wl-strip .fs-label{display:block;margin-bottom:var(--s2)}
+.wl-strip .fs-dl{flex:1 1 420px;max-width:760px;grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr)}
+.wl-strip .fs-dl dd{overflow-wrap:anywhere}
+.wl-strip .fs-dl a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:2px}
+.narrow .wl-strip .fs-dl{grid-template-columns:auto minmax(0,1fr);max-width:none}
+.fs-tag.wl-ink{border-color:var(--ink);color:var(--ink)}
+.wl-banners{display:grid;gap:var(--s3);margin-top:calc(var(--s3) - var(--s5))}
+.wl-banners:empty{display:none}
+.wl-banner-acts{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.status-message{min-height:16px;font:400 11px/1.4 var(--mono);color:var(--muted)}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:var(--s5);align-items:start}
+.narrow .workspace{grid-template-columns:minmax(0,1fr)}
+
+/* Evidence */
+.evidence{min-width:0}
+.evidence>h2{margin:0 0 var(--s2);font:500 20px/1.2 var(--display)}
+.evidence>p{margin:0 0 var(--s4);font:400 13px/1.45 var(--body);color:var(--muted)}
+.empty{padding:var(--s6);border:1px dashed var(--rule);border-radius:var(--radius);background:var(--panel);font:400 13px/1.45 var(--body);color:var(--muted)}
+.empty strong{display:block;margin-bottom:var(--s2);font:500 20px/1.2 var(--display);color:var(--ink)}
+.match-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s4);align-items:start;padding-bottom:var(--s4);border-bottom:1px solid var(--rule)}
+.scoreline{font:500 20px/1.2 var(--display)}
+.scoreline,.project-title,.match-meta{overflow-wrap:anywhere}
+.match-meta{text-align:right;font:400 11px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.state{display:inline-flex;align-items:center;gap:var(--s1);margin-top:var(--s2);padding:1px 5px;border:1px solid var(--rule);border-radius:var(--radius);font:500 9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.state.ready{border-color:var(--ink);color:var(--ink)}
+.state.error{border-color:var(--p0);color:var(--p0-text)}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:wl-pulse 1.6s infinite}
+:is(.ready,.error)>.pulse{display:none}
+@keyframes wl-pulse{50%{opacity:.25}}
+.section-h{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:var(--s2) var(--s4);margin:var(--s6) 0 var(--s3)}
+.section-h h2{margin:0;font:500 20px/1.2 var(--display)}
+.section-h span{font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stories{display:grid;gap:var(--s2)}
+.story{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:var(--s4);align-items:start;padding:var(--s4);background:var(--panel);border:1px solid var(--rule);border-left:3px solid transparent;border-radius:var(--radius)}
+.story:has(input:checked){border-left-color:var(--accent)}
+.story-rank{font:400 11px/1.4 var(--mono);color:var(--muted)}
+.story h3{margin:0 0 var(--s1);font:600 16px/1.2 var(--display)}
+.story p{margin:0;font:400 12px/1.4 var(--body);color:var(--muted)}
+.story-value{font:400 12px/1.4 var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+.story-value label{display:inline-flex;align-items:center;gap:var(--s2);min-height:var(--tap);font:inherit;cursor:pointer}
+.story input{accent-color:var(--accent)}
+.team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
+.team-card{min-width:0;padding:var(--s4);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.team-card h3{margin:0 0 var(--s3);font:600 16px/1.2 var(--display)}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3)}
+.metric{padding-top:var(--s2);border-top:1px solid var(--rule2)}
+.metric b{display:block;font:500 20px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.metric small{font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.viz-tools{display:flex;gap:var(--s2);flex-wrap:wrap;margin-bottom:var(--s3)}
+.viz-tools select{height:32px;min-width:150px;max-width:100%;padding:0 var(--s3);background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:var(--radius);font:400 13px/1 var(--body)}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;max-width:100%}
+.seg button{min-height:calc(var(--tap) - 2px);padding:4px 10px;background:var(--panel);color:var(--ink);border:0;border-left:1px solid var(--rule);font:400 12px/1.2 var(--body);white-space:nowrap}
+.seg button:first-child{border-left:0}
+.seg button:hover{background:var(--panel2)}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.pitch-wrap{padding:var(--s4);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.plot-card h3{margin:0 0 var(--s3);font:500 16px/1.2 var(--display)}
+.pitch{display:block;width:100%;aspect-ratio:105/68;background:var(--pitch);color:var(--pitchline)}
+.pitch>g:first-of-type{stroke-opacity:1}
+.plot-note{margin:var(--s2) 0 0;font:400 11px/1.4 var(--body);color:var(--muted)}
+.plot-note a{color:var(--ink);text-underline-offset:2px}
+.plot-actions{display:flex;gap:var(--s2);flex-wrap:wrap;margin:var(--s3) 0}
+.evidence details{background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.evidence summary{display:flex;align-items:center;min-height:var(--tap);padding:var(--s2) var(--s4);font:500 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.trace{max-height:300px;overflow:auto;border-top:1px solid var(--rule)}
+.trace table{border-collapse:collapse;width:100%;font:400 12px/1.4 var(--body)}
+.trace th{position:sticky;top:0;padding:var(--s2) var(--s3);background:var(--panel);border-bottom:1px solid var(--ink);font:500 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;white-space:nowrap}
+.trace td{padding:var(--s2) var(--s3);border-bottom:1px solid var(--rule2);text-align:left}
+.trace td:is(:nth-child(1),:nth-child(2),:nth-child(6)){font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.errorbox{margin-top:var(--s4);padding:var(--s3) var(--s5);background:var(--panel);border:1px solid var(--p0);border-radius:var(--radius);font:400 12px/1.4 var(--body);color:var(--ink);overflow-wrap:anywhere}
+.loading-lines{display:grid;gap:var(--s2);margin-top:var(--s4)}
+.loading-lines i{display:block;height:14px;background:var(--skel);border-radius:var(--radius);animation:fs-pulse 1.2s ease-in-out infinite}
+.loading-lines i:nth-child(2){width:78%}.loading-lines i:nth-child(3){width:63%}
+
+/* Desk: notes, draft, AI brief, publish */
+.desk{display:flex;flex-direction:column;min-width:0;background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.desk-tabs{display:flex;border-bottom:1px solid var(--rule);overflow-x:auto}
+.desk-tabs button{flex:1 0 auto;min-height:var(--tap);padding:var(--s3) var(--s3);background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font:400 13px/1 var(--body);white-space:nowrap}
+.desk-tabs button:hover{color:var(--ink)}
+.desk-tabs button.on{color:var(--ink);font-weight:600;border-bottom-color:var(--accent)}
+.desk-tabs button:focus-visible{outline-offset:-2px}
+.desk-body{flex:1;min-width:0;padding:var(--s5)}
+.desk-body>.empty{border:0;padding:0;background:none}
+.desk .label{display:block;margin:var(--s5) 0 var(--s2);font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.desk .label:first-child{margin-top:0}
+.desk :is(textarea,select,input.field){width:100%;background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:var(--radius)}
+.desk :is(select,input.field){height:32px;padding:0 var(--s3);font:400 13px/1 var(--body)}
+.desk textarea{resize:vertical;min-height:140px;padding:var(--s4);font:500 15px/1.6 var(--display)}
+.desk textarea.draft{min-height:460px}
+.narrow .desk textarea.draft{min-height:300px}
+.brief{font-size:15px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.label+.brief,.brief[style]{font:400 12px/1.4 var(--body);color:var(--muted)}
+.desk-body>p{margin:0 0 var(--s3);font:400 12px/1.4 var(--body);color:var(--muted)}
+.desk-body>.plot-actions{margin:var(--s5) 0 0;padding-top:var(--s3);border-top:1px solid var(--rule)}
+.savebar{display:flex;justify-content:space-between;align-items:center;gap:var(--s4);padding:var(--s3) var(--s5);border-top:1px solid var(--rule);font:400 11px/1.4 var(--mono);color:var(--muted)}
+#saveState{color:var(--ink)}
+
+.fs-export-stage .plot-note{font-size:18px}.fs-export-stage .plot-card h3{font-size:22px}
+@media(max-width:760px){
+  .rail #projects{max-height:168px;overflow:auto}
+  .team-grid{grid-template-columns:minmax(0,1fr)}
+  .match-head{grid-template-columns:minmax(0,1fr)}.match-meta{text-align:left}
+  .story{grid-template-columns:minmax(0,1fr)}
+  .viz-tools select{width:100%;min-width:0;height:44px}
+  .seg{display:flex;width:100%}.seg button{flex:1 1 0}
+  .desk :is(select,input.field){height:44px}
+  .plot-actions>*{flex:1 1 140px}
+}
+@media(prefers-reduced-motion:reduce){.pulse,.loading-lines i{animation:none}}
 </style>
-<style>
-body{font-family:var(--font-body, sans-serif)}h1{font-size:clamp(30px,4vw,46px);line-height:1.05}.mast{padding:12px 0}.deck{font-size:14px}.ghost,.solid,.eyebrow,.project-meta,.match-meta,.state,.section-h span,.metric small,.story-rank,.story-value,.seg button,.desk-tabs button,.label,.savebar,.plot-note{font-size:12px;line-height:1.4}.mast-actions,.section-h{flex-wrap:wrap}.metric small{font-size:11px}.workspace{grid-template-columns:210px minmax(0,1fr) 330px;min-height:540px}.trace{max-height:300px;overflow:auto}.trace table{border-collapse:collapse;width:100%;font-size:12px}.trace td,.trace th{text-align:left;padding:6px;border-bottom:1px solid var(--line)}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:3px}.plot-actions{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.status-message{font-size:13px;color:var(--muted);padding:8px 0}button:disabled{opacity:.6;cursor:wait}@media(max-width:1100px){.workspace{grid-template-columns:190px minmax(0,1fr)}}@media(max-width:720px){.workspace{display:block}.mast{flex-direction:column;gap:8px}.mast-actions{flex-direction:row}.new-strip{grid-template-columns:minmax(0,1fr)}.story{grid-template-columns:1fr}.viz-tools select{width:100%;min-width:0}.ghost,.solid,.seg button,.desk-tabs button{min-height:44px}.desk{min-height:350px}}@media(prefers-reduced-motion:reduce){.pulse,.loading-lines i{animation:none}}
-</style>
-<style>.scoreline,.project-title,.match-meta{overflow-wrap:anywhere}.fs-export-stage .plot-note{font-size:18px}.fs-export-stage .plot-card h3{font-size:22px}</style>
-<style>body{font-family:var(--f-body,system-ui,sans-serif)}.mono,.ghost,.solid,.eyebrow,.project-meta,.match-meta,.state,.section-h span,.metric small,.story-rank,.story-value,.seg button,.desk-tabs button,.label,.savebar,.plot-note{font-family:var(--f-mono,monospace)}select,select option,select optgroup{background:var(--sheet)!important;color:var(--ink)!important}.plot-card h3{font:600 16px/1.4 var(--f-body);margin:4px 0 8px}.story-value{color:var(--ink)}</style>
 <link rel="stylesheet" href="shell.css?v=pr1">
 <link rel="stylesheet" href="components.css?v=pr1">
 </head>
 <body><script>window.FutScout&&FutScout.mount()</script>
-<main class="shell">
-  <header class="mast">
-    <div><div class="kicker">FutScout · editorial workspace</div><h1>The writing lab.</h1><div class="deck">Turn one match centre into a structured evidence pack, working notes and a finished article. The analysis stays traceable to the underlying events.</div></div>
-    <div class="fs-slots" hidden><span data-fs-slot="actions"><a href="match.html">Raw analysis</a></span></div><script>window.FutScout&&FutScout.adopt()</script>
-  </header>
-  <form class="new-strip" id="newForm">
-    <input class="field mono" id="matchUrl" aria-label="WhoScored match URL" placeholder="Paste a WhoScored match URL…" required>
-    <select id="competition" aria-label="Competition"><optgroup label="England"><option value="ENG-League Cup">EFL Cup</option><option value="ENG-FA Cup">FA Cup</option><option value="ENG-Premier League">Premier League</option><option value="ENG-Championship">Championship</option></optgroup><optgroup label="Europe"><option value="INT-Champions League">Champions League</option><option value="INT-Europa League">Europa League</option><option value="INT-Conference League">Conference League</option></optgroup><optgroup label="Top five leagues"><option value="ESP-La Liga">La Liga</option><option value="ITA-Serie A">Serie A</option><option value="GER-Bundesliga">Bundesliga</option><option value="FRA-Ligue 1">Ligue 1</option></optgroup><optgroup label="North America"><option value="USA-MLS">MLS</option><option value="USA-Leagues Cup">Leagues Cup</option></optgroup></select>
-    <select id="season" aria-label="Season"><option value="2627">2026/27</option><option value="2526">2025/26</option></select>
-    <button class="solid" type="submit">start workspace</button>
-  </form>
-  <div id="commandStatus" class="status-message" role="status" aria-live="polite"></div>
-  <section class="workspace">
-    <aside class="rail"><div class="rail-h"><span class="eyebrow">Saved matches</span><span class="count" id="projectCount">0</span></div><div id="projects"><div class="loading-lines"><i></i><i></i><i></i></div></div></aside>
-    <article class="evidence" id="evidence"><div class="empty"><div><strong>Start with a match.</strong>Paste its WhoScored URL above. Once the match is ingested, this desk will assemble the evidence.</div></div></article>
-    <aside class="desk" id="desk"><div class="desk-tabs"><button class="on" data-tab="notes">notes</button><button data-tab="draft">draft</button><button data-tab="brief">AI brief</button><button data-tab="publish">publish</button></div><div class="desk-body" id="deskBody"><div class="empty"><div>Select a workspace to begin.</div></div></div><div class="savebar"><span id="saveState">nothing to save</span><span>autosave</span></div></aside>
-  </section>
+<main class="wl fs-body">
+  <aside class="rail fs-rail">
+    <form class="new-strip fs-rail-full" id="newForm">
+      <span class="fs-label">New workspace</span>
+      <div class="fs-field wl-url"><label for="matchUrl">WhoScored match URL</label><input class="field mono" id="matchUrl" aria-label="WhoScored match URL" placeholder="Paste a WhoScored match URL…" required></div>
+      <div class="fs-field"><label for="competition">Competition</label><select id="competition" aria-label="Competition"><optgroup label="England"><option value="ENG-League Cup">EFL Cup</option><option value="ENG-FA Cup">FA Cup</option><option value="ENG-Premier League">Premier League</option><option value="ENG-Championship">Championship</option></optgroup><optgroup label="Europe"><option value="INT-Champions League">Champions League</option><option value="INT-Europa League">Europa League</option><option value="INT-Conference League">Conference League</option></optgroup><optgroup label="Top five leagues"><option value="ESP-La Liga">La Liga</option><option value="ITA-Serie A">Serie A</option><option value="GER-Bundesliga">Bundesliga</option><option value="FRA-Ligue 1">Ligue 1</option></optgroup><optgroup label="North America"><option value="USA-MLS">MLS</option><option value="USA-Leagues Cup">Leagues Cup</option></optgroup></select></div>
+      <div class="fs-field"><label for="season">Season</label><select id="season" aria-label="Season"><option value="2627">2026/27</option><option value="2526">2025/26</option></select></div>
+      <button class="solid fs-btn primary" type="submit">start workspace</button>
+    </form>
+    <div class="rail-h fs-rail-full"><span class="eyebrow">Saved matches</span><span class="count" id="projectCount">0</span></div>
+    <div id="projects" class="fs-rail-full"><div class="wl-skel" aria-hidden="true"><div class="fs-skel row"></div><div class="fs-skel row"></div><div class="fs-skel row"></div></div></div>
+  </aside>
+  <div class="fs-canvas wl-canvas" data-fs-canvas="editorial" data-fs-app>
+    <header class="wl-head">
+      <div><div class="kicker">FutScout · editorial workspace</div><h1 class="fs-title">The writing lab.</h1></div>
+      <p class="deck">Turn one match centre into a structured evidence pack, working notes and a finished article. The analysis stays traceable to the underlying events.</p>
+      <div class="fs-slots" hidden><span class="mast-actions" data-fs-slot="actions"><a href="match.html">Raw analysis</a></span></div><script>window.FutScout&&FutScout.adopt()</script>
+    </header>
+    <div>
+      <section class="fs-identity wl-strip" id="wsStrip" aria-label="Open workspace: identity, save and revision status"></section>
+      <div class="wl-banners" id="wsBanners"></div>
+    </div>
+    <div id="commandStatus" class="status-message" role="status" aria-live="polite"></div>
+    <section class="workspace">
+      <article class="evidence" id="evidence"><div class="empty"><div><strong>Start with a match.</strong>Paste its WhoScored URL in the rail. Once the match is ingested, this desk will assemble the evidence.</div></div></article>
+      <aside class="desk" id="desk"><div class="desk-tabs"><button class="on" data-tab="notes">notes</button><button data-tab="draft">draft</button><button data-tab="brief">AI brief</button><button data-tab="publish">publish</button></div><div class="desk-body" id="deskBody"><div class="empty"><div>Select a workspace to begin.</div></div></div><div class="savebar"><span id="saveState">nothing to save</span><span>autosave</span></div></aside>
+    </section>
+  </div>
 </main>
 <script>
 const SB='https://xrsilhiffjoulyoqhdmp.supabase.co';
@@ -59,7 +202,6 @@ const AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6I
 const CANONICAL=new Set(['ENG-Premier League','ESP-La Liga','FRA-Ligue 1','GER-Bundesliga','ITA-Serie A','USA-MLS']);
 let KEY='',PROJECTS=[],CUR=null,EVENTS=[],TAB='notes',VIZ='passes',PLAYER='ALL',TEAM='';let saveTimer=null,pollTimer=null;
 const $=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function toggleTheme(){document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light')}catch(e){}}
 function bytesHex(bytes){return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('')}
 async function initKey(){try{KEY=localStorage.getItem('writingLabKey')||''}catch(e){}if(KEY.length<64){KEY=bytesHex(crypto.getRandomValues(new Uint8Array(32)));try{localStorage.setItem('writingLabKey',KEY)}catch(e){}}}
 async function keyHash(){return bytesHex(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(KEY))))}
@@ -112,7 +254,7 @@ function hasPoint(e,end=false){return(end?['end_x','end_y']:['x','y']).every(k=>
 function writingPlayerKey(e){return e.player_id!=null?'id:'+String(e.player_id):'name:'+e.team+':'+e.player}function writingPlayerLabel(){return PLAYER==='ALL'?'All players':EVENTS.find(e=>writingPlayerKey(e)===PLAYER)?.player||PLAYER}function selectedPlotEvents(){return EVENTS.filter(e=>e.team===TEAM&&(PLAYER==='ALL'||writingPlayerKey(e)===PLAYER)).filter(e=>VIZ==='passes'?isPass(e)&&hasPoint(e)&&hasPoint(e,true):hasPoint(e)&&(VIZ==='shots'?e.is_shot:e.is_touch))}
 function pitchBase(){return'<rect width="105" height="68" fill="transparent"/><g fill="none" stroke="currentColor" stroke-opacity=".42" stroke-width=".35"><rect x="1" y="1" width="103" height="66"/><line x1="52.5" y1="1" x2="52.5" y2="67"/><circle cx="52.5" cy="34" r="9.15"/><rect x="1" y="13.84" width="16.5" height="40.32"/><rect x="87.5" y="13.84" width="16.5" height="40.32"/><rect x="1" y="24.84" width="5.5" height="18.32"/><rect x="98.5" y="24.84" width="5.5" height="18.32"/></g>'}
 function tip(e){return esc((e.player||e.team||'Unknown')+' · '+(e.minute??'?')+"' · "+e.type)}
-function pitchSvg(){let es=selectedPlotEvents(),marks='';if(VIZ==='passes'){es.filter(isPass).slice(-420).forEach(e=>{const p=pt(e),ok=success(e);marks+='<g><title>'+tip(e)+'</title><line x1="'+p.x+'" y1="'+p.y+'" x2="'+p.ex+'" y2="'+p.ey+'" stroke="'+(ok?'var(--blue)':'var(--red)')+'" stroke-width=".45" stroke-opacity=".55" '+(ok?'':'stroke-dasharray="1 1"')+'/><circle cx="'+p.x+'" cy="'+p.y+'" r=".55" fill="'+(ok?'var(--blue)':'var(--red)')+'"/></g>'})}else if(VIZ==='touches'||VIZ==='shots'){const arr=VIZ==='shots'?es.filter(e=>e.is_shot):es.filter(e=>e.is_touch);arr.slice(-650).forEach(e=>{const p=pt(e);marks+='<g><title>'+tip(e)+'</title><circle cx="'+p.x+'" cy="'+p.y+'" r="'+(VIZ==='shots'?(e.is_goal?2:1.3):.65)+'" fill="'+(e.is_goal?'var(--red)':'var(--gold)')+'" fill-opacity=".72" stroke="var(--sheet)" stroke-width=".25"/></g>'})}else{const arr=es.filter(e=>e.is_touch),grid={};arr.forEach(e=>{const gx=Math.min(9,Math.floor((+e.x||0)/10)),gy=Math.min(7,Math.floor((+e.y||0)/12.5)),k=gx+'-'+gy;grid[k]=(grid[k]||0)+1});const max=Math.max(1,...Object.values(grid));Object.entries(grid).forEach(([k,n])=>{const [x,y]=k.split('-').map(Number);marks+='<rect x="'+(x*10.5)+'" y="'+(y*8.5)+'" width="10.5" height="8.5" fill="var(--red)" fill-opacity="'+(.08+.72*n/max)+'"><title>'+n+' touches</title></rect>'})}return'<svg class="pitch" viewBox="0 0 105 68" role="img" aria-label="'+esc(VIZ)+' map for '+esc(PLAYER==='ALL'?TEAM:writingPlayerLabel())+'">'+pitchBase()+marks+'</svg>'}
+function pitchSvg(){let es=selectedPlotEvents(),marks='';if(VIZ==='passes'){es.filter(isPass).slice(-420).forEach(e=>{const p=pt(e),ok=success(e);marks+='<g><title>'+tip(e)+'</title><line x1="'+p.x+'" y1="'+p.y+'" x2="'+p.ex+'" y2="'+p.ey+'" stroke="'+(ok?'var(--blue)':'var(--muted)')+'" stroke-width=".45" stroke-opacity=".55" '+(ok?'':'stroke-dasharray="1 1"')+'/><circle cx="'+p.x+'" cy="'+p.y+'" r=".55" fill="'+(ok?'var(--blue)':'var(--muted)')+'"/></g>'})}else if(VIZ==='touches'||VIZ==='shots'){const arr=VIZ==='shots'?es.filter(e=>e.is_shot):es.filter(e=>e.is_touch);arr.slice(-650).forEach(e=>{const p=pt(e);marks+='<g><title>'+tip(e)+'</title><circle cx="'+p.x+'" cy="'+p.y+'" r="'+(VIZ==='shots'?(e.is_goal?2:1.3):.65)+'" fill="'+(e.is_goal?'var(--accent)':'var(--gold)')+'" fill-opacity=".72" stroke="var(--pitch)" stroke-width=".25"/></g>'})}else{const arr=es.filter(e=>e.is_touch),grid={};arr.forEach(e=>{const gx=Math.min(9,Math.floor((+e.x||0)/10)),gy=Math.min(7,Math.floor((+e.y||0)/12.5)),k=gx+'-'+gy;grid[k]=(grid[k]||0)+1});const max=Math.max(1,...Object.values(grid));Object.entries(grid).forEach(([k,n])=>{const [x,y]=k.split('-').map(Number);marks+='<rect x="'+(x*10.5)+'" y="'+(y*8.5)+'" width="10.5" height="8.5" fill="var(--gold)" fill-opacity="'+(.08+.72*n/max)+'"><title>'+n+' touches</title></rect>'})}return'<svg class="pitch" viewBox="0 0 105 68" role="img" aria-label="'+esc(VIZ)+' map for '+esc(PLAYER==='ALL'?TEAM:writingPlayerLabel())+'">'+pitchBase()+marks+'</svg>'}
 function toggleEvidence(id,on){let a=Array.isArray(CUR.selected_evidence)?[...CUR.selected_evidence]:[];if(on&&!a.includes(id))a.push(id);if(!on)a=a.filter(x=>x!==id);CUR.selected_evidence=a;queueSave();if(TAB==='notes')renderDesk()}
 async function retryScrape(){if(!CUR)return;const id=CUR.id,key='retry:'+id;if(commands.has(key))return;commands.add(key);$('commandStatus').textContent='Requesting ingestion retry…';try{const rows=await api('writing_lab_projects?id=eq.'+encodeURIComponent(id)+'&scrape_status=eq.error',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify({scrape_status:'queued',scrape_error:null,updated_at:new Date().toISOString()})});if(!rows?.[0]||rows[0].scrape_status!=='queued')throw new Error('Retry was not confirmed; refresh to see the current worker state.');if(rows?.[0]){const p=mergeProject(rows[0]),i=PROJECTS.findIndex(p=>p.id===id);if(i>=0)PROJECTS[i]=p;if(CUR?.id===id){CUR=p;renderEvidence();startPolling()}renderProjects()}$('commandStatus').textContent='Retry queued; awaiting worker.'}catch(e){$('commandStatus').textContent='Retry failed; no success assumed. '+e.message}finally{commands.delete(key)}}
 function renderDesk(){if(!CUR){$('deskBody').innerHTML='<div class="empty"><div>Select a workspace to begin.</div></div>';return}document.querySelectorAll('.desk-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===TAB));if(TAB==='notes')$('deskBody').innerHTML='<label class="label" for="notes">Workspace notes</label><textarea id="notes" placeholder="Capture the angle, questions, quotes to verify, and anything you do not want to lose…" oninput="CUR.workspace_notes=this.value;queueSave()">'+esc(CUR.workspace_notes)+'</textarea><label class="label">Evidence notebook</label><div class="brief">Selected article leads: '+esc((CUR.selected_evidence||[]).length)+'\n\nUse the checkboxes beside each lead to keep the strongest evidence in view while writing.</div>';else if(TAB==='draft')$('deskBody').innerHTML='<label class="label" for="draft">Article draft</label><textarea class="draft" id="draft" placeholder="Write the article here…" oninput="CUR.article_draft=this.value;queueSave()">'+esc(CUR.article_draft)+'</textarea>';else if(TAB==='brief')$('deskBody').innerHTML='<div class="brief">'+(CUR.editorial_brief?esc(CUR.editorial_brief):'<div class="loading-lines"><i></i><i></i><i></i></div>')+'</div>'+(CUR.scrape_status==='ready'?'<button class="ghost" style="margin-top:14px" onclick="generateBrief(true)">regenerate brief</button>':'');else $('deskBody').innerHTML='<label class="label">Workflow status</label><select onchange="CUR.workflow_status=this.value;queueSave();renderProjects()"><option value="working" '+(CUR.workflow_status==='working'?'selected':'')+'>Working</option><option value="draft_complete" '+(CUR.workflow_status==='draft_complete'?'selected':'')+'>Draft complete</option><option value="published" '+(CUR.workflow_status==='published'?'selected':'')+'>Published</option><option value="archived" '+(CUR.workflow_status==='archived'?'selected':'')+'>Archived</option></select><label class="label">Published article URL</label><input class="field" value="'+esc(CUR.article_url||'')+'" placeholder="https://…" oninput="CUR.article_url=this.value;queueSave()"><div class="brief" style="margin-top:18px">The workspace keeps the source match, chosen evidence, notes, AI brief and full draft together. Archived is a workflow label; the saved research record remains available.</div>'}
@@ -130,6 +272,31 @@ renderDesk=function(){renderDeskBase();document.querySelectorAll('.desk-tabs but
 document.querySelectorAll('.desk-tabs button').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;writeLocation();renderDesk()});$('newForm').addEventListener('submit',createProject);
 window.addEventListener('popstate',()=>{const id=new URLSearchParams(location.search).get('project');if(id)openProject(id,true);else{activeRequest++;CUR=null;EVENTS=[];TEAM='';PLAYER='ALL';TAB='notes';VIZ='passes';stopPolling();renderProjects();renderDesk();$('evidence').innerHTML='<p>Select a workspace to begin.</p>';const raw=document.querySelector('.mast-actions a');if(raw)raw.href='match.html'}});
 window.addEventListener('beforeunload',e=>{if([...drafts.values()].some(d=>d.dirty)){e.preventDefault();e.returnValue='';}});
+/* ---- Press Room presentation: workspace identity strip and banners ----
+   A read-only mirror of state this page already holds. It never writes CUR, drafts, briefStates, evidenceStates or storage and sends no request; it redraws when the existing renderers touch the DOM. */
+let stripTimer=null,stripMain='',stripBanners='';
+function stripTag(text,cls){return'<span class="fs-tag '+(cls||'')+'">'+esc(text)+'</span>'}
+function stripRow(label,value){return'<dt>'+label+'</dt><dd>'+value+'</dd>'}
+function stripBanner(kind,label,text,actions){return'<div class="fs-banner '+kind+'"><span class="fs-banner-label">'+label+'</span><span class="fs-banner-text">'+esc(text)+'</span>'+(actions?'<span class="wl-banner-acts">'+actions+'</span>':'')+'</div>'}
+function openBriefTab(){document.querySelector('.desk-tabs [data-tab="brief"]')?.click()}
+function renderStrip(){const p=CUR;let main,banners='';
+ if(!p)main='<div class="fs-identity-main"><span class="fs-label">Open workspace</span><h2 class="fs-identity-name">No workspace open</h2><p class="fs-identity-meta">Choose a saved match in the rail, or start one from a WhoScored match URL.</p></div><dl class="fs-dl">'+stripRow('Save','Nothing to save')+stripRow('Recovery','Drafts are kept in this browser until the workspace confirms them')+'</dl>';
+ else{const id=p.id,d=drafts.get(id),ev=evidenceStates.get(id),bs=briefStates.get(id)||{},saved=p.evidence_notes?._futscout_brief,save=$('saveState').textContent,ready=p.scrape_status==='ready';
+  const raw={ready:['raw ready','wl-ink'],queued:['queued',''],scraping:['ingesting',''],error:['ingestion failed','warn']}[p.scrape_status]||['status unavailable','def'];
+  let stale=false;if(p.editorial_brief){if(bs.stale)stale=true;else if(saved?.fingerprint&&ev?.status==='ready')stale=saved.fingerprint!==briefFingerprint(p)}
+  const brief=bs.status==='loading'?'Generating for this workspace…':bs.status==='error'?'Generation failed; previous brief preserved':!p.editorial_brief?'None generated. Generation is manual.':stale?'Stale: predates newer notes, selected evidence or events':'Saved'+(saved?.generated_at?' · generated <span class="fs-num">'+esc(saved.generated_at)+'</span>':' · generation time not recorded')+(!saved?.fingerprint?' · no fingerprint stored, staleness cannot be checked':ev?.status==='ready'?' · inputs unchanged since generation':' · staleness is checked once evidence loads');
+  const evidence=!ready?(p.scrape_status==='error'?'Ingestion failed; no events':'Waiting for ingestion'):ev?.status==='ready'?'<span class="fs-num">'+ev.events.length+'</span> raw event records · loaded <span class="fs-num">'+esc(ev.asOf)+'</span>':ev?.status==='loading'?'Loading events…':ev?.status==='empty'?'Event query returned no records':ev?.status==='error'?'Could not load. '+esc(ev.error||''):'Not requested yet';
+  const revision=d?'Local revision <span class="fs-num">'+d.rev+'</span> · '+(saving.has(id)?'sync in flight':d.dirty?'edits not yet confirmed by the workspace':'no unsynced edits'):'No local revision';
+  const source=/^https:\/\//.test(p.whoscored_url||'')?'<a target="_blank" rel="noopener" href="'+esc(p.whoscored_url)+'">WhoScored match '+esc(p.game_id||'pending')+'</a>':'WhoScored match '+esc(p.game_id||'pending');
+  main='<div class="fs-identity-main"><span class="fs-label">Open workspace</span><h2 class="fs-identity-name">'+esc(projectTitle(p))+'</h2><p class="fs-identity-meta">'+esc(p.competition)+' · '+esc(p.season)+' · '+esc(p.match_date||'date pending')+'</p><div class="fs-chips">'+stripTag(raw[0],raw[1])+stripTag(CANONICAL.has(p.competition)?'canonical league':'isolated competition','')+stripTag('workflow · '+String(p.workflow_status||'unknown').replace('_',' '),'')+(d?.dirty?stripTag('unsynced edits','partial'):'')+(stale?stripTag('AI brief stale','partial'):'')+(bs.status==='error'?stripTag('AI brief failed','warn'):'')+'</div></div><dl class="fs-dl">'+stripRow('Save',esc(save))+stripRow('Revision',revision)+stripRow('Record','updated <span class="fs-num">'+esc(p.updated_at||'not reported')+'</span>')+stripRow('Evidence',evidence)+stripRow('AI brief',brief)+stripRow('Pack','<span class="fs-num">writing-events-v1</span> · raw evidence, not confirmed analytics publication')+stripRow('Source',source)+stripRow('Workspace','<span class="fs-num">'+esc(id)+'</span>')+'</dl>';
+  if(/fail|unavailable/i.test(save))banners+=stripBanner('fs-banner-warn','Save',save,'<button class="fs-btn sm" onclick="saveProject()">Retry save</button><button class="fs-btn sm" onclick="downloadEvidence(\'article\')">Download draft</button>');
+  else if(/^Recovered local draft/.test(save))banners+=stripBanner('fs-banner-stale','Recovered','A draft kept in this browser was restored over the workspace copy and is not synced yet. It syncs on your next edit, or use Retry save.','<button class="fs-btn sm" onclick="saveProject()">Retry save</button>');
+  if(stale)banners+=stripBanner('fs-banner-stale','Stale AI brief','The AI brief predates newer notes, selected evidence or event data. It is kept as written; regenerate it from the AI brief tab to include the changes.','<button class="fs-btn sm" onclick="openBriefTab()">Open AI brief</button>');
+  if(bs.status==='error')banners+=stripBanner('fs-banner-warn','AI brief',(bs.error||'Brief generation failed')+'. Nothing in the workspace changed; the previous brief is preserved.','<button class="fs-btn sm" onclick="openBriefTab()">Open AI brief</button>')}
+ if(main!==stripMain){stripMain=main;$('wsStrip').innerHTML=main}if(banners!==stripBanners){stripBanners=banners;$('wsBanners').innerHTML=banners}}
+const stripObserver=new MutationObserver(()=>{clearTimeout(stripTimer);stripTimer=setTimeout(renderStrip,120)});
+for(const id of ['saveState','deskBody','evidence','projects'])stripObserver.observe($(id),{childList:true,characterData:true,subtree:true});
+setInterval(()=>{if(document.visibilityState==='visible')renderStrip()},2000);renderStrip();
 (async()=>{await initKey();await loadProjects(false);const q=new URLSearchParams(location.search),id=q.get('project'),game=q.get('match');if(id)await openProject(id,true);else if(game){const p=PROJECTS.find(p=>String(p.game_id)===game||String(p.canonical_game_id)===game);if(p)await openProject(p.id);else{$('matchUrl').value='https://www.whoscored.com/Matches/'+game;$('commandStatus').textContent='No saved workspace for this match. Review competition and season before submitting.'}}else if(PROJECTS.length){await openProject(PROJECTS[0].id,true);writeLocation(true)}})().catch(e=>{$('projects').innerHTML='<div class="errorbox">'+esc(e.message)+'</div><button class="ghost" onclick="loadProjects(false)">Retry workspaces</button>'});
 </script>
 </body>
