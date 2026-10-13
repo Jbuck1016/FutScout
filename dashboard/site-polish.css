@@ -1,30 +1,13 @@
-/* Editorial cleanup: shared direction, scoped to avoid changing bespoke plots. */
-body.lab-polished{--ink:var(--text);--line:var(--border);--cyan:var(--p60);--serif:Georgia,serif;background:var(--bg);font-family:var(--sans)}
-html.dark body.lab-polished{--cyan:var(--p60)}
-.lab-polished .shell{max-width:1280px}
-.lab-polished .mast{border-top:0;gap:24px;padding-top:0}
-.lab-polished h1{font-size:clamp(30px,3vw,40px);line-height:1.08;letter-spacing:-.035em}
-.lab-polished .lede{font-size:16px;max-width:900px}
-.lab-polished .action,.lab-polished .tab{font:600 14px/1.3 var(--sans);min-height:42px;border-radius:var(--radius);text-transform:none;display:inline-flex;align-items:center}
-.lab-polished .tab.on{background:var(--blue);border-color:var(--blue);color:white}
-.lab-polished .tabs{background:var(--bg);backdrop-filter:none;gap:6px;flex-wrap:wrap}
-.lab-polished .ph{align-items:flex-start;flex-wrap:wrap}
-.lab-polished .ph h2{line-height:1.22;font-size:22px}
-.lab-polished .ph span{font:600 12px/1.5 var(--sans);letter-spacing:.04em}
-.lab-polished .panel{border:0;border-top:2px solid var(--line);padding:16px}
-.lab-polished .grid{gap:20px}
-.lab-polished .metric,.lab-polished .model-table{font-family:var(--sans);font-size:calc(15px * var(--scale));font-variant-numeric:tabular-nums}
-.lab-polished .metric b{max-width:58%;text-align:right;overflow-wrap:anywhere}
-.lab-polished .copy,.lab-polished .plain,.lab-polished .explain{font-size:calc(16px * var(--scale));line-height:1.65}
-.lab-polished .verdict{background:var(--bg);border:0;border-left:4px solid var(--acid)}
-.lab-polished .stat b{font-family:var(--sans);font-size:24px;font-variant-numeric:tabular-nums}
-.lab-polished .stat span{font-family:var(--sans);letter-spacing:.035em}
-.lab-polished .rank-row{font-family:var(--sans);font-size:14px}
-.lab-polished .guide-context{margin:0 0 20px;padding:16px 20px;border-left:4px solid var(--acid);background:var(--paper);line-height:1.6}
-.lab-polished .guide-context p{margin:5px 0 0;color:var(--muted)}
-.lab-polished details.snapshot-history{padding:12px 0;color:var(--muted);font-size:14px}
-.lab-polished summary{cursor:pointer;font-weight:600;color:var(--ink)}
-.lab-polished #bundleDates{font-size:14px;line-height:1.6}
+/* Page polish. Tokens only.
+   .lab-polished   Model laboratory. Its layout and type now live in
+                   model-lab.html against the Press Room tokens; only the
+                   density decisions that pre-date the redesign remain here.
+   .player-start*, .pillar-*   Player fingerprints (players.html). */
+html.dark body.lab-polished{color-scheme:dark}
+/* Density pass (2026-10-01): the per-view instruction asides stay out of the way. */
+.lab-polished .guide-context{display:none}
+.lab-polished details.snapshot-history{padding:var(--s2) 0;color:var(--muted)}
+@media(max-width:760px){.lab-polished .inputs{grid-template-columns:1fr 1fr}}
 .player-start{max-width:1000px;margin:36px auto;padding:28px;color:var(--text)}
 .player-start .eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text2)}
 .player-start h1{font:700 clamp(30px,3vw,44px)/1.15 var(--display);margin:12px 0 18px}
@@ -36,7 +19,5 @@ html.dark body.lab-polished{--cyan:var(--p60)}
 .player-start button{font:600 14px/1.3 var(--body);min-height:42px;padding:10px 15px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg);color:var(--text);cursor:pointer}
 .player-start button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
 .player-start-note{font-size:14px!important;border-top:1px solid var(--border2);padding-top:20px}
-@media(max-width:700px){.lab-polished .tabs{position:static;display:grid;grid-template-columns:1fr 1fr;overflow:visible}.lab-polished .tab{justify-content:center;padding:10px}.lab-polished .rank-row{grid-template-columns:minmax(100px,1fr) 1fr 65px}.lab-polished .panel{padding:18px}.lab-polished .metric{gap:12px}.player-start{margin:0;padding:20px}.player-start-grid{grid-template-columns:1fr}}
-.lab-polished .mast{margin-bottom:12px}.lab-polished .lede{margin:10px 0}.lab-polished .stat{padding:12px 16px}.lab-polished .rail{margin:14px 0}.lab-polished #bundleDates{margin:10px 0;font-size:13px}.lab-polished .tabs{margin:12px 0}.lab-polished .callout{padding:10px 14px}.lab-polished .callout a{color:var(--acid)}.lab-polished .guide-context{display:none}
+@media(max-width:700px){.player-start{margin:0;padding:20px}.player-start-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.pillar-row{grid-template-columns:minmax(100px,1fr) minmax(60px,1fr) 40px;gap:8px}.pillar-axis{font-size:11px}.pillar-comparison .pname-link{font-size:13px}}
-
