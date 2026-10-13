@@ -6,6 +6,18 @@ if(!data || (requested && requested!==data.match.game_id)){root.textContent='No 
 const m=data.match, $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=n=>(n*100).toFixed(1)+'%', num=(n,d=2)=>Number(n).toFixed(d);
 $('pdf').onclick=()=>window.print();
+/* Print is always light, whatever the page theme. */
+window.addEventListener('beforeprint',()=>document.body.classList.add('fs-light'));window.addEventListener('afterprint',()=>document.body.classList.remove('fs-light'));
+/* Identity strip: restates dates and counts already in the saved bundle. Captured and retrospective evidence stay on separate rows. */
+const day=v=>v?new Date(v).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'}):'date not supplied';
+const stripDates=[['frozen forecast',data.provenance?.as_of],['saved report',data.provenance?.generated_at],['event feed',data.events_retrieved_on],['challenger comparison',data.challenger_scope?.as_of]].filter(p=>p[1]);
+const distinctDays=new Set(stripDates.map(p=>String(p[1]).slice(0,10))).size;
+$('stripCaptured').innerHTML='<span class="fs-tag frozen">Frozen</span> Forecast as of '+esc(day(data.provenance?.as_of))+', before kickoff';
+$('stripRetro').textContent='Saved report '+day(data.provenance?.generated_at)+' · event feed retrieved '+day(data.events_retrieved_on)+' · challenger comparison as of '+day(data.challenger_scope?.as_of);
+$('stripDates').textContent=distinctDays>1?'Mixed-date: '+distinctDays+' different dates across '+stripDates.length+' sources. None is a live read.':'Single date: '+day(stripDates[0]?.[1]);
+$('stripCounts').textContent=data.shots.length+' shots with fitted xG'+(data.identity_audit?.events_verified!=null?' · '+Number(data.identity_audit.events_verified).toLocaleString()+' event identities verified':' · event identity count not supplied');
+const reviewEntity='Brighton 3–0 Arsenal · Premier League · '+day(m.date)+' · match '+m.game_id;
+window.futScoutExportContext=()=>{const w=$('state-window'),f=$('state-filter');return {entity:reviewEntity,scope:'Worked match review; retrospective evidence, not a current prediction'+(w&&f?'; score-state window: '+w.selectedOptions[0].textContent+'; score before the event: '+f.selectedOptions[0].textContent:''),snapshot:'Forecast frozen '+String(data.provenance?.as_of||'not supplied'),report_generated:String(data.provenance?.generated_at||'not supplied'),event_feed_retrieved:String(data.events_retrieved_on||'not supplied'),model:String(data.provenance?.model_version||'not supplied'),boundary:'Historical snapshot; not refreshed; not promotion evidence'};};
 function ribbon(p){return `<div class="labels"><span class="home">Brighton</span><span>Draw</span><span class="away">Arsenal</span></div><div class="ribbon" role="img" aria-label="Brighton ${pct(p.H)}, draw ${pct(p.D)}, Arsenal ${pct(p.A)}"><span class="h" style="width:${p.H*100}%">${pct(p.H)}</span><span style="width:${p.D*100}%">${pct(p.D)}</span><span class="a" style="width:${p.A*100}%">${pct(p.A)}</span></div>`;}
 $('probabilities').innerHTML=ribbon(m.probabilities);
 $('scores').innerHTML=`<div><b>${num(m.home_expected_goals)}–${num(m.away_expected_goals)}</b><small>Pre-match expected goals</small></div><div><b>${num(m.log_loss,3)}</b><small>Realised log loss</small></div><div><b>${num(m.brier,3)}</b><small>Multiclass Brier</small></div>`;
@@ -17,8 +29,8 @@ const svg=(width,height,title,body)=>`<svg xmlns="http://www.w3.org/2000/svg" vi
 const markTitle=s=>`${s.team}: ${s.player}, ${s.minute}:${String(s.second).padStart(2,'0')}, fitted xG ${num(s.xg,4)}, ${s.is_goal?'goal':'not a goal'}`;
 let map='';
 for(const [i,team] of ['Brighton','Arsenal'].entries()){
- const ox=25+i*540,oy=62,w=500,h=w*68/105,color=i?'var(--away)':'var(--home)';
- map+=`<text x="${ox}" y="30" font-size="22" font-weight="700">${team} · ${data.shots.filter(s=>s.team===team).length} shots · ${num(sums(team))} xG</text><g transform="translate(${ox},${oy})" fill="none" stroke="var(--line)" stroke-width="1.5"><rect width="${w}" height="${h}"/><path d="M250 0V${h}"/><circle cx="250" cy="${h/2}" r="43.57"/><rect x="421.43" y="65.81" width="78.57" height="192"/><rect x="473.81" y="118.43" width="26.19" height="87.24"/><rect x="0" y="65.81" width="78.57" height="192"/><rect x="0" y="118.43" width="26.19" height="87.24"/></g>`;
+ const ox=25+i*540,oy=62,w=500,h=w*68/105,color=i?'var(--purple)':'var(--blue)';
+ map+=`<text x="${ox}" y="30" font-size="22" font-weight="700">${team} · ${data.shots.filter(s=>s.team===team).length} shots · ${num(sums(team))} xG</text><g transform="translate(${ox},${oy})" fill="none" stroke="var(--pitchline)" stroke-width="1.5"><rect width="${w}" height="${h}"/><path d="M250 0V${h}"/><circle cx="250" cy="${h/2}" r="43.57"/><rect x="421.43" y="65.81" width="78.57" height="192"/><rect x="473.81" y="118.43" width="26.19" height="87.24"/><rect x="0" y="65.81" width="78.57" height="192"/><rect x="0" y="118.43" width="26.19" height="87.24"/></g>`;
  for(const s of data.shots.filter(s=>s.team===team)){map+=`<circle tabindex="0" aria-label="${esc(markTitle(s))}" cx="${ox+s.x*w/100}" cy="${oy+(100-s.y)*h/100}" r="${Math.sqrt(Number(s.xg))*22}" fill="${s.is_goal?color:'var(--paper)'}" stroke="${color}" stroke-width="2"><title>${esc(markTitle(s))}</title></circle>`;}
  map+=`<text x="${ox+w/2}" y="415" text-anchor="middle" font-size="14">Attack direction →</text>`;
 }
@@ -27,23 +39,29 @@ $('shotmaps').innerHTML=svg(1090,488,'Shot maps: Brighton 17 attempts, Arsenal 1
 const elapsedShots=data.shots.map((s,i)=>({...s,elapsed:(data.score_states?.shot_elapsed_seconds[i] ?? (s.minute*60+s.second))/60})).sort((a,b)=>a.elapsed-b.elapsed);
 const duration=(data.score_states?.duration_seconds ?? 5760)/60;
 let timeline='';const x=t=>55+t/duration*960,y=v=>280-v/2*210;
-for(let value=0;value<=2;value+=.5)timeline+=`<path d="M55 ${y(value)}H1015" stroke="var(--line)"/><text x="40" y="${y(value)+5}" text-anchor="end" font-size="14">${value}</text>`;
+for(let value=0;value<=2;value+=.5)timeline+=`<path d="M55 ${y(value)}H1015" stroke="var(--rule)"/><text x="40" y="${y(value)+5}" text-anchor="end" font-size="14">${value}</text>`;
 for(const minute of [0,15,30,45,60,75,90])timeline+=`<text x="${x(minute)}" y="305" text-anchor="middle" font-size="14">${minute}′</text>`;
 timeline+='<text x="535" y="328" text-anchor="middle" font-size="13">Elapsed match minutes · added time included · halftime excluded</text>';
-timeline+='<text x="55" y="25" font-size="18" font-weight="700">Cumulative fitted xG</text><text x="690" y="25" font-size="16" style="fill:var(--home)">Brighton —</text><text x="865" y="25" font-size="16" style="fill:var(--away)">Arsenal - -</text>';
+timeline+='<text x="55" y="25" font-size="18" font-weight="700">Cumulative fitted xG</text><text x="690" y="25" font-size="16" style="fill:var(--blue)">Brighton —</text><text x="865" y="25" font-size="16" style="fill:var(--purple)">Arsenal - -</text>';
 for(const [i,team] of ['Brighton','Arsenal'].entries()){
 let total=0,d=`M${x(0)} ${y(0)}`,goals='';
-for(const s of elapsedShots.filter(s=>s.team===team)){const t=s.elapsed;d+=`H${x(t)}V${y(total+=Number(s.xg))}`;if(s.is_goal)goals+=`<circle cx="${x(t)}" cy="${y(total)}" r="6" fill="var(--${i?'away':'home'})"><title>${esc(markTitle(s))}</title></circle><text x="${x(t)}" y="${y(total)-14}" text-anchor="middle" font-size="14">Goal ${s.minute+1}′</text>`;}
-d+=`H${x(duration)}`;timeline+=`<path d="${d}" fill="none" stroke="var(--${i?'away':'home'})" stroke-width="3" ${i?'stroke-dasharray="8 5"':''}/>${goals}`;
+for(const s of elapsedShots.filter(s=>s.team===team)){const t=s.elapsed;d+=`H${x(t)}V${y(total+=Number(s.xg))}`;if(s.is_goal)goals+=`<circle cx="${x(t)}" cy="${y(total)}" r="6" fill="var(--${i?'purple':'blue'})"><title>${esc(markTitle(s))}</title></circle><text x="${x(t)}" y="${y(total)-14}" text-anchor="middle" font-size="14">Goal ${s.minute+1}′</text>`;}
+d+=`H${x(duration)}`;timeline+=`<path d="${d}" fill="none" stroke="var(--${i?'purple':'blue'})" stroke-width="3" ${i?'stroke-dasharray="8 5"':''}/>${goals}`;
 }
 $('timeline').innerHTML=svg(1060,360,'Cumulative fitted xG and goal timing. Brighton scored in minutes 31, 45 and 57.',timeline);
-$('shots').innerHTML=data.shots.map(s=>`<tr><td>${esc(s.team)}</td><td>${esc(s.player)}</td><td>${s.minute}:${String(s.second).padStart(2,'0')}</td><td>${num(s.xg,4)}</td><td>${s.is_goal?'Goal':'Other attempt'}</td></tr>`).join('');
+$('shots').innerHTML=data.shots.map(s=>`<tr><td>${esc(s.team)}</td><td>${esc(s.player)}</td><td class="num">${s.minute}:${String(s.second).padStart(2,'0')}</td><td class="num">${num(s.xg,4)}</td><td>${s.is_goal?'Goal':'Other attempt'}</td></tr>`).join('');
 const c=data.challenger;$('challenger').innerHTML=ribbon({H:c.home_win_probability,D:c.draw_probability,A:c.away_win_probability})+`<p class="caption">${esc(data.challenger_model)} · comparison as of ${esc(data.challenger_scope.as_of)}</p>`;
 $('provenance').innerHTML=`<strong>Provenance</strong><p>Frozen forecast: ${esc(data.provenance.as_of)}. Saved report generated: ${esc(data.provenance.generated_at)}. Model: ${esc(data.provenance.model_version)}. Match key: ${esc(m.game_id)}. Shot source: ${esc(data.event_source)}.</p><p>Report SHA-256: ${esc(data.report_sha256)}</p><p>Visual reference: <a href="https://johnspacemuller.substack.com/p/premier-league-match-dashboards">John Muller’s Athletic match dashboards</a>. Independent FutScout implementation; no affiliation. Current scope: one worked review, not an automatically generated verdict.</p>`;
 document.querySelectorAll('[data-export]').forEach(button=>button.onclick=async()=>{
- const node=$(button.dataset.export).querySelector('svg').cloneNode(true),styles=getComputedStyle(document.documentElement);
- for(const el of [node,...node.querySelectorAll('*')]){for(const attr of ['fill','stroke','style']){const v=el.getAttribute(attr);if(v)el.setAttribute(attr,v.replace(/var\((--[\w-]+)\)/g,(_,key)=>styles.getPropertyValue(key).trim()));}if(el.tagName==='text')el.setAttribute('fill',el.getAttribute('style')?.includes('fill:')?el.getAttribute('style').split('fill:')[1]:styles.getPropertyValue('--ink').trim());}
+ /* PNG is always light: tokens are resolved against an .fs-light probe, not the page theme. */
+ const node=$(button.dataset.export).querySelector('svg').cloneNode(true),probe=document.createElement('div');probe.className='fs-light';probe.hidden=true;document.body.appendChild(probe);
+ const styles=getComputedStyle(probe),token=key=>styles.getPropertyValue(key).trim(),box=node.viewBox.baseVal,width=box.width,height=box.height,exported=new Date().toISOString();
+ /* Stamp: entity and scope, snapshot dates, export time as a separate value, source URL. */
+ node.setAttribute('viewBox','0 0 '+width+' '+(height+48));
+ node.insertAdjacentHTML('beforeend','<path d="M20 '+(height+4)+'H'+(width-20)+'" stroke="var(--ink)"/><text x="20" y="'+(height+21)+'" font-size="11">'+esc(reviewEntity+' · retrospective evidence, not a current prediction · forecast frozen '+(data.provenance?.as_of||'not supplied')+' · event feed retrieved '+(data.events_retrieved_on||'not supplied'))+'</text><text x="20" y="'+(height+38)+'" font-size="11">'+esc('Exported '+exported+' (export time, not data freshness) · '+location.href)+'</text>');
+ for(const el of [node,...node.querySelectorAll('*')]){for(const attr of ['fill','stroke','style']){const v=el.getAttribute(attr);if(v)el.setAttribute(attr,v.replace(/var\((--[\w-]+)\)/g,(_,key)=>token(key)));}if(el.tagName==='text'){el.setAttribute('fill',el.getAttribute('style')?.includes('fill:')?el.getAttribute('style').split('fill:')[1]:token('--ink'));el.setAttribute('font-family',token('--body'));}}
+ probe.remove();
  const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(node)],{type:'image/svg+xml'}));
- try{const img=new Image();img.src=url;await img.decode();const box=node.viewBox.baseVal,canvas=document.createElement('canvas');canvas.width=box.width*2;canvas.height=box.height*2;canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);const a=document.createElement('a');a.download=`brighton-arsenal-${button.dataset.export}.png`;a.href=canvas.toDataURL('image/png');a.click();}catch(e){button.textContent='Export failed — retry';}finally{URL.revokeObjectURL(url);}
+ try{const img=new Image();img.src=url;await img.decode();const canvas=document.createElement('canvas');canvas.width=width*2;canvas.height=(height+48)*2;canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);const a=document.createElement('a');a.download=`brighton-arsenal-${button.dataset.export}.png`;a.href=canvas.toDataURL('image/png');a.click();if(window.FutScout?.toast)FutScout.toast('PNG exported · light · stamped');}catch(e){button.textContent='Export failed — retry';}finally{URL.revokeObjectURL(url);}
 });
 })();
