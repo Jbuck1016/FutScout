@@ -165,22 +165,7 @@ details p:last-child{margin-bottom:0}
 <div class="wrap">
 
   <div class="sys">
-    <div class="sys-top">
-      <span class="dot"></span>
-      <span class="sys-title">FutScout · <b>Field Guide</b></span>
-      <span class="spacer"></span>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="insights.html">Insights</a>
-        <a href="search.html">Search</a>
-        <a href="players.html">Players</a>
-        <a href="teams.html">Teams</a>
-        <a href="sequences.html">Sequences</a>
-        <a href="methodology.html">Method</a>
-      </nav>
-      <button class="tbtn" id="themeBtn" type="button" aria-label="Toggle light/dark theme">☾</button>
-      <button class="btn noprint" onclick="window.print()">Save as PDF</button>
-    </div>
+    <div class="fs-slots" hidden><span data-fs-slot="actions"><button type="button" class="noprint" onclick="window.print()">Save as PDF</button></span></div><script>window.FutScout&&FutScout.adopt()</script>
     <div class="sys-line">
       A working manual for the platform: what each metric means, how to read the maps,
       how to build a shortlist, and where the numbers will mislead you.
@@ -985,9 +970,9 @@ function resetQuiz(){ answered={}; renderQuiz(); document.getElementById('scoreV
   document.getElementById('scoreMsg').textContent=''; }
 renderQuiz();
 
-function paintThemeBtn(){document.getElementById('themeBtn').textContent=
+function paintThemeBtn(){(document.getElementById('themeBtn')||document.createElement('button')).textContent=
   document.documentElement.classList.contains('dark')?'☀':'☾';}
-document.getElementById('themeBtn').addEventListener('click',function(){
+(document.getElementById('themeBtn')||document.createElement('button')).addEventListener('click',function(){
   const d=document.documentElement.classList.toggle('dark');
   try{localStorage.setItem('theme',d?'dark':'light')}catch(e){}
   paintThemeBtn();

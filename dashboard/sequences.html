@@ -135,12 +135,7 @@ select option,select optgroup{background-color:var(--bg2,var(--panel,var(--panel
 <link rel="stylesheet" href="components.css?v=pr1">
 </head>
 <body><script>window.FutScout&&FutScout.mount()</script>
-<div class="hdr">
-  <div class="hdr-logo">S</div>
-  <div><div class="hdr-title">Sequence Explorer</div><div class="hdr-sub" id="hdrSub">loading&hellip;</div></div>
-  <div class="tabs" id="tabs"></div>
-  <button type="button" class="tbtn" id="themeBtn" aria-label="Toggle light and dark theme">☾</button>
-</div>
+<div class="fs-slots" hidden><span id="hdrSub" data-fs-slot="pop">loading&hellip;</span><div class="tabs" id="tabs" data-fs-slot="tabs"></div></div><script>window.FutScout&&FutScout.adopt()</script>
 <details class="explain" id="explain">
   <summary>What a sequence is, and how to read these</summary>
   <div class="explain-body">

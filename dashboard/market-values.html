@@ -34,7 +34,6 @@ a{color:inherit}.shell{max-width:1320px;margin:auto;padding:24px 24px 70px}.top{
 </head>
 <body><script>window.FutScout&&FutScout.mount()</script>
 <main class="shell">
-  <header class="top"><a class="back" href="index.html">← Analytics index</a><span class="eyebrow">11 / Market intelligence</span><button class="theme" onclick="toggleTheme(this)">Light / dark</button></header>
   <section class="hero">
     <div><div class="eyebrow">Valuation is context, not verdict</div><h1>Market values</h1><p>Transfermarkt estimates joined to FutScout’s current player identities, roles and usage. Compare price concentration, squad coverage and how heavily each club is leaning on its most valuable players.</p></div>
     <aside class="method"><b>Read this first</b>These are public market estimates—not fees, salary data, or our opinion of player quality. Squad totals cover linked players in the current analysis dataset. Always read the coverage percentage beside a total.</aside>
@@ -70,7 +69,7 @@ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){retur
 function euro(v){v=+v||0;if(v>=1e9)return'€'+(v/1e9).toFixed(2).replace(/\.00$/,'')+'bn';if(v>=1e6)return'€'+(v/1e6).toFixed(v>=1e8?0:1).replace(/\.0$/,'')+'m';if(v>=1e3)return'€'+Math.round(v/1e3)+'k';return'€'+Math.round(v).toLocaleString()}
 function pct(v){return Math.round(v*100)+'%'}
 function median(a){if(!a.length)return 0;const b=a.slice().sort(function(x,y){return x-y}),m=Math.floor(b.length/2);return b.length%2?b[m]:(b[m-1]+b[m])/2}
-function toggleTheme(){document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light')}catch(e){}renderChart(filteredRows())}
+window.addEventListener('fs:theme',function(){renderChart(filteredRows())});
 async function sbAll(table,select){const page=1000,all=[];let from=0;while(true){const u=new URL(SB+'/rest/v1/'+table);u.searchParams.set('select',select);const r=await fetch(u,{headers:Object.assign({},HD,{'Range':from+'-'+(from+page-1),'Range-Unit':'items'})});if(!r.ok)throw new Error(table+' '+r.status);const rows=await r.json();all.push.apply(all,rows);if(rows.length<page)return all;from+=page}}
 
 async function init(){

@@ -96,7 +96,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .badge{font-size:10px;color:var(--text3)}
 
 /* Layout */
-.app{display:flex;flex-direction:column;height:100vh}
+body{display:flex;flex-direction:column}
+.app{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
 .main{display:flex;flex:1;min-height:0;overflow:hidden}
 
 /* Sidebar */
@@ -649,31 +650,20 @@ html:not(.dark) .ps-hl-card,html:not(.dark) .sb-group,html:not(.dark) .mom-chart
 </head>
 <body><script>window.FutScout&&FutScout.mount()</script>
 <div class="app">
-  <div class="hdr">
-    <div class="hdr-logo">&#9917;</div>
-    <div class="hdr-info">
-      <div class="team-sw" id="teamSw"></div>
-      <div class="hdr-sub" id="matchInfo">Loading...</div>
-    </div>
-    <div class="hdr-tabs" id="hdrTabs">
+  <div class="fs-slots" hidden>
+    <span data-fs-slot="pop"><span id="matchInfo">Loading...</span> <span id="matchCount"></span></span>
+    <div class="hdr-tabs" id="hdrTabs" data-fs-slot="tabs">
       <button class="htab on" data-tab="match">Match Analysis</button>
       <button class="htab" data-tab="season">Season Stats</button>
       <button class="htab" data-tab="momentum">Momentum</button>
     </div>
-    <div class="hdr-right">
-      <a class="btn-fp" href="index.html">&#8962; Home</a>
-      <a class="btn-fp" href="players.html">&#128100; Players</a>
-      <a class="btn-fp" href="teams.html">&#127942; Teams</a>
-      <button class="btn-exp" id="btnExpAll">&#11015; Export All</button>
-      <button class="btn-report" id="btnGenReport">&#9997; Generate Report</button>
-      <span class="badge" id="matchCount"></span>
-      <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">&#127769;</button>
-    </div>
-  </div>
+    <span data-fs-slot="actions"><button type="button" id="btnExpAll">Export all</button><button type="button" id="btnGenReport">Report</button></span>
+  </div><script>window.FutScout&&FutScout.adopt()</script>
   <div class="main" id="tabMatch">
     <div class="side" id="sidebar">
       <div class="s-sec"><div class="s-hd">Competition</div><div id="compGroup"></div></div>
       <div class="s-sec"><div class="s-hd">Match</div><select class="s-sel" id="matchSel"><option value="">&#8212; select &#8212;</option></select></div>
+      <div class="s-sec"><div class="s-hd">Team</div><div class="team-sw" id="teamSw"></div></div>
       <div class="s-sec"><div class="s-hd">Period</div>
         <label class="chk"><input type="checkbox" class="period-cb" value="1"> 1st Half</label>
         <label class="chk"><input type="checkbox" class="period-cb" value="2"> 2nd Half</label>
@@ -3222,7 +3212,7 @@ function exportPlayerPDF(){
    The removeProperty calls stay, so a tab still holding values from an older
    build drops them. */
 function applyTheme(){syncCanvasTheme();const t=T(),s=document.documentElement.style;s.setProperty('--accent',t.color);s.setProperty('--accent-dim',t.colorDim);s.setProperty('--accent-glow',t.colorGlow);s.removeProperty('--bg');s.removeProperty('--bg2');}
-function initThemeToggle(){const saved=localStorage.getItem('theme');if(saved!=='light')document.documentElement.classList.add('dark');syncCanvasTheme();const btn=document.getElementById('themeToggle');const update=()=>{const d=document.documentElement.classList.contains('dark');btn.innerHTML=d?'&#9728;&#65039;':'&#127769;';};update();btn.onclick=()=>{document.documentElement.classList.toggle('dark');const d=document.documentElement.classList.contains('dark');localStorage.setItem('theme',d?'dark':'light');applyTheme();update();if(typeof renderAll==='function'&&S.selMatch)renderAll();};}
+function initThemeToggle(){syncCanvasTheme();window.addEventListener('fs:theme',()=>{applyTheme();if(typeof renderAll==='function'&&S.selMatch)renderAll();});}
 function initTeamSwitcher(){
   const el=document.getElementById('teamSw');
   const names=Object.keys(TEAMS)

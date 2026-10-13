@@ -53,10 +53,10 @@ body{background-image:radial-gradient(circle at 86% -12%,color-mix(in srgb,var(-
 <link rel="stylesheet" href="components.css?v=pr1">
 </head>
 <body class="lab-polished"><script>window.FutScout&&FutScout.mount()</script><main class="shell">
-<header class="mast"><div><div class="kicker">FutScout · private research desk</div><h1>Model laboratory</h1><p class="lede">A guided workspace for understanding which model works best, which football ideas it uses, why individual forecasts move, and where the evidence is still weak.</p></div><div class="actions"><a class="action" href="model-review.html">forecasts →</a><a class="action" href="index.html">analytics</a><button class="action" id="textSize" aria-label="Change text size">text: standard</button><button class="action" id="theme">light / dark</button></div></header>
+<header class="mast"><div><div class="kicker">FutScout · private research desk</div><h1>Model laboratory</h1><p class="lede">A guided workspace for understanding which model works best, which football ideas it uses, why individual forecasts move, and where the evidence is still weak.</p></div><div class="actions"><button class="action" id="textSize" aria-label="Change text size">text: standard</button></div><div class="fs-slots" hidden><span data-fs-slot="actions"><a href="model-review.html">Forecasts</a></span></div><script>window.FutScout&&FutScout.adopt()</script></header>
 <section class="rail" id="rail"></section>
 <p class="copy" id="bundleDates" aria-live="polite"></p>
-<nav class="tabs" id="tabs" aria-label="Model lab sections"></nav>
+<div class="fs-slots" hidden><nav class="tabs" id="tabs" data-fs-slot="tabs" aria-label="Model lab sections"></nav></div>
 <section class="view on" id="overview"></section>
 <section class="view" id="validation"></section>
 <section class="view" id="legitimacy"></section>
@@ -74,7 +74,7 @@ function boot(){
  const dateLabel=value=>value?new Date(value).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'}):'date unavailable';
  document.getElementById('bundleDates').textContent='Mixed-date research bundle · example forecasts '+dateLabel(D.as_of)+' · original model tournament '+dateLabel(D.model_tournament?.created_at)+' · rich-feature coverage '+dateLabel(coverageAt)+' · input drift '+dateLabel(D.drift?.checked_at)+'. Counts above are snapshots, not a live feed.';
  const views=[['overview','Start here'],['matches','Explain a match'],['validation','Compare models'],['legitimacy','Trust tests'],['research','Challenger desk'],['features','Feature evidence'],['monitoring','Data health'],['guide','Reading guide']],requested=new URLSearchParams(location.search).get('tab'),initial=views.some(v=>v[0]===requested)?requested:'overview';document.getElementById('tabs').innerHTML=views.map(v=>`<button class="tab ${v[0]===initial?'on':''}" data-view="${v[0]}">${v[1]}</button>`).join('');document.querySelectorAll('.view').forEach(e=>e.classList.toggle('on',e.id===initial));document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.view').forEach(e=>e.classList.remove('on'));b.classList.add('on');document.getElementById(b.dataset.view).classList.add('on');const u=new URL(location);u.searchParams.set('tab',b.dataset.view);history.pushState(null,'',u)});
- document.getElementById('theme').onclick=()=>{document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light')}catch(e){}};
+ 
  const sizes=['standard','large','xlarge'];let size=localStorage.getItem('labTextSize')||'standard';setSize(size);document.getElementById('textSize').onclick=()=>{size=sizes[(sizes.indexOf(size)+1)%sizes.length];setSize(size)};
  renderOverview();renderValidation();renderLegitimacy();renderFeatureStability();enhanceExternalBenchmark();renderResearch();renderFeatures();renderMatches();renderMonitoring();renderGuide();refreshResearchCopy();polishLabEvidence();installLabHistory();
 }

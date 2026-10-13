@@ -168,22 +168,7 @@ select option,select optgroup{background-color:var(--bg2,var(--panel,var(--panel
 <div class="wrap">
 
   <div class="sys">
-    <div class="sys-top">
-      <span class="dot"></span>
-      <span class="sys-title">FutScout · <b>Player search</b></span>
-      <span class="spacer"></span>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="insights.html">Insights</a>
-        <a href="search.html">Search</a>
-        <a href="players.html">Players</a>
-        <a href="teams.html">Teams</a>
-        <a href="sequences.html">Sequences</a>
-        <a href="guide.html">Guide</a>
-        <a href="methodology.html">Method</a>
-      </nav>
-      <button type="button" class="tbtn" id="themeBtn" aria-label="Toggle light or dark theme">☾</button>
-    </div>
+    <div class="fs-slots" hidden><div data-fs-slot="tabs"><a href="search.html" aria-current="page">Player search</a><a href="players.html">Player Fingerprints</a></div></div><script>window.FutScout&&FutScout.adopt()</script>
     <div class="sys-line" id="sysLine">loading index…</div>
   </div>
 
@@ -581,8 +566,8 @@ document.getElementById('presets').addEventListener('click',function(e){
   inp.focus();
   runAsk();
 });
-function paintThemeBtn(){document.getElementById('themeBtn').textContent=document.documentElement.classList.contains('dark')?'☀':'☾';}
-document.getElementById('themeBtn').addEventListener('click',function(){
+function paintThemeBtn(){(document.getElementById('themeBtn')||document.createElement('button')).textContent=document.documentElement.classList.contains('dark')?'☀':'☾';}
+(document.getElementById('themeBtn')||document.createElement('button')).addEventListener('click',function(){
   const d=document.documentElement.classList.toggle('dark');
   try{localStorage.setItem('theme',d?'dark':'light')}catch(e){}
   paintThemeBtn();

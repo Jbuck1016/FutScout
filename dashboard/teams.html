@@ -209,17 +209,13 @@ select option,select optgroup{background-color:var(--bg2,var(--panel,var(--panel
 <link rel="stylesheet" href="components.css?v=pr1">
 </head>
 <body><script>window.FutScout&&FutScout.mount()</script>
-<div class="hdr page-hdr">
-  <div class="hdr-logo">T</div>
-  <div class="hdr-id"><div class="hdr-title">Team Profiles</div><div class="hdr-row"><div id="lgPick" class="lgpick"></div><div class="hdr-sub" id="hdrSub">loading&hellip;</div><span class="as-of" id="asOf"></span></div></div>
-  <div class="tabs" id="tabs" aria-label="Team profile sections"></div>
-  <div class="hdr-right">
-    <div class="navmenu" id="navMenu"></div>
-    <button class="lnk acc" onclick="exportPNG()">&#11015; PNG</button>
-    <button class="lnk acc" onclick="exportPDF()">&#11015; PDF</button>
-    <button class="lnk" onclick="var d=document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',d?'dark':'light')}catch(e){}">Theme</button>
-  </div>
-</div>
+<div class="fs-slots" hidden>
+  <div id="lgPick" class="lgpick" data-fs-slot="scope"></div>
+  <span id="hdrSub" data-fs-slot="pop">loading&hellip;</span>
+  <span class="as-of" id="asOf"></span>
+  <div class="tabs" id="tabs" data-fs-slot="tabs" aria-label="Team profile sections"></div>
+  <span data-fs-slot="actions"><button type="button" onclick="exportPNG()">PNG</button><button type="button" onclick="exportPDF()">PDF</button></span>
+</div><script>window.FutScout&&FutScout.adopt()</script>
 <div class="wrap">
   <div class="side" id="side"><input class="side-search" aria-label="Search teams" placeholder="Search team…" oninput="TEAMQ=this.value;renderList()"><div class="plist" id="tlist"></div></div>
   <div class="main" id="main"><div class="empty">Loading&hellip;</div></div>
@@ -1349,6 +1345,7 @@ function renderAsOf(){
   if(ASOF.is_stale) txt+=' \u00B7 '+Math.round(ASOF.hours_old)+'h old';
   el.textContent=txt;
   el.className='as-of'+(ASOF.is_stale?' warn':'');
+  if(window.FutScout)FutScout.setFreshness(ASOF);
 }
 fetch(SB+'/rest/v1/v_analytics_as_of?select=*',{headers:HD})
   .then(function(r){return r.ok?r.json():null})

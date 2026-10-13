@@ -5,8 +5,6 @@ const requested=new URLSearchParams(location.search).get('game');
 if(!data || (requested && requested!==data.match.game_id)){root.textContent='No verified review bundle is available for this fixture. Return to Model Lab to inspect the saved forecasts.';return;}
 const m=data.match, $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct=n=>(n*100).toFixed(1)+'%', num=(n,d=2)=>Number(n).toFixed(d);
-try{document.documentElement.classList.toggle('dark',localStorage.getItem('theme')==='dark');}catch(e){}
-$('theme').onclick=()=>{const dark=document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',dark?'dark':'light');}catch(e){}};
 $('pdf').onclick=()=>window.print();
 function ribbon(p){return `<div class="labels"><span class="home">Brighton</span><span>Draw</span><span class="away">Arsenal</span></div><div class="ribbon" role="img" aria-label="Brighton ${pct(p.H)}, draw ${pct(p.D)}, Arsenal ${pct(p.A)}"><span class="h" style="width:${p.H*100}%">${pct(p.H)}</span><span style="width:${p.D*100}%">${pct(p.D)}</span><span class="a" style="width:${p.A*100}%">${pct(p.A)}</span></div>`;}
 $('probabilities').innerHTML=ribbon(m.probabilities);

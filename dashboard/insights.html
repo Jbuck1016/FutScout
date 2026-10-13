@@ -117,21 +117,6 @@ select option,select optgroup{background-color:var(--bg2,var(--panel,var(--panel
 <div class="wrap">
 
   <div class="sys">
-    <div class="sys-top">
-      <span class="dot"></span>
-      <span class="sys-title">FutScout — <b>Scouting insights</b></span>
-      <span class="spacer"></span>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="teams.html">Teams</a>
-        <a href="search.html">Search</a>
-        <a href="players.html">Players</a>
-        <a href="sequences.html">Sequences</a>
-        <a href="guide.html">Guide</a>
-        <a href="methodology.html">Method</a>
-      </nav>
-      <button type="button" class="tbtn" id="themeBtn" aria-label="Toggle light or dark theme" title="Toggle theme">☾</button>
-    </div>
     <div class="sys-line" id="sysLine">reading insights…</div>
   </div>
 
@@ -338,8 +323,8 @@ function buildLeagueSelect(){
 }
 
 /* theme */
-function paintThemeBtn(){document.getElementById('themeBtn').textContent=document.documentElement.classList.contains('dark')?'☀':'☾';}
-document.getElementById('themeBtn').addEventListener('click',function(){
+function paintThemeBtn(){(document.getElementById('themeBtn')||document.createElement('button')).textContent=document.documentElement.classList.contains('dark')?'☀':'☾';}
+(document.getElementById('themeBtn')||document.createElement('button')).addEventListener('click',function(){
   var dark=document.documentElement.classList.toggle('dark');
   try{localStorage.setItem('theme',dark?'dark':'light')}catch(e){}
   paintThemeBtn();

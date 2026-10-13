@@ -160,11 +160,6 @@ tbody tr:hover td{background:var(--panel2)}
 <div class="wrap">
 
   <div class="sys">
-    <div class="sys-top">
-      <span class="sys-mark">▐</span>
-      <span class="sys-title">FutScout <span style="color:var(--dim);font-weight:600">/ Football analytics</span></span>
-      <button id="themeBtn" onclick="toggleTheme(this)" title="Toggle light / dark" style="margin-left:auto;align-self:center;background:none;border:1px solid var(--line2);color:var(--dim);font:600 13px/1 var(--f-mono);width:30px;height:24px;border-radius:5px;cursor:pointer">&#9728;</button>
-    </div>
     <div class="sys-line" id="sysLine">
       <span class="dotlive"></span> connecting<span class="blink">_</span>
     </div>
@@ -481,7 +476,7 @@ qEl.addEventListener('keydown',function(e){
   else if(e.key==='Escape'){this.value='';search('');this.blur()}
 });
 document.addEventListener('keydown',function(e){
-  if((e.key==='/'||((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k')) && document.activeElement!==qEl){
+  if(e.key==='/' && document.activeElement!==qEl && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||'')){
     e.preventDefault();qEl.focus();
   }
 });

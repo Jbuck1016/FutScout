@@ -332,21 +332,13 @@ html:not(.dark) .scout-results .scout-rank{color:var(--muted)}
 </head>
 <body><script>window.FutScout&&FutScout.mount()</script>
 
-<div class="hdr page-hdr">
-  <div class="hdr-logo">P</div>
-  <div class="hdr-id">
-    <div class="hdr-title">Player Fingerprints</div>
-    <div class="hdr-row"><div id="lgPick" class="lgpick"></div>
-      <div class="hdr-sub" id="hdrSub">loading&hellip;</div><span class="as-of" id="asOf"></span></div>
-  </div>
-  <div class="tabs" id="tabs" aria-label="Player analysis sections"></div>
-  <div class="hdr-right">
-    <div class="navmenu" id="navMenu"></div>
-    <button class="lnk acc" onclick="exportPNG()">&#11015; PNG</button>
-    <button class="lnk acc" onclick="exportPDF()">&#11015; PDF</button>
-    <button class="lnk" onclick="toggleDark()">Theme</button>
-  </div>
-</div>
+<div class="fs-slots" hidden>
+  <div id="lgPick" class="lgpick" data-fs-slot="scope"></div>
+  <span id="hdrSub" data-fs-slot="pop">loading&hellip;</span>
+  <span class="as-of" id="asOf"></span>
+  <div class="tabs" id="tabs" data-fs-slot="tabs" aria-label="Player analysis sections"></div>
+  <span data-fs-slot="actions"><button type="button" onclick="exportPNG()">PNG</button><button type="button" onclick="exportPDF()">PDF</button></span>
+</div><script>window.FutScout&&FutScout.adopt()</script>
 
 <div class="wrap">
   <div class="side" id="side">
@@ -2244,6 +2236,7 @@ function renderAsOf(){
   if(ASOF.is_stale) txt+=' \u00B7 '+Math.round(ASOF.hours_old)+'h old';
   el.textContent=txt;
   el.className='as-of'+(ASOF.is_stale?' warn':'');
+  if(window.FutScout)FutScout.setFreshness(ASOF);
 }
 fetch(SB+'/rest/v1/v_analytics_as_of?select=*',{headers:HD})
   .then(function(r){return r.ok?r.json():null})

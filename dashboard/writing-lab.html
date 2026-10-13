@@ -38,7 +38,7 @@ body{font-family:var(--font-body, sans-serif)}h1{font-size:clamp(30px,4vw,46px);
 <main class="shell">
   <header class="mast">
     <div><div class="kicker">FutScout · editorial workspace</div><h1>The writing lab.</h1><div class="deck">Turn one match centre into a structured evidence pack, working notes and a finished article. The analysis stays traceable to the underlying events.</div></div>
-    <div class="mast-actions"><a class="ghost" href="match.html">raw analysis</a><a class="ghost" href="index.html">home</a><button class="ghost" onclick="toggleTheme()">light / dark</button></div>
+    <div class="fs-slots" hidden><span data-fs-slot="actions"><a href="match.html">Raw analysis</a></span></div><script>window.FutScout&&FutScout.adopt()</script>
   </header>
   <form class="new-strip" id="newForm">
     <input class="field mono" id="matchUrl" aria-label="WhoScored match URL" placeholder="Paste a WhoScored match URL…" required>
