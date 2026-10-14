@@ -1,5 +1,7 @@
 # Soccer forecast research checkpoint — 14 October 2026
 
+Follow-up: the complete local cache has now been reconstructed and seven additional advanced-feature candidates evaluated. The [new report](../soccer_local_features_20261014/README.md) resolves the xG/xT export gap and identifies three invalid event feeds plus a legacy phase-definition mismatch. The original numeric results below remain preserved; they do not certify source quality.
+
 The isolated branch fixes inconsistent score probabilities and reproduces the current model exactly. Six historical comparisons are complete; the new feature, decay and low-score candidates do not earn promotion.
 
 ## Location and scope

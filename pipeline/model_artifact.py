@@ -328,7 +328,7 @@ def _match_explanation(artifact: dict[str, Any], model_frame: pd.DataFrame,
             f"{away_team} {number(row.get('opponent.field_tilt_pct_3'))}%."
         ),
         "Completed box passes": (
-            f"Last 3 completed open-play passes ending in the box (including passes starting there) per match: {home_team} "
+            f"Last 3 completed passes ending in the box (including passes starting there) per match: {home_team} "
             f"{number(row.get('team.box_entries_pass_3'))}, {away_team} "
             f"{number(row.get('opponent.box_entries_pass_3'))}."
         ),

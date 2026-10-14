@@ -1,5 +1,7 @@
 # Feature definitions, availability and rights — 14 October 2026
 
+Follow-up supersedes the xG/xT availability and legacy phase assumptions below: [local reconstruction, seven comparisons and exact remaining gaps](../soccer_local_features_20261014/README.md). The v1 snapshot box-pass values reconcile to all-phase completed passes; the SQL open-play predicate did not prove the stored flags were correct. The earlier findings below are retained as checkpoint history.
+
 This audit concerns the existing private local soccer data and offline research. It does not certify provider licensing or the current production database. No external provider-key calls, purchases, export uploads or database changes were made.
 
 ## Metric contract
