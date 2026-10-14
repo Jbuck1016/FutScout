@@ -33,7 +33,10 @@ ALLOWED_FUNCTIONS = {
 
 
 def git(*args):
-    result = subprocess.run(["git", *args], cwd=ROOT, capture_output=True)
+    # Pin LF for this command only. Do not inherit Windows autocrlf defaults
+    # or change repository/global configuration in a shared environment.
+    result = subprocess.run(["git", "-c", "core.autocrlf=false", "-c", "core.eol=lf", *args],
+                            cwd=ROOT, capture_output=True)
     if result.returncode:
         raise RuntimeError(result.stderr.decode(errors="replace"))
     return result.stdout
@@ -115,6 +118,7 @@ def run(base, output):
         for path in (*MODIFIED, *ADDED))
     patch_path = output / "probability_labels_only.patch"
     patch_path.write_text(patch_text, encoding="utf-8", newline="\n")
+    assert b"\r" not in patch_path.read_bytes(), "patch must preserve LF"
     # Export the committed base to a disposable ordinary directory, never a
     # second repository or a shared/operational worktree.
     archived = git("archive", "--format=zip", base_commit, "pipeline", SCHEMA,
@@ -129,11 +133,14 @@ def run(base, output):
                 raise ValueError("archive member leaves isolated export")
         archive.extractall(clean)
     original_hashes = file_hashes(clean)
+    for path in MODIFIED:
+        assert (clean / path).read_bytes() == before[path].encode("utf-8")
+        assert b"\r" not in (clean / path).read_bytes(), "modified base files must preserve LF"
     prefix = str(clean.relative_to(ROOT)).replace("\\", "/")
     git("apply", "--check", f"--directory={prefix}", str(patch_path))
     git("apply", f"--directory={prefix}", str(patch_path))
     for path, source in after.items():
-        assert (clean / path).read_text(encoding="utf-8") == source
+        assert (clean / path).read_bytes() == source.encode("utf-8"), "patched file bytes must preserve LF"
     assert not (clean / "pipeline/soccer_forecast_research.py").exists()
     assert not (clean / "pipeline/soccer_player_strength.py").exists()
     sys.path.insert(0, str(ROOT / "pipeline"))
@@ -160,11 +167,17 @@ def run(base, output):
     restored = file_hashes(clean)
     assert original_hashes == restored, "reverse patch did not restore exact exported files"
     git("apply", f"--directory={prefix}", str(patch_path))
+    for path, source in after.items():
+        assert (clean / path).read_bytes() == source.encode("utf-8"), "reapplied file bytes must preserve LF"
     manifest = {
         "mode": "offline minimal patch against an exported committed base; no operational checkout changed",
         "base_commit": base_commit, "source_research_commit": source_commit,
         "patch": patch_path.name, "patch_sha256": sha(patch_path.read_bytes()),
         "base_archive_sha256": sha(archived),
+        "line_endings": {"required": "LF", "git_command_overrides": ["core.autocrlf=false", "core.eol=lf"],
+                         "configuration_scope": "per command only; no repository/global settings changed",
+                         "patch_and_modified_base_files_lf_verified": True,
+                         "patched_and_reapplied_file_bytes_verified": True},
         "files": {path: {"before_sha256": sha(before[path].encode()) if path in before else None,
                           "after_sha256": sha(after[path].encode())} for path in (*MODIFIED, *ADDED)},
         "unchanged_model_contracts": unchanged,

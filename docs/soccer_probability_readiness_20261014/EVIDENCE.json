@@ -174,5 +174,45 @@
       "No live body-size limit, PostgreSQL TOAST size, full season runtime, or concurrent load was verified."
     ]
   },
-  "pending": "Actual deployed schema, server round trip, RLS/FK/idempotency, gateway limits and full simulation runtime. No live action attempted."
+  "pending": "Actual deployed schema, server round trip, RLS/FK/idempotency, gateway limits and full simulation runtime. No live action attempted.",
+  "readiness_review_commit": "142337307204820b948a41630f3b2f67ad75a035",
+  "line_endings": {
+    "required": "LF",
+    "git_command_overrides": [
+      "core.autocrlf=false",
+      "core.eol=lf"
+    ],
+    "configuration_scope": "per command only; no repository/global settings changed",
+    "patch_and_modified_base_files_lf_verified": true,
+    "patched_and_reapplied_file_bytes_verified": true
+  },
+  "forced_crlf_default_verification": {
+    "mode": "process-only forced Git defaults; no repository/global configuration writes",
+    "injected_defaults": {
+      "core.autocrlf": "true",
+      "core.eol": "crlf"
+    },
+    "unoverridden_probe_autocrlf": "true",
+    "builder_command_overrides": [
+      "core.autocrlf=false",
+      "core.eol=lf"
+    ],
+    "manifest_and_patch_match_default_run": true,
+    "raw_patched_file_hashes_verified": true,
+    "forced_default_reverse_patch_restored_all_original_files": true,
+    "forced_default_tests": [
+      {
+        "script": "check_probability_integration.py",
+        "exit_code": 0
+      },
+      {
+        "script": "check_league_table_simulator.py",
+        "exit_code": 0
+      },
+      {
+        "script": "check_model_review_dashboard.py",
+        "exit_code": 0
+      }
+    ]
+  }
 }

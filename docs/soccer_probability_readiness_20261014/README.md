@@ -12,7 +12,7 @@ trip or deployed fix.
 ## Deliverable and scope
 
 The private package is under
-`artifacts/soccer_research_readiness_20261014/minimal_package/`:
+`artifacts/soccer_research_readiness_20261014_lf/minimal_package/`:
 
 - `probability_labels_only.patch`: six files, based on committed backend
   `21b7f3ccc5970650b9204f138eb677c7a31dc799`.
@@ -60,8 +60,17 @@ The standalone ten-test suite passed both in the isolated research checkout and
 on the clean committed-base export with only the six-file patch. Existing
 league-table simulator and private model-review dashboard checks also passed
 on that export. Applying the reverse patch restored every exported original
-file hash and removed both added files. The forward patch was then reapplied
-to leave an inspectable verification copy.
+file hash and removed both added files **with LF preserved and
+`core.autocrlf=false`**. The forward patch was then reapplied to leave an
+inspectable verification copy. The corrected package explicitly pins these
+settings and checks raw bytes after both forward applications; text equality
+alone can hide Windows newline conversion.
+
+A second package build injected `core.autocrlf=true` and `core.eol=crlf` only
+into its process environment. The builder's per-command LF overrides still
+produced the same patch and file hashes, passed all three checks, and restored
+every original byte on reversal. See `forced_crlf_default_verification.json`
+in the updated bundle. No persisted Git configuration was changed.
 
 Tests use installed `postgrest 2.28.3`, `supabase 2.28.3`, `httpx 0.28.1`,
 `numpy 2.1.3`, `scipy 1.15.3`, and `scikit-learn 1.6.1`. Socket/real HTTP
@@ -91,9 +100,37 @@ python -B pipeline/tools/package_probability_readiness.py --output artifacts/soc
 ```
 
 Use a fresh output directory: the builder refuses to reuse a `clean_base`.
-It reads Git objects locally and never contacts a remote. Do not run forecast or
+It reads Git objects locally and never contacts a remote. Every Git invocation
+uses per-command `-c core.autocrlf=false -c core.eol=lf`; no repository or global
+Git settings are changed. Do not run forecast or
 simulation CLI entry points as an offline test: their current implementations
 create database clients even when `--execute` is absent.
+
+### Preserve LF during integration and reversal
+
+The patch and manifest hashes describe **LF bytes**. This PC's default
+`core.autocrlf=true` can change working-file newline bytes during application or
+reversal. Use the following command form for each operation, from a separately
+prepared, clean LF integration checkout or the builder's committed-base export:
+
+```powershell
+git -c core.autocrlf=false -c core.eol=lf apply --check <patch-path>
+git -c core.autocrlf=false -c core.eol=lf apply <patch-path>
+# Reversal verification belongs in the disposable verification copy:
+git -c core.autocrlf=false -c core.eol=lf apply --reverse --check <patch-path>
+git -c core.autocrlf=false -c core.eol=lf apply --reverse <patch-path>
+```
+
+Replace `<patch-path>` with the actual package patch path. Per-command options
+do not convert an existing CRLF checkout to LF. Before applying, compare raw
+file bytes with `before_sha256` in the manifest; after applying, compare with
+`after_sha256`; after reversal, compare every original exported file hash.
+Prepare a fresh isolated checkout with LF preserved, or use the builder's
+`git archive` export, if the pre-application hashes differ. Never normalize
+shared, operational or uncommitted work just to match this package. Do not use
+`git config --global` for this task. Target-specific `.gitattributes` may also
+affect checkout bytes and must be reviewed if the integration target differs
+from the verified base.
 
 ## Precision contract and consumers
 
@@ -167,7 +204,8 @@ denied. The operational and Claude branches remain unmodified.
    hunk. Prepare one scoped commit, for example **Fix forecast score-grid
    consistency and box-pass labels**, containing only the six listed files.
    Apply-check success against the old base does not establish compatibility
-   with later or uncommitted work. Re-run the three package checks there.
+   with later or uncommitted work. Preserve LF with the per-command settings
+   and raw-byte checks above. Re-run the three package checks there.
 2. In a separately authorized isolated database/staging target, inspect actual
    numeric types, JSONB column, sum constraint, composite unique key, RLS/grants
    and PostgREST schema cache. Verify installed deployment dependencies. Keep
@@ -214,4 +252,6 @@ the authorized registry workflow. The fitting artifacts and coefficients do
 not change in this package. Both readers already accept explicit score lists,
 so archived grids should remain readable after code rollback. The checked
 reverse patch proves source-file restoration against the exported base only;
-it is not a database or deployment rollback test.
+it requires the LF/per-command Git settings above and is not a database or
+deployment rollback test. Do not infer byte-identical restoration from a
+successful reverse apply under the PC's default autocrlf setting.
