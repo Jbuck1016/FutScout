@@ -1,120 +1,133 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Methodology · FutScout</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>
-(function(){try{var t=localStorage.getItem('theme');if(t==='light')document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}})();
-</script>
 <script src="gate.js"></script>
-<link rel="stylesheet" href="theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css?v=pr1">
+<script src="site-tools.js?v=pr1"></script>
 <style>
-/* Canvas, surfaces, lines, text, green and red come from theme.css, which
-   carries this page's token names as aliases onto the shared palette. What is
-   left is this page's own accent family and its blue. */
-:root{
-  /* Light amber a step darker, so the tier headings and badges clear AA on the
-     shared surfaces. #9c6b1e was 4.10:1 on a card; #8a5e1a is 5.03:1. Same hue
-     family, tints rebased, dark mode untouched. */
-  --amber:#8a5e1a;--amber-dim:rgba(138,94,26,.10);--amber-line:rgba(138,94,26,.32);
-  --blue:#2f6aa8;
-}
-html.dark{
-  --bg:#0e1219;--panel:#161b24;--panel2:#1e242e;
-  --line:#272e3a;--line2:#3a4351;
-  --text:#f2f5fa;--dim:#b6c2d4;--dim2:#8b98ab;
-  --amber:#e2b877;--amber-dim:rgba(226,184,119,.10);--amber-line:rgba(226,184,119,.32);
-  --green:#3ddc97;--red:#ff5f56;--blue:#5aa9ff;
-}
+/* Learn reading layout. Tokens come from theme.css, chrome from shell.css and
+   the fs- components from components.css; this page declares no palette.
+   Every rule is scoped to .wrap so nothing here can restyle the shell.
+
+   .doc is a two-track grid: running text sits in the first track, a
+   65-character measure; wide tables and figures span both tracks and scroll
+   inside their own box. */
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);line-height:1.6}
-a{color:var(--amber);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:1160px;margin:0 auto;padding:20px 18px 70px;display:grid;
-  grid-template-columns:220px 1fr;gap:24px;align-items:start}
-@media(max-width:920px){.wrap{grid-template-columns:1fr}}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 13px/1.45 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding:var(--s6) var(--s6) 60px;display:grid;
+  grid-template-columns:230px minmax(0,1fr);gap:var(--s5) 32px;align-items:start}
+.wrap.one{grid-template-columns:minmax(0,1fr);max-width:920px}
+.wrap a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:2px}
+.wrap a:hover{text-decoration-color:var(--ink)}
 
-.sys{grid-column:1/-1;border:1px solid var(--line);background:var(--panel);border-radius:3px;padding:13px 16px;margin-bottom:6px}
-.sys-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
-.sys-title{font:700 13px/1 var(--f-mono)}.sys-title b{color:var(--amber)}
-.spacer{flex:1}
-.nav{display:flex;gap:2px;flex-wrap:wrap}
-.nav a{font:600 9.5px/1 var(--f-mono);color:var(--dim);border:1px solid var(--line2);border-radius:3px;
-  padding:6px 9px;text-transform:uppercase;letter-spacing:.06em}
-.nav a:hover{color:var(--amber);border-color:var(--amber-line);text-decoration:none}
-.tbtn{cursor:pointer;border:1px solid var(--line2);background:var(--panel2);border-radius:3px;
-  width:30px;height:26px;display:grid;place-items:center;color:var(--dim);font-size:13px}
-.sys-line{font:500 11px/1.7 var(--f-mono);color:var(--dim);margin-top:8px}
+/* strapline across the top of the page */
+.sys{grid-column:1/-1;padding-bottom:var(--s4);border-bottom:1px solid var(--ink)}
+.sys-line{max-width:90ch;font:400 12px/1.4 var(--body);color:var(--muted)}
 
-.toc{position:sticky;top:14px;border:1px solid var(--line);background:var(--panel);border-radius:3px;padding:12px 13px}
-@media(max-width:920px){.toc{position:static}}
-.toc h4{font:700 9px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin:0 0 9px}
-.toc a{display:block;font:500 11.5px/1.5 var(--f-body);color:var(--dim);padding:2px 0}
-.toc a:hover{color:var(--amber);text-decoration:none}
-.toc .grp{font:700 8.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);margin:11px 0 4px}
+/* side navigation */
+.toc{position:sticky;top:var(--s5);max-height:calc(100vh - 28px);overflow:auto;padding:var(--s4);
+  background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.toc h4{margin:0 0 var(--s3);font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc ol,.toc ul{margin:0;padding:0;list-style:none}
+.toc ol{counter-reset:toc}
+.toc ol>li{counter-increment:toc}
+.toc ol>li>a::before{content:counter(toc,decimal-leading-zero);flex:0 0 auto;font:400 10px/1.9 var(--mono);color:var(--muted)}
+.toc a{display:flex;align-items:baseline;gap:var(--s3);min-height:var(--tap);padding:var(--s2) var(--s3);border-left:3px solid transparent;
+  font:400 12px/1.4 var(--body);color:var(--ink);text-decoration:none}
+.toc a:hover{background:var(--panel2)}
+.toc a:focus-visible{outline-offset:-2px}
+.toc .sub a{padding-left:28px;font-size:11px;color:var(--muted)}
+.toc .grp{margin:var(--s4) 0 var(--s1);padding:0 var(--s3);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
-.doc{min-width:0}
-h2{font:700 20px/1.25 var(--f-body);letter-spacing:-.02em;margin:30px 0 4px;padding-top:15px;border-top:1px solid var(--line)}
-h2:first-child{margin-top:0;border-top:none;padding-top:0}
-h3{font:700 15px/1.3 var(--f-body);margin:22px 0 6px}
-h4{font:700 11px/1.3 var(--f-mono);letter-spacing:.05em;margin:16px 0 5px;color:var(--amber)}
-p{margin:0 0 11px;font-size:14px}
-ul,ol{margin:0 0 12px;padding-left:20px}li{margin-bottom:5px;font-size:14px}
-code{font:600 12px var(--f-mono);background:var(--panel2);border:1px solid var(--line);border-radius:3px;padding:1px 5px;color:var(--amber)}
-pre{background:var(--panel2);border:1px solid var(--line);border-left:2px solid var(--amber-line);
-  border-radius:3px;padding:12px 14px;overflow-x:auto;margin:10px 0}
-pre code{background:none;border:none;padding:0;color:var(--text);font-size:12px;line-height:1.65}
-strong{font-weight:700}em{font-style:italic;color:var(--dim)}
+/* the document */
+.doc{min-width:0;font-size:15px;display:grid;grid-template-columns:minmax(0,65ch) minmax(0,1fr);align-content:start}
+.doc>*{grid-column:1;min-width:0;margin-top:0;margin-bottom:var(--s5)}
+.doc>:is(table,.fs-table-scroll):has(th:nth-child(4)),.doc>.wide{grid-column:1/-1}
+.doc h1{margin:0 0 var(--s4);font:600 30px/1.05 var(--display);letter-spacing:-.01em}
+.doc h2{margin:32px 0 var(--s3);padding-top:var(--s5);border-top:1px solid var(--ink);font:600 24px/1.1 var(--display);scroll-margin-top:var(--s4)}
+.doc h2 .n{display:block;margin-bottom:var(--s3);font:500 10px/1 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.doc h3{margin:var(--s6) 0 var(--s2);font:500 20px/1.2 var(--display);scroll-margin-top:var(--s4)}
+.doc h4{margin:var(--s5) 0 var(--s1);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc h5{margin:0 0 var(--s3);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc>h3,.doc>h4{margin-bottom:var(--s2)}
+.doc p{margin-top:0;margin-bottom:var(--s4);font-size:15px;line-height:1.6}
+.doc>p{margin-bottom:var(--s5)}
+.doc .lead{font:500 16px/1.45 var(--display);color:var(--ink)}
+.doc ul,.doc ol{padding-left:20px}
+.doc :is(ul,ol) :is(ul,ol){margin:var(--s2) 0 0}
+.doc li{margin-bottom:var(--s2);font-size:15px;line-height:1.6}
+.doc strong,.doc b{font-weight:600}
+.doc em{font-style:italic}
+.doc code{padding:0 4px;background:var(--panel2);border:1px solid var(--rule);border-radius:var(--radius);font:400 .87em var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.doc pre{padding:var(--s4) var(--s5);background:var(--panel2);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto}
+.doc pre code{padding:0;background:none;border:0;font:400 12px/1.6 var(--mono);overflow-wrap:normal}
+.doc :target{scroll-margin-top:var(--s4)}
+/* the anchor a link landed on: the same 3px accent rule a selected row carries */
+.doc :is(h2,h3,p,dt,dd):target,.doc dt:target+dd{margin-left:-11px;padding-left:var(--s3);border-left:3px solid var(--accent)}
 
-table{width:100%;border-collapse:collapse;margin:11px 0;font-size:13px}
-th{font:700 8.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);
-  text-align:left;padding:8px;border-bottom:1px solid var(--line2);background:var(--panel2)}
-td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
-td.num,th.num{text-align:right;font-family:var(--f-mono);font-size:12px}
-tbody tr:last-child td{border-bottom:none}
+/* tables: mono header labels on an ink rule, digits in mono */
+.doc table{width:100%;border-collapse:collapse;margin:0;font:400 12px/1.4 var(--body)}
+.doc :is(.box,.tier,.card) :is(table,.fs-table-scroll){margin:var(--s3) 0 var(--s4)}
+.doc th{padding:var(--s2) var(--s3);border-bottom:1px solid var(--ink);text-align:left;vertical-align:bottom;
+  font:500 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc td{padding:var(--s2) var(--s3);border-bottom:1px solid var(--rule2);vertical-align:top}
+.doc :is(td,th).num{text-align:right}
+.doc td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.doc table:has(th:nth-child(4)){min-width:520px}
+.lv,.kfig{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
-.tier{border:1px solid var(--line);border-radius:4px;padding:13px 15px;margin-bottom:12px;background:var(--panel)}
-.tier.t1{border-left:3px solid var(--green)}
-.tier.t2{border-left:3px solid var(--blue)}
-.tier.t3{border-left:3px solid var(--amber)}
-.tier.t4{border-left:3px solid var(--red)}
-.tier h4{margin-top:0}
-.tier .badge{font:700 8.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;
-  border-radius:3px;padding:4px 7px;margin-left:8px}
-.t1 .badge{color:var(--green);border:1px solid color-mix(in srgb,var(--green) 40%,transparent)}
-.t2 .badge{color:var(--blue);border:1px solid color-mix(in srgb,var(--blue) 40%,transparent)}
-.t3 .badge{color:var(--amber);border:1px solid var(--amber-line)}
-.t4 .badge{color:var(--red);border:1px solid color-mix(in srgb,var(--red) 40%,transparent)}
+/* notes */
+.box,.callout,.card,.tier,.snap{padding:var(--s4) var(--s5);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.box.data,.callout{background:var(--panel2)}
+/* a limitation or caution: the gold rule, never the accent */
+.box.warn,.callout.warn,.snap{border-color:var(--gold)}
+.doc :is(.box,.callout,.card,.tier,.snap)>:last-child{margin-bottom:0}
+.doc :is(.box,.callout,.card,.tier,.snap) :is(p,li){font-size:13px;line-height:1.45}
+.unavail{color:var(--p0-text);font-weight:600}
+.foot{grid-column:1/-1;margin-top:var(--s6);padding-top:var(--s4);border-top:1px solid var(--rule);font:400 11px/1.6 var(--mono);color:var(--muted)}
 
-.box{border:1px solid var(--line);background:var(--panel);border-radius:3px;padding:12px 15px;margin:13px 0}
-.box.warn{border-color:var(--amber-line);background:var(--amber-dim)}
-.box h5{font:700 9px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin:0 0 8px}
-.box p:last-child,.box ul:last-child{margin-bottom:0}
-.foot{grid-column:1/-1;margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
-  font:500 10.5px/1.8 var(--f-mono);color:var(--dim2)}
-@media print{.toc,.nav,.tbtn{display:none}.wrap{display:block}body{background:#fff;color:#000}
-  pre,table,.tier,.box{page-break-inside:avoid}}
-.unavail{color:var(--red,#ff5f56);font-weight:600}
+@media (max-width:900px){
+  /* one column, the side navigation above the content */
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .toc{position:static;max-height:none}
+}
+@media (max-width:760px){
+  .wrap{padding:var(--s5) var(--s5) 48px}
+  .toc{max-height:168px}
+  .doc{grid-template-columns:minmax(0,1fr)}
+  .doc>:is(table,.fs-table-scroll):has(th:nth-child(4)),.doc>.wide{grid-column:1}
+  .doc h1{font-size:24px}
+}
+@media print{
+  .fs-shell,.fs-bottom,.fs-toast,.fs-palette,.toc,.noprint{display:none!important}
+  html,body{background:none}
+  .wrap{display:block;max-width:none;padding:0}
+  .doc h2{break-after:avoid}
+  .doc :is(pre,table,.box,.callout,.card,.tier,.snap,.q,details,.m){break-inside:avoid}
+  .wrap a{text-decoration:none}
+}
+
+/* ---- Methodology ---- */
+/* Evidence tiers. The grade is stated in the heading and its tag; no tier
+   borrows a percentile colour, because a tier is not a ranking. */
+.doc .tier h4{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s2) var(--s3);margin-top:0;margin-bottom:var(--s3);color:var(--ink)}
+.tier .badge{padding:1px 5px;border:1px solid var(--ink);border-radius:var(--radius);font:500 9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+.t3 .badge{border-style:dashed}
+.t4 .badge{border-color:var(--p0);color:var(--p0-text)}
 </style>
-<script src="site-tools.js" defer></script>
+<link rel="stylesheet" href="shell.css?v=pr1">
+<link rel="stylesheet" href="components.css?v=pr1">
 </head>
-<body>
+<body><script>window.FutScout&&FutScout.mount()</script>
 <div class="wrap">
 
   <div class="sys">
-    <div class="sys-top">
-      <span class="dot"></span>
-      <span class="sys-title">FutScout &mdash; <b>Methodology</b></span>
-      <span class="spacer"></span>
-      <nav class="nav">
-        <a href="index.html">Home</a><a href="guide.html">Guide</a>
-        <a href="validation.html">Validation</a><a href="glossary.html">Reference</a>
-      </nav>
-      <button class="tbtn" id="themeBtn" type="button" aria-label="Toggle light/dark theme">&#9790;</button>
-    </div>
     <div class="sys-line">
       Event-metric definitions, thresholds and evidence. Forecast-model artifacts and diagnostics are in the <a href="model-lab.html?tab=guide">Model Lab guide</a>. <span id="mAsOf">as of —</span>.
     </div>
@@ -257,7 +270,7 @@ where m.home_score &lt;&gt; coalesce(ev.h,0)
   team&rsquo;s perspective, left to right. Converting to metres uses a 105 &times; 68 pitch:</p>
   <pre><code>x_metres = x / 100 * 105
 y_metres = y / 100 * 68</code></pre>
-  <p>Thirds are cut at x &lt; 33.3, 33.3&ndash;66.7 and &ge; 66.7. The penalty area is
+  <p id="zone-definitions">Thirds are cut at x &lt; 33.3, 33.3&ndash;66.7 and &ge; 66.7. The penalty area is
   x &ge; 83 with y between 21.1 and 78.9. Wide channels are y &lt; 21.1 or y &gt; 78.9.</p>
 
   <!-- ================= INGEST ================= -->
@@ -509,16 +522,6 @@ similarity % = 100 - distance</code></pre>
     hold it back. Read the check results, not this footer, for the current state.
   </div>
 </div>
-<script>
-function paintThemeBtn(){var b=document.getElementById('themeBtn');
-  if(b)b.textContent=document.documentElement.classList.contains('dark')?'\u2600':'\u263e';}
-(function(){var b=document.getElementById('themeBtn');if(!b)return;
-  b.addEventListener('click',function(){
-    var d=document.documentElement.classList.toggle('dark');
-    try{localStorage.setItem('theme',d?'dark':'light')}catch(e){}
-    paintThemeBtn();});
-  paintThemeBtn();})();
-</script>
 
 <script>
 (function(){
@@ -597,6 +600,12 @@ function paintThemeBtn(){var b=document.getElementById('themeBtn');
       set('msStatus','out-of-time: '+Number(d.validation_shots).toLocaleString()+' shots · '+d.validation_from+' to '+d.validation_through+' · Brier '+Number(d.brier_score).toFixed(5));
     }).catch(function(){set('msStatus','temporal holdout unavailable',true);});
 })();
+</script>
+<script>
+/* Printing is always on the light palette, whatever the screen theme: the
+   root theme is set to light for the print and put back afterwards. */
+window.addEventListener('beforeprint',function(){var r=document.documentElement;if(!r.hasAttribute('data-print-theme')){r.setAttribute('data-print-theme',r.getAttribute('data-theme')||'');r.setAttribute('data-theme','light')}});
+window.addEventListener('afterprint',function(){var r=document.documentElement;if(r.hasAttribute('data-print-theme')){var t=r.getAttribute('data-print-theme');if(t)r.setAttribute('data-theme',t);else r.removeAttribute('data-theme');r.removeAttribute('data-print-theme')}});
 </script>
 </body>
 </html>

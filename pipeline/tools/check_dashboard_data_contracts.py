@@ -24,6 +24,12 @@ def main() -> int:
             failures.append(message)
 
     pages = {name: (DASHBOARD / name).read_text(encoding="utf-8") for name in ACTIVE_PAGES}
+    # Press Room moved focus rings into theme.css and PNG/PDF capture into
+    # site-tools.js, so those contracts are read from the shared files.
+    theme_css = (DASHBOARD / "theme.css").read_text(encoding="utf-8")
+    site_tools = (DASHBOARD / "site-tools.js").read_text(encoding="utf-8")
+    shared_pdf = ("toDataURL('image/jpeg',.92),'JPEG'" in site_tools and
+                  "undefined,'FAST'" in site_tools)
 
     # Unknown league membership may remain visible in an unscoped list, but it
     # must never be silently filed into MLS or shown as a zero-match MLS state.
@@ -52,7 +58,7 @@ def main() -> int:
             "players.html: substitute appearances qualify for the directory")
     require(not re.search(r"\.filter\([^\n]{0,160}starts[^\n]{0,80}>\s*0", players),
             "players.html: directory is not filtered to starters")
-    require("lgOfTeam(peer.team)===playerLeague" in players and "eligible role peers" in players,
+    require("lgOfTeam(peer.team)===lg" in players and "eligible role peers" in players,
             "players.html: displayed comparison cohort is limited to the player's league and role")
 
     # WhoScored y=0 is the right touchline. SVG y grows downward, so this
@@ -67,13 +73,15 @@ def main() -> int:
             "Orientation · attack left → right · team right = bottom edge" in pages["teams.html"] and
             "Orientation · attack bottom → top · team right = screen right" in pages["match.html"],
             "player, team and match pitches teach their page-specific orientation")
-    require('data-chart-title="scatter"' in players and "raw per-90 values" in players,
+    require('data-chart-title="scatter"' in players and
+            "axes are raw values in their labelled units" in players,
             "players.html: scatter has a visible title and measurement context")
     require("x0>=0?Math.max(0,x0-padX)" in players and
             "y0>=0?Math.max(0,y0-padY)" in players,
             "players.html: scatter padding cannot invent negative values for nonnegative metrics")
-    require("'</svg>'+legendHtml()" in players,
-            "players.html: scatter explains its percentile colour scale")
+    require('<i style="background:var(--ink)"></i>Cohort</span>' in players and
+            '<i style="background:var(--accent)"></i>Selected player</span>' in players,
+            "players.html: scatter keys its point colours")
     require("function shotSizeKey()" in players and
             "Example marker sizes: 0.05, 0.20 and 0.50 expected goals" in players and
             "cfg.sizeKey?shotSizeKey()" in players,
@@ -85,8 +93,7 @@ def main() -> int:
     # Enter/Space onkeydown. They are real buttons now, so Enter and Space come
     # from the element rather than from a hand-rolled handler, and each says
     # which dialog it opens and whether that dialog is open.
-    require("<button type=\"button\" class=\"row drill\"" in players and
-            "<button type=\"button\" class=\"val-link\"" in players and
+    require("<button type=\"button\" class=\"val-link\"" in players and
             "aria-label=\"Plot '+esc(d.label)" in players and
             "aria-haspopup=\"dialog\" aria-controls=\"drillWrap\" aria-expanded=\"false\"" in players and
             "role=\"button\" tabindex=\"0\"" not in players,
@@ -95,34 +102,33 @@ def main() -> int:
             "aria-label=\"Close pitch evidence\"" in players and
             "e.key==='Escape'" in players and "DRILL_RETURN.focus()" in players,
             "players.html: pitch evidence dialog manages close and return focus")
-    require("c.toDataURL('image/jpeg',0.9),'JPEG'" in players and
-            "undefined,'FAST'" in players,
-            "players.html: plot PDFs use a compressed opaque export image")
-    require("@media(max-width:1180px){.split{grid-template-columns:1fr}.split-r{order:-1}}" in players,
+    require("window.FutScoutExports" in site_tools and shared_pdf,
+            "shared exports write PDFs from a compressed opaque image")
+    require('<div class="fs-cols-2 research"><div class="pitch-host">' in players and
+            players.index('class="pitch-host"') < players.index('class="measures-host"'),
             "players.html: pitch precedes the long metric table in single-column layouts")
     require("function actionMark(" in players and
             all(shape in players for shape in ["'triangle'", "'diamond'", "'square'", "'cross'", "'ring'"]),
             "players.html: multi-action maps distinguish layers without colour")
-    require("class=\"player-overview\"" in players and
-            "OVOPEN=window.innerWidth>820" in players and
-            ".player-overview>summary{display:flex}" in players,
-            "players.html: overview is collapsible on small screens")
+    require('class="fs-overview player-overview"' in players and
+            "OVOPEN=false" in players and
+            'aria-expanded="\'+OVOPEN+\'" aria-controls="ovGrid"' in players,
+            "players.html: overview is collapsed by default behind a labelled toggle")
     require("SC.x==='prog_carries_90'&&SC.y==='key_pass_90'" in players and
-            "quadrant names describe wide-player involvement, not overall quality" in players,
+            "not a verdict on quality" in players,
             "players.html: quadrant labels are limited to a defensible pairing")
     require("'Plot studio'" in players and "function renderPlotStudio()" in players and
             "function studioEventPlot()" in players,
             "players.html: custom player plot studio is a first-class analysis path")
-    require("function pizzaSvg(keys,title)" in players and
+    require("function pizzaSvg(keys,title,mode)" in players and
             "segmented percentile pizza" in players and
             "ringSlice" in players and "openCategoryPizza" in players,
             "players.html: category and custom pizzas use readable segmented radial wedges")
     require("Build across categories" in players and "selectedMetricTray" in players and
-            "the selection stays in the tray" in players,
+            "the slice list keeps them" in players,
             "players.html: pizza builder preserves cross-category metric selections")
-    require("profile-brief" in players and "Start here · relative strength" in players and
-            "Review question" in players,
-            "players.html: profile starts with an evidence-linked interpretive synopsis")
+    require("profile-brief" not in players and "Review question" not in players,
+            "players.html: profile carries no interpretation card (Press Room brief)")
     require("Attacking half" in players and "VZ.shotFocus" in players and
             "Math.max(0.52" in players,
             "players.html: shot maps support attacking-half focus and visible low-xG markers")
@@ -148,18 +154,16 @@ def main() -> int:
             "source records match these filters" in players,
             "players.html: overlapping pitch layers and record counts describe what is actually shown")
     require("viewBox=arguments[5]||'-3 -3 111.5 78'" in players and
-            'viewBox="-3 -3 111.5 78"' in players and
-            "overflow-y:auto;overflow-x:hidden" in players,
+            'viewBox="-3 -3 111.5 78"' in players,
             "players.html: attack label and plot filters stay inside their bounds")
-    require("scout-result-head" in players and ".scout-results .c-pct{font-size:11px" in players and
+    require(".c-pct{display:block;font:500 11px" in players and
             "Top '+rows.length+' of '+SK.rows.length+' qualifying players" in players,
             "players.html: Scout has readable result hierarchy and sample context")
     require("function ordinal(n)" in players and "ordinal(r.pct)+' percentile" in players,
             "players.html: percentile ordinals use correct English suffixes")
 
     match = pages["match.html"]
-    require("activeVizs:['progressive']" in match and
-            '<div class="viz-btn on" data-viz="progressive">' in match,
+    require("activeVizs:['progressive']" in match,
             "match.html: first match view defaults to the lower-density progressive-pass map")
     require("const dense=!S.selPlayer&&evts.length>60" in match and
             ".slice(0,36):evts" in match and
@@ -177,33 +181,26 @@ def main() -> int:
             "ctx.moveTo(p2.cx-r,p2.cy-r)" in match and
             "Incomplete · dashed" in players,
             "player and match pass maps distinguish failure without colour alone")
-    require("for(const viz of candidates)" in match and
+    require("for(const viz of vizOrder())" in match and
             "if(S.activeVizs.length>=S.plotSlots)break" in match,
             "match.html: plot-count controls fill the requested number of slots")
-    require('width:calc((100% - 24px)/3)' in match,
-            "match.html: three-plot widths include both inter-panel gaps")
-    require('.pitch-area[data-count="4"]{overflow-y:auto;align-content:flex-start}' in match and
-            'height:min(720px,72vh)' in match,
-            "match.html: four-plot layout preserves readable pitch height")
-    require('@media(min-width:1400px)' in match and
-            'width:calc((100% - 36px)/4)' in match and
-            "const wideFour=n===4&&window.matchMedia('(min-width: 1400px)').matches" in match and
-            'wideFour?4:Math.min(3,Math.ceil(n/2))' in match,
-            "match.html: wide four-plot layout uses four portrait-friendly columns")
+    require(".pitch-area{flex:0 0 auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))" in match and
+            '.pitch-area[data-count="1"]{grid-template-columns:minmax(0,820px)}' in match and
+            ".narrow .pitch-area{grid-template-columns:minmax(0,1fr)}" in match,
+            "match.html: plot slots share a two-column grid that collapses to one when narrow")
     require("legendEl.innerHTML=items.map" in match and
-            "Draw compact legend ON canvas" not in match and
-            '.panel-viz-defensive{width:min(100%,880px)' in match,
+            "Draw compact legend ON canvas" not in match,
             "match.html: defensive action legend stays outside the pitch")
-    require("btn.setAttribute('role','button')" in match and
-            "btn.setAttribute('aria-pressed'" in match and
-            "e.key==='Enter'||e.key===' '" in match,
-            "match.html: visualization selectors expose keyboard button semantics")
+    require('<label for="slotSel\'+i+\'">Slot ' in match and
+            '<select id="slotSel\'+i+\'" class="slot-sel' in match and
+            "btn.setAttribute('role','button')" not in match,
+            "match.html: visualization choice is a labelled native select per plot slot")
 
     teams = pages["teams.html"]
     require("function shotOutcomeLegend(counts,forTeam)" in teams and
             "shotOutcomeLegend({goal:g" in teams and "class=\"shot-key\"" in teams,
             "teams.html: shot outcome legend demonstrates each plotted glyph")
-    require('<div class="viz-eyebrow">Relationship</div>' in teams and
+    require('<span class="fs-label">Relationship</span>' in teams and
             "eligible teams · raw values · dashed guides are displayed-sample medians" in teams,
             "teams.html: league scatter states the relationship and measurement context")
     require("const xmin=x0>=0?Math.max(0,x0-px):x0-px" in teams and
@@ -223,18 +220,18 @@ def main() -> int:
             "Incomplete · dashed" in teams and
             "color===TPAL.fail?' stroke-dasharray" in teams,
             "teams.html: pass outcome counts and failure dash do not rely on colour")
-    require("aria-pressed=\"'+(MP.kind===m.k)+'\"" in teams and
-            "aria-pressed=\"'+(MP.mode==='pattern')+'\"" in teams and
+    require("function mapBtn(label,on,code){return '<button type=\"button\" aria-pressed=\"'+on+'\"" in teams and
+            "mapBtn(m.l,MP.kind===m.k" in teams and
+            "mapBtn('Pattern',MP.mode==='pattern'" in teams and
             "aria-pressed=\"'+(!off[l.k])+'\"" in players and
-            ".lchip:focus-visible,.vzb:focus-visible" in players,
+            ":focus-visible{outline:2px solid var(--accent)" in theme_css,
             "player and team plot toggles expose pressed state and focus")
-    require("clone=el.cloneNode(true)" in teams and "overflow:visible" in teams and
-            "clone.querySelectorAll('.pitch-box')" in teams and
-            "c.toDataURL('image/jpeg',0.9),'JPEG'" in teams,
-            "teams.html: exports expand scrolling content and compress PDFs")
-    require("@media(max-width:640px){.ranking-chart{display:none}" in teams and
-            "The compact table carries every value" in teams,
-            "teams.html: mobile rankings replace the unreadable full chart with the complete table")
+    require("clone=card.cloneNode(true)" in teams and
+            "clone.classList.remove('narrow')" in teams and
+            "window.FutScoutExports" in teams and shared_pdf,
+            "teams.html: exports capture a full-width clone and compress PDFs")
+    require(".narrow .tm-rank{grid-template-columns:minmax(0,1fr)}" in teams,
+            "teams.html: rankings stack to one column when narrow")
 
     if failures:
         print(f"\n{len(failures)} dashboard contract check(s) failed.")

@@ -1,199 +1,183 @@
 /* ---------------------------------------------------------------------------
-   Shared page shell: the header strip and its tab bar.
+   FutScout shell (chrome). Rendered by site-tools.js on all 18 destinations.
 
-   Linked BEFORE each page's inline <style>, so anything a page declares after
-   the link still wins. Only rules the pages already agreed on live here; where
-   a page genuinely differed, that difference stayed inline on that page as a
-   small override rather than being harmonised. It started as a pure extraction
-   pass; the header identity group (.hdr-id) and the site nav menu (.navmenu)
-   were added later and are scoped so they only reach the pages that use them.
+   Linked AFTER each page's inline <style>, so the chrome is the same everywhere
+   and a page cannot restyle it by accident. Data panels live in components.css.
+   Every value is a token from theme.css.
 
-   Used by players.html, teams.html, match.html and sequences.html. NOT by
-   glossary.html, which shares only the class name "hdr": its markup is
-   hdr-mark / hdr-t / hdr-s and it defines none of the custom properties below.
-
-   Relies on the host page defining: --bg2, --bg3, --border, --border2,
-   --surface, --accent, --text, --text3, --shadow. The font tokens --f-display,
-   --f-body and --f-mono come from theme.css, which every page linking this file
-   also links.
+   Bands, top to bottom:
+     .fs-top      46px  wordmark, group menus, SCOPE, freshness, GO TO, THEME
+     .fs-ws       40px  breadcrumb, the page's own local tabs, population, actions
+     .fs-shell-stale    only when the snapshot is stale
+     .fs-bottom   48px  phone only: six group tokens
+   Nothing in the shell is sticky or sized in viewport units.
 --------------------------------------------------------------------------- */
 
-/* Header bar.
-   match.html runs a wider gap and sits above a higher stacking context, so it
-   overrides gap and z-index inline. */
-.hdr{height:52px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:14px;flex-shrink:0;box-shadow:var(--shadow);z-index:10}
+.fs-shell{flex:0 0 auto;width:100%;background:var(--panel);color:var(--ink);font:400 13px/1.45 var(--body);position:relative;z-index:80;box-sizing:border-box}
+.fs-shell *,.fs-bottom *,.fs-palette *{box-sizing:border-box}
 
-/* Logo chip. Geometry only: the four pages set the glyph's font and colour
-   differently, so those stay inline (match.html also recolours the chip). */
-.hdr-logo{width:32px;height:32px;border-radius:50%;background:var(--accent);display:grid;place-items:center}
+/* ---------- Top bar ---------- */
+.fs-top{display:flex;flex-wrap:wrap;align-items:center;gap:0 var(--s5);min-height:var(--h-top);padding:0 var(--s5);background:var(--panel);border-bottom:1px solid var(--ink)}
+.fs-mark{font:600 17px/1 var(--display);letter-spacing:.02em;color:var(--ink);text-decoration:none;white-space:nowrap;flex:0 0 auto}
+.fs-mark span{color:var(--accent)}
+.fs-burger{display:none}
 
-/* Title block. match.html has no .hdr-title element; it uses .hdr-info.
+.fs-groups{display:flex;align-items:center;gap:2px;min-width:0}
+.fs-group{position:relative}
+.fs-group>summary{list-style:none;cursor:pointer;display:flex;align-items:center;min-height:var(--tap);padding:0 var(--s3);
+  font:400 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-radius:var(--radius);white-space:nowrap;user-select:none}
+.fs-group>summary::-webkit-details-marker{display:none}
+.fs-group>summary:hover,.fs-group[open]>summary{color:var(--ink)}
+.fs-group.is-active>summary{background:var(--ink);color:var(--bg)}
+.fs-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:90;min-width:210px;padding:var(--s1);
+  background:var(--panel);border:1px solid var(--ink);border-radius:var(--radius);box-shadow:var(--menu-shadow)}
+.fs-menu a{display:flex;align-items:center;min-height:var(--tap);padding:0 var(--s4);border-left:3px solid transparent;
+  color:var(--ink);text-decoration:none;font:400 13px/1.2 var(--body);white-space:nowrap}
+.fs-menu a:hover,.fs-menu a:focus-visible{background:var(--panel2)}
+.fs-menu a[aria-current="page"]{border-left-color:var(--accent);background:var(--bg);font-weight:600}
 
-   These carried literal font fallbacks for a while, because teams.html and
-   sequences.html declared no --f-display and a bare var() made the whole font
-   shorthand invalid. theme.css defines the font tokens for every page now, so
-   the token is the single source of truth again. */
-.hdr-title{font:800 15px/1 var(--f-display);letter-spacing:-.015em}
-.hdr-sub{font-size:10px;color:var(--text3);margin-top:3px}
-.hdr-row{display:flex;align-items:center;gap:8px;margin-top:3px}
+.fs-right{margin-left:auto;display:flex;align-items:center;gap:var(--s4);min-width:0}
+.fs-lab{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.fs-scope{display:flex;align-items:center;gap:var(--s2);min-width:0}
+.fs-scope-slot{display:flex;align-items:center;min-width:0}
+.fs-scope-slot>*{display:flex;align-items:center;margin:0;padding:0;border:0;background:none}
+.fs-shell .fs-scope select{appearance:auto;height:var(--tap);min-height:var(--tap);max-width:190px;padding:0 var(--s2);background:var(--panel);color:var(--ink);
+  border:1px solid var(--rule);border-radius:var(--radius);font:400 12px/1 var(--body);cursor:pointer}
+.fs-shell .fs-scope select:disabled{color:var(--muted);cursor:not-allowed;background:var(--panel2)}
+.fs-fresh{display:flex;align-items:center;gap:var(--s2);font:400 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.fs-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex:0 0 auto}
+.fs-fresh.is-stale .fs-dot{background:var(--p0)}
+.fs-fresh.is-stale{color:var(--ink)}
+.fs-fresh.is-missing .fs-dot{background:none;border:1px solid var(--muted)}
 
-/* Identity group, players.html and teams.html only.
-   Page name, league picker and the caption that qualifies it are one control
-   group, not three separately styled things sharing a corner. .hdr-id stacks
-   the two rows; .hdr-row is the group, drawn as a single inset chip.
-   Everything below is scoped under .hdr-id, and only these two pages have one,
-   so sequences.html and match.html are untouched. */
-.hdr-id{display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0;flex-shrink:0}
-.hdr-id .hdr-row{margin-top:0;gap:7px;padding:3px 8px;max-width:100%;
-  border:1px solid var(--border);border-radius:7px;background:var(--surface)}
+/* The k button: mono uppercase, ink border. Chrome and export actions use it. */
+.fs-k,.fs-actions :is(button,a),.fs-card-export button{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);
+  min-height:var(--tap);padding:0 var(--s4);background:var(--panel);color:var(--ink);border:1px solid var(--ink);border-radius:var(--radius);
+  font:500 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;text-decoration:none;white-space:nowrap;cursor:pointer}
+.fs-k:hover,.fs-actions :is(button,a):hover,.fs-card-export button:hover{background:var(--panel2)}
+.fs-k[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.fs-k:disabled,.fs-actions :is(button,a):disabled{color:var(--muted);border-color:var(--rule);cursor:not-allowed}
+.fs-k kbd{font:inherit;color:var(--muted)}
+.fs-goto{display:inline-flex}
 
-/* One type scale across the group: the caption sits one step under the title
-   and matches the picker beside it, so neither shouts. It stays on one line at
-   desktop, because the old three-line wrap is what forced the header taller
-   than its 52px. */
-.hdr-id .hdr-row .hdr-sub{margin-top:0;white-space:nowrap;color:var(--text3);
-  font:600 10.5px/1.35 var(--f-body);letter-spacing:.005em}
+/* ---------- Workspace row ---------- */
+.fs-ws{display:flex;align-items:stretch;gap:var(--s5);height:var(--h-ws);padding:0 var(--s5);background:var(--panel);border-bottom:1px solid var(--rule)}
+.fs-crumb{display:flex;align-items:center;flex:0 0 auto;font:400 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.fs-ws-tabs{display:flex;align-items:stretch;flex:1 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+/* Whatever strip the page hands over is flattened into this row. */
+.fs-ws-tabs>*{display:flex;align-items:stretch;flex:0 0 auto;gap:0;margin:0;padding:0;background:none;border:0;border-radius:0;box-shadow:none;overflow:visible;flex-wrap:nowrap;width:auto;height:auto;position:static}
+.fs-ws-tabs :is(a,button){appearance:none;display:inline-flex;align-items:center;flex:0 0 auto;height:auto;min-height:0;margin:0;padding:0 var(--s4);
+  background:none;border:0;border-bottom:2px solid transparent;border-radius:0;box-shadow:none;
+  color:var(--muted);font:400 13px/1 var(--body);letter-spacing:0;text-transform:none;text-decoration:none;white-space:nowrap;cursor:pointer}
+.fs-ws-tabs :is(a,button):hover{color:var(--ink);background:none}
+.fs-ws-tabs :is(a,button):is(.on,.active,.is-active,[aria-selected="true"],[aria-current],[aria-pressed="true"]){color:var(--ink);font-weight:600;border-bottom-color:var(--accent);background:none;box-shadow:none}
+.fs-ws-tabs :is(a,button):focus-visible{outline-offset:-2px}
+.fs-ws-right{display:flex;align-items:center;gap:var(--s4);flex:0 0 auto;margin-left:auto;min-width:0}
+.fs-pop{font:400 11px/1.3 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.fs-pop>*{font:inherit;color:inherit;letter-spacing:inherit;margin:0}
+.fs-pop:empty{display:none}
+.fs-actions{display:flex;align-items:center;gap:var(--s2)}
+.fs-actions:empty{display:none}
+.fs-actions>*{display:contents}
 
-/* Inside the chip the select drops its own box: one border around the group
-   reads as one control, nested borders read as two. Hover and keyboard focus
-   still give it an edge, and the native menu marker keeps it obviously a
-   control. Border width is kept, only the colour goes, so hover shifts nothing. */
-.hdr-id .hdr-row .lgpick select{background:transparent;border-color:transparent;color:var(--text);
-  padding:1px 2px;font:700 10.5px/1.35 var(--f-body)}
-.hdr-id .hdr-row .lgpick select:hover{background:var(--bg2);border-color:var(--border2)}
+/* ---------- Banners (shell stale banner + page banners share this) ---------- */
+.fs-banner{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s3) var(--s4);padding:var(--s3) var(--s5);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);color:var(--ink);font:400 12px/1.4 var(--body)}
+.fs-banner[hidden]{display:none}
+.fs-banner-label{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:3px 5px;border:1px solid currentColor;border-radius:var(--radius);flex:0 0 auto}
+.fs-banner-text{flex:1 1 240px;min-width:0}
+.fs-banner-warn{border-color:var(--p0)}
+.fs-banner-warn .fs-banner-label{color:var(--p0-text)}
+.fs-banner-stale{border-color:var(--gold)}
+.fs-banner-stale .fs-banner-label{color:var(--gold-text)}
+.fs-shell-stale{border-width:0 0 0 0;border-top:2px solid var(--gold);border-bottom:1px solid var(--rule);border-radius:0}
 
-/* Right-hand action cluster. match.html runs a wider gap, set inline. */
-.hdr-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+/* ---------- Palette ---------- */
+.fs-palette{width:min(620px,calc(100vw - 24px));max-height:min(620px,calc(100vh - 48px));margin:8vh auto auto;padding:0;
+  background:var(--panel);color:var(--ink);border:1px solid var(--ink);border-radius:var(--radius);box-shadow:var(--menu-shadow);font:400 13px/1.45 var(--body);overflow:hidden}
+.fs-palette[open]{display:flex;flex-direction:column}
+.fs-palette::backdrop{background:color-mix(in srgb,var(--ink) 42%,transparent)}
+.fs-pal-head{display:flex;align-items:center;gap:var(--s4);padding:var(--s4) var(--s5);border-bottom:1px solid var(--ink)}
+.fs-pal-head input{flex:1 1 auto;min-width:0;height:32px;padding:0 var(--s3);background:var(--panel);color:var(--ink);border:1px solid var(--ink);border-radius:var(--radius);font:400 13px/1 var(--body)}
+.fs-pal-body{overflow:auto;padding:var(--s2) 0 var(--s4)}
+.fs-pal-group{border-bottom:1px solid var(--rule2)}
+.fs-pal-row{display:flex;align-items:center;gap:var(--s4);min-height:var(--tap);padding:0 var(--s5);border-left:3px solid transparent;color:var(--ink);text-decoration:none}
+.fs-pal-row[hidden]{display:none}
+.fs-pal-row:hover,.fs-pal-row:focus-visible{background:var(--panel2);border-left-color:var(--ink)}
+.fs-pal-row[aria-current="page"]{border-left-color:var(--accent);background:var(--bg)}
+.fs-pal-row .fs-tag{flex:0 0 62px;text-align:center}
+.fs-pal-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fs-pal-meta{font:400 11px/1 var(--mono);color:var(--muted);white-space:nowrap}
+.fs-pal-note{margin:var(--s4) var(--s5) 0;font:400 11px/1.4 var(--body);color:var(--muted)}
 
-/* Header actions on players.html and teams.html. Scoped to .hdr-right so the
-   same .lnk class keeps its existing look everywhere else on those pages, and
-   compound enough (0,2,0) to outrank each page's own .lnk without editing it.
-   match.html has no .lnk in its header, so none of this reaches it. */
-.hdr-right .lnk{display:inline-flex;align-items:center;gap:5px;
-  background:transparent;border:1px solid var(--border);color:var(--text2);
-  font:600 10.5px/1 'Inter',system-ui,sans-serif;letter-spacing:.02em;
-  min-height:29px;padding:0 10px;border-radius:7px;text-decoration:none;white-space:nowrap;cursor:pointer;
-  transition:color .15s,background-color .15s,border-color .15s}
-.hdr-right .lnk:hover{background:var(--surface2);color:var(--text);border-color:var(--border2)}
-.hdr-right .lnk.acc{color:var(--accent);border-color:var(--accent-glow);background:var(--accent-dim)}
-.hdr-right .lnk.acc:hover{background:var(--accent-glow);color:var(--accent)}
-.hdr-right .lnk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* ---------- Toast ---------- */
+.fs-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;max-width:calc(100vw - 32px);padding:var(--s3) var(--s5);
+  background:var(--ink);color:var(--bg);border-radius:var(--radius);font:400 11px/1.3 var(--mono);letter-spacing:.04em;text-transform:uppercase;
+  opacity:0;pointer-events:none;transition:opacity .15s}
+.fs-toast.on{opacity:1}
 
-/* League picker, players.html and teams.html.
-   No max-width: a select sizes itself to its widest option, so the chosen label
-   is always readable. The old 150px cap cut "Premier League (20 available)"
-   mid-word. */
-.lgpick select{background:var(--bg);color:var(--text);border:1px solid var(--line2,var(--border));
-  border-radius:6px;padding:3px 7px;font:700 10px/1.3 inherit;cursor:pointer;
-  max-width:none;width:auto;min-width:0;text-overflow:clip;
-  /* field-sizing tracks the option actually selected, so the control is only as
-     wide as the label it is showing. Where it is not supported, width:auto falls
-     back to the widest option, which is roomier but still never truncates. */
-  field-sizing:content;
-  transition:border-color .15s,background-color .15s}
-.lgpick select:hover{border-color:var(--accent);background:var(--bg2)}
-/* Keyboard focus must stay visible; only the mouse focus ring is dropped. */
-.lgpick select:focus{border-color:var(--accent)}
-.lgpick select:focus:not(:focus-visible){outline:none}
-.lgpick select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* ---------- Phone bottom bar ---------- */
+.fs-bottom{display:none}
 
-/* Tab bar. players.html and teams.html additionally let this scroll
-   horizontally, which sequences.html does not, so that stays inline on them.
-   match.html uses .hdr-tabs and is untouched by these rules.
+/* ---------- Export stage and controls ---------- */
+.fs-card-export{display:inline-flex;gap:var(--s1);margin-left:auto}
+.fs-export-bar{display:flex;justify-content:flex-end;margin:0 0 var(--s4)}
+.fs-exporting{opacity:.62;pointer-events:none}
+.fs-export-stage{position:fixed;left:-20000px;top:0;width:1120px;padding:28px;background:var(--panel);color:var(--ink);z-index:-1}
+/* html2canvas 1.4 misplaces glyphs in letter-spaced text inside flex boxes. */
+.fs-export-stage *{animation:none!important;transition:none!important;letter-spacing:0!important}
+.fs-export-stage table td,.fs-export-stage table th,.fs-export-stage .row,.fs-export-stage .row-lbl,.fs-export-stage .row-val,.fs-export-stage .row-pct{font-size:18px!important;line-height:1.45!important}
+.fs-export-stage .row{min-height:28px}
+.fs-export-stage table th{letter-spacing:.02em!important}
+.fs-export-stage table{table-layout:auto!important}
+.fs-export-stage .match{opacity:1!important;transform:none!important}
+.fs-export-stage .frow{font-size:18px!important;min-height:32px}
+.fs-export-stage .frow>span{overflow-wrap:anywhere}
+.fs-stamp{margin:18px 0 0;padding-top:12px;border-top:1px solid var(--ink);color:var(--ink);font:400 15px/1.5 var(--mono)}
+.fs-stamp-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.fs-stamp-head .fs-mark{font-size:20px}
+.fs-stamp-title{font:500 15px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.fs-stamp dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:2px 16px;margin:0}
+.fs-stamp dt{font:500 13px/1.7 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.fs-stamp dd{margin:0;overflow-wrap:anywhere}
 
-   Overflow cue: a shaded edge on whichever side has more bar to reach. It is
-   painted only when the page adds .cue-l / .cue-r, which those pages do from
-   the strip's own scroll position, so a bar that fits paints nothing at all.
-   The previous version tried to do this in pure CSS by parking an opaque cover
-   over each shadow and attaching the two to different scroll origins; on a
-   fractional strip width the pair drifted apart and left a bright hairline just
-   past the last tab, reading as an edge that was not there. sequences.html adds
-   neither class, so its non-scrolling strip is unaffected either way. */
-.tabs{display:flex;gap:2px;margin-left:20px;border-radius:8px;padding:3px;
-  background-color:var(--surface);background-repeat:no-repeat;scroll-behavior:smooth}
-.tabs.cue-l{background-image:linear-gradient(to right,color-mix(in srgb,var(--text3) 55%,transparent),rgba(0,0,0,0));
-  background-position:left center;background-size:26px 100%}
-.tabs.cue-r{background-image:linear-gradient(to left,color-mix(in srgb,var(--text3) 55%,transparent),rgba(0,0,0,0));
-  background-position:right center;background-size:26px 100%}
-.tabs.cue-l.cue-r{background-image:
-    linear-gradient(to right,color-mix(in srgb,var(--text3) 55%,transparent),rgba(0,0,0,0)),
-    linear-gradient(to left,color-mix(in srgb,var(--text3) 55%,transparent),rgba(0,0,0,0));
-  background-position:left center,right center;background-size:26px 100%,26px 100%}
-.tab{background:none;border:none;color:var(--text3);font:600 12px/1 'Inter';padding:7px 15px;border-radius:6px;cursor:pointer;
-  white-space:nowrap;transition:color .15s,background-color .15s}
-.tab:hover{color:var(--text);background:var(--surface2)}
-/* Active tab carries weight and a filled chip, not colour alone. */
-.tab.on{color:var(--text);background:var(--bg3);box-shadow:var(--shadow);font-weight:800}
-.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fs-table-scroll{max-width:100%;overflow:auto}
 
-/* Cross-page nav links inside the tab bar. Left in place for any page that
-   still puts links in its tab strip; players.html and teams.html no longer do,
-   see the site nav menu below. */
-.tab-x{text-decoration:none;color:var(--text3)}
-.tab-x:hover{color:var(--accent)}
-.tab-div{width:1px;align-self:stretch;background:var(--border2);margin:3px 5px;flex-shrink:0}
-
-/* Site nav menu, players.html and teams.html.
-   The header used to carry two kinds of navigation in one strip: seven page
-   tabs and nine site destinations, sixteen targets in a 52px row. The tail of
-   the site nav was only reachable by scrolling and sat under the export
-   buttons. Site nav now lives behind one labelled trigger, so the tab strip has
-   a single job. Every destination is still present, one click away.
-
-   The panel is position:fixed and placed from script: both pages set
-   overflow:hidden on body, which would clip an absolutely positioned panel at
-   the header edge. */
-.navmenu{position:relative;display:flex}
-.navmenu-btn::after{content:'';width:0;height:0;margin-top:2px;
-  border:3.5px solid transparent;border-top-color:currentColor;transition:transform .15s}
-.navmenu-btn[aria-expanded="true"]{background:var(--surface2);color:var(--text);border-color:var(--border2)}
-.navmenu-btn[aria-expanded="true"]::after{transform:rotate(180deg);margin-top:-2px}
-.navmenu-panel{position:fixed;top:0;right:0;z-index:60;display:none;
-  min-width:198px;max-height:calc(100vh - 72px);overflow-y:auto;
-  background:var(--bg2);border:1px solid var(--border2);border-radius:9px;padding:5px;
-  box-shadow:0 12px 30px rgba(0,0,0,.28)}
-.navmenu-panel.open{display:block}
-.navmenu-h{font:700 8.5px/1 'Inter',system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--text3);padding:8px 9px 6px}
-.navmenu-panel a{display:block;padding:7px 9px;border-radius:6px;text-decoration:none;color:var(--text2);
-  font:600 11.5px/1.2 'Inter',system-ui,sans-serif;white-space:nowrap;
-  transition:color .15s,background-color .15s}
-.navmenu-panel a:hover{background:var(--surface2);color:var(--text)}
-.navmenu-panel a:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;
-  background:var(--surface2);color:var(--text)}
-
-/* Players and Teams have a long identity chip and six or seven local tabs.
-   Give the tabs their own full-width row before they get squeezed beneath the
-   export controls. At phone widths, wrap the tab buttons instead of requiring
-   a hidden horizontal scroll to discover sections. Other page shells keep
-   their existing single-row layout. */
-@media(max-width:1440px){
-  .hdr.page-hdr{height:auto;min-height:52px;flex-wrap:wrap;gap:7px 12px;padding:7px 14px}
-  .hdr.page-hdr .tabs{order:3;flex:1 0 100%;width:100%;margin-left:0;min-width:0}
-  .hdr.page-hdr .hdr-right{margin-left:auto}
-}
-@media(max-width:820px){
-  .hdr.page-hdr .tabs{flex-wrap:wrap;overflow:visible;scroll-behavior:auto}
-  .hdr.page-hdr .tab{padding:7px 10px}
-  .hdr.page-hdr .hdr-id{min-width:0;flex:1 1 180px}
+/* ---------- 761 to 1100px: the top bar keeps every control, on two lines ---------- */
+@media (min-width:761px) and (max-width:1100px){
+  .fs-top{flex-wrap:wrap;height:auto;min-height:var(--h-top);row-gap:0}
+  .fs-groups{flex:1 1 auto}
+  .fs-right{flex:1 1 100%;margin-left:0;justify-content:flex-end;min-height:38px;border-top:1px solid var(--rule2)}
+  .fs-fresh{margin-right:auto}
+  .fs-pop{max-width:34vw}
 }
 
-/* Narrow header. The identity chip stacks and its caption is allowed to wrap
-   again: one unbroken line plus a 390px viewport would put the whole page into
-   horizontal scroll. Scoped to .hdr-id, so only players.html and teams.html
-   see it. */
-@media(max-width:820px){
-  /* A wrapping flex line places items at their natural width before it shrinks
-     anything, so an identity group that wants 334px pushed itself onto its own
-     row and left the logo sitting alone above it. A small flex-basis lets it
-     share the first row with the logo and then grow into whatever is left. */
-  .hdr-id{flex:1 1 180px}
-  .hdr-id .hdr-row{flex-wrap:wrap;row-gap:4px}
-  .hdr-id .hdr-row .hdr-sub{white-space:normal}
+/* ---------- 760px and under: phone shell ---------- */
+@media (max-width:760px){
+  .fs-top{flex-wrap:wrap;height:auto;min-height:var(--h-top);gap:var(--s2) var(--s3);padding:0 var(--s4)}
+  .fs-groups{display:none}
+  .fs-burger{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin-left:-10px;background:none;border:0;color:var(--ink);font:400 20px/1 var(--body);cursor:pointer}
+  .fs-right{display:contents}
+  .fs-goto{display:none}
+  #fsThemeBtn{margin-left:auto}
+  /* SCOPE and freshness drop to a second mono line. */
+  .fs-scope,.fs-fresh{order:10;min-height:32px}
+  .fs-top::after{content:"";order:9;flex:0 0 100%;height:0;border-top:1px solid var(--rule2)}
+  .fs-scope{flex:0 1 auto;padding:var(--s1) 0}
+  .fs-fresh{flex:1 1 0;min-width:0;padding:var(--s1) 0;white-space:normal;justify-content:flex-end;text-align:right;line-height:1.3;font-size:10px}
+  .fs-shell .fs-scope select{max-width:38vw;height:32px;min-height:32px}
+  .fs-shell-stale{padding:var(--s2) var(--s4)}
+  .fs-ws{gap:var(--s3);padding:0 var(--s4);flex-wrap:wrap;height:auto;min-height:var(--h-ws)}
+  .fs-ws-right,.fs-actions{flex-wrap:wrap;flex:0 1 auto;row-gap:var(--s1)}
+  .fs-crumb{display:none}
+  .fs-pop{display:none}
+  .fs-ws.is-empty{display:none}
+  .fs-bottom{display:flex;align-items:stretch;height:var(--h-bottom);flex:0 0 auto;width:100%;background:var(--panel);border-top:1px solid var(--ink);position:relative;z-index:80}
+  .fs-bottom :is(a,button){flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;padding:0 2px;background:none;border:0;border-top:2px solid transparent;margin-top:-1px;
+    color:var(--muted);font:400 10px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;text-decoration:none;cursor:pointer}
+  .fs-bottom .is-active{color:var(--ink);font-weight:500;border-top-color:var(--accent)}
+  .fs-palette{margin:12px auto auto;max-height:calc(100vh - 24px)}
+  .fs-toast{bottom:64px}
 }
 
-/* Anything animated above is a courtesy, so drop it when asked. */
-@media (prefers-reduced-motion:reduce){
-  .tabs{scroll-behavior:auto}
-  .tab,.hdr-right .lnk,.lgpick select,.navmenu-btn::after,.navmenu-panel a{transition:none}
-}
+/* ---------- Print: chrome never prints ---------- */
+@media print{.fs-shell,.fs-bottom,.fs-toast,.fs-palette,.fs-card-export,.fs-export-bar{display:none!important}}

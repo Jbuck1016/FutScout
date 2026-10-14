@@ -14,6 +14,6 @@ vm.runInContext(p.slice(p.indexOf('function pillarRows('),p.indexOf('async funct
 const rows=c.pillarRows([{player_id:1,score:0},{player_id:2,score:null},{player_id:3,score:80},{player_id:4,score:99}], [{player_id:1,player_name:'A'},{player_id:2,player_name:'B'},{player_id:3,player_name:'C'}]);
 assert.deepEqual(Array.from(rows,r=>r.score),[80,0]);
 assert(p.includes('aria-label="Compare '));assert(p.includes('aria-label="Pillar league"'));assert(p.includes('aria-label="Pillar role"'));
-assert(read('site-tools.js').includes('background:#dce8f5;color:#132b43'));
+assert(read('shell.css').includes('.fs-group.is-active>summary{background:var(--ink);color:var(--bg)}'));
 console.log('PASS: compact pages, removed prompts, high-opacity movements, unclipped direction, pillar missing/zero/cohort contracts and nav contrast');
 

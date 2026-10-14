@@ -1,261 +1,211 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Player search · FutScout</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>
-(function(){try{var t=localStorage.getItem('theme');if(t==='light')document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}})();
-</script>
-<link rel="stylesheet" href="theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css?v=pr1">
+<script src="site-tools.js?v=pr1"></script>
 <style>
-/* Light palette and font tokens are in theme.css. This page keeps only its own
-   accent family and blue. */
-:root{
-  --amber:#9c6b1e;--amber-dim:rgba(156,107,30,.10);--amber-line:rgba(156,107,30,.32);
-  --blue:#2f6aa8;
-}
-html.dark{
-  --bg:#0e1219;--panel:#161b24;--panel2:#1e242e;
-  --line:#272e3a;--line2:#3a4351;
-  --text:#f2f5fa;--dim:#b6c2d4;--dim2:#8b98ab;
-  --amber:#e2b877;--amber-dim:rgba(226,184,119,.10);--amber-line:rgba(226,184,119,.32);
-  --green:#3ddc97;--red:#ff5f56;--blue:#5aa9ff;
-}
+/* Page-local layout for Player search. Tokens come from theme.css and the
+   fs-* components from components.css; nothing here declares a colour value. */
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);
-  -webkit-font-smoothing:antialiased;line-height:1.5}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1240px;margin:0 auto;padding:20px 16px 60px}
+a{color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:var(--s6) var(--s5) calc(var(--s6)*3);display:flex;flex-direction:column;gap:var(--s5);min-width:0}
+.ps-head .fs-sub b{font:500 12px/1.4 var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.ps-mode{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s2) var(--s4)}
+.ps-panel{display:flex;flex-direction:column;gap:var(--s5)}
+.wrap [hidden]{display:none!important}
 
-.sys{border:1px solid var(--line);background:var(--panel);border-radius:3px;padding:12px 15px;margin-bottom:14px}
-.sys-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
-.sys-title{font:700 13px/1 var(--f-mono)}
-.sys-title b{color:var(--amber)}
-.spacer{flex:1}
-.nav{display:flex;gap:2px;flex-wrap:wrap}
-.nav a{font:600 9.5px/1 var(--f-mono);color:var(--dim);border:1px solid var(--line2);
-  border-radius:3px;padding:6px 9px;text-transform:uppercase;letter-spacing:.06em}
-.nav a:hover{color:var(--amber);border-color:var(--amber-line)}
-.tbtn{cursor:pointer;border:1px solid var(--line2);background:var(--panel2);border-radius:3px;
-  width:30px;height:26px;display:grid;place-items:center;color:var(--dim);font-size:13px}
-.tbtn:hover{color:var(--amber)}
-.sys-line{font:500 11px/1.7 var(--f-mono);color:var(--dim);margin-top:7px}
-.sys-line b{color:var(--text)}
+/* Query mode */
+.ask{display:flex;align-items:flex-end;gap:var(--s3)}
+.ask .fs-field{flex:1 1 auto}
+#askInput{text-overflow:ellipsis}
+.fs-btn.askbtn{min-height:32px;padding:0 var(--s6)}
+.hint{margin:0}
+.ex{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2)}
+.ex button,.presets button{white-space:normal;text-align:left;justify-content:flex-start}
 
-.ask{display:flex;gap:8px;margin:0 0 14px;align-items:stretch}
-#askInput{flex:1 1 auto;min-width:0;background:var(--panel);color:var(--text);
-  border:1px solid var(--line2);border-radius:3px;padding:14px 16px;
-  font:500 15px/1.3 var(--f-body);text-overflow:ellipsis}
-#askInput:focus{outline:none;border-color:var(--amber-line);background:var(--panel2)}
-#askInput::placeholder{color:var(--dim2);font-size:14px}
+/* Filters mode */
+.fg{display:flex;flex-direction:column;gap:var(--s2);min-width:0}
+.fs-label .hint-in{letter-spacing:0;text-transform:none;font:400 11px/1.4 var(--body)}
+.presets,.chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.ps-filters{display:flex;flex-direction:column;gap:var(--s5)}
+.ps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--s5);align-items:start}
+.row{display:flex;align-items:center;gap:var(--s3);min-height:var(--tap)}
+.row input[type=range]{flex:1 1 auto;min-width:0;cursor:pointer}
+.val,.tval{font:400 11px/1.4 var(--mono);font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.val{min-width:46px;text-align:right;color:var(--ink)}
+.ps-traits{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:var(--s3) var(--s5)}
+/* An active trait floor is a selection, so it carries the accent left rule. */
+.trait-row{border-left:3px solid transparent;padding-left:var(--s3);min-width:0}
+.trait-row.on{border-left-color:var(--accent)}
+.trait-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3)}
+.trait-name{font:400 12px/1.4 var(--body);color:var(--muted)}
+.trait-row.on .trait-name{color:var(--ink);font-weight:600}
+.trait-row.on .tval{color:var(--ink)}
+.trait-row input[type=range]{display:block;width:100%;margin:0;min-height:var(--tap);cursor:pointer}
+select:disabled{color:var(--muted);background:var(--panel2);cursor:not-allowed}
+.fs-btn.mobile-filter-toggle{display:none}
 
-.ans{border:1px solid var(--amber-line);background:var(--panel);border-radius:3px;
-  padding:13px 15px;margin:0 0 14px}
-.ans-h{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:10px}
-.ans-t{font:700 10px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
-.parse{font:500 10.5px/1.5 var(--f-mono);color:var(--dim)}
-.parse b{color:var(--text)}
-.how{font:400 11.5px/1.6 var(--f-body);color:var(--dim2);border-left:2px solid var(--line2);
-  padding-left:9px;margin:8px 0 2px}
-.pn.link{cursor:pointer;border-bottom:1px dotted var(--line2)}
-.pn.link:hover{color:var(--amber);border-bottom-color:var(--amber-line)}
-.pill{display:inline-block;font:600 9px/1 var(--f-mono);border:1px solid var(--line2);
-  border-radius:3px;padding:4px 7px;margin-right:4px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
-/* Clearing the answer is an action, so the control is a button. Reset back to
-   the plain "clear" text it was as a span. */
-.ans .close{margin-left:auto;cursor:pointer;color:var(--dim);font:600 10px var(--f-mono);
-  background:none;border:0;padding:0;margin-top:0;margin-bottom:0;margin-right:0}
-.ans .close:hover{color:var(--amber)}
-.ans .close:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-.ex{font:500 10.5px/1.7 var(--f-mono);color:var(--dim2);margin:-6px 0 14px}
-/* Each example loads itself into the box and runs, so each is a button. A
-   button is an atomic inline box, and inheriting the row's 1.7 line-height
-   would make it taller than the line it sits on and push the row 1px per line.
-   line-height:normal puts the dotted underline back on the same baseline the
-   span had. */
-.ex button{cursor:pointer;border-bottom:1px dotted var(--line2);
-  background:none;border-top:0;border-left:0;border-right:0;padding:0;margin:0;
-  font-family:inherit;font-size:inherit;font-weight:inherit;line-height:normal;
-  color:inherit;text-align:left;vertical-align:baseline;max-width:100%;white-space:normal}
-.ex button:hover{color:var(--amber)}
-.ex button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-.layout{display:grid;grid-template-columns:270px 1fr;gap:14px;align-items:start}
-@media(max-width:900px){.layout{grid-template-columns:1fr}}
+/* Active-scope line */
+.ps-chips{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2);min-width:0}
+.ps-chips .fs-chip{white-space:normal}
+button.fs-chip{min-height:var(--tap)}
+.fs-chip b{font-weight:500}
+.fs-input.sortsel{width:auto;min-width:200px;max-width:100%}
 
-.side{border:1px solid var(--line);background:var(--panel);border-radius:3px;padding:13px 14px;
-  position:sticky;top:12px}
-@media(max-width:900px){.side{position:static}}
-.fg{margin-bottom:15px}
-.fg:last-child{margin-bottom:0}
-.fl{font:700 9px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber);
-  margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.fl .hint{color:var(--dim2);letter-spacing:.02em;font-weight:500;text-transform:none;font-size:9.5px}
-.chips{display:flex;flex-wrap:wrap;gap:4px}
-.chip{font:600 10px/1 var(--f-mono);color:var(--dim);background:var(--panel2);
-  border:1px solid var(--line2);border-radius:3px;padding:6px 9px;cursor:pointer;user-select:none}
-.chip:hover{border-color:var(--amber-line);color:var(--text)}
-.chip.on{background:var(--amber-dim);color:var(--amber);border-color:var(--amber-line)}
-.row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
-.row:last-child{margin-bottom:0}
-input[type=range]{flex:1;accent-color:var(--amber);height:3px;cursor:pointer}
-.val{font:600 10.5px/1 var(--f-mono);color:var(--text);min-width:46px;text-align:right}
-select{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line2);
-  border-radius:3px;padding:7px 8px;font:500 11px/1.2 var(--f-mono);cursor:pointer}
-select:focus{outline:none;border-color:var(--amber-line)}
-/* The slider column was fixed at 74px, so the value printed on top of the track.
-   Label and value now share a line and the slider gets the full width beneath. */
-.trait-row{display:block;margin-bottom:11px}
-.trait-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:3px}
-.trait-name{font:500 11px/1.3 var(--f-body);color:var(--dim)}
-.trait-row.on .trait-name{color:var(--text);font-weight:600}
-.trait-row .mini{display:block}
-.trait-row input[type=range]{width:100%;height:3px;display:block;margin:0}
-.tval{font:600 10px/1 var(--f-mono);color:var(--dim2);white-space:nowrap}
-.trait-row.on .tval{color:var(--amber)}
-.btn{width:100%;background:var(--panel2);color:var(--dim);border:1px solid var(--line2);
-  border-radius:3px;padding:8px;font:600 10px/1 var(--f-mono);letter-spacing:.06em;
-  text-transform:uppercase;cursor:pointer;margin-top:9px}
-/* .btn is width:100% for the sidebar buttons. The ask button sits beside an input,
-   so it must size to its own content or it swallows the row. Declared after .btn and
-   with two classes so it wins on both source order and specificity. */
-button.btn.askbtn{width:auto;flex:0 0 auto;margin-top:0;padding:0 28px;
-  font-size:11px;align-self:stretch}
-.btn:hover{color:var(--amber);border-color:var(--amber-line)}
-.presets{display:flex;flex-direction:column;gap:4px}
-.preset{text-align:left;background:transparent;border:1px solid var(--line2);border-radius:3px;
-  color:var(--dim);padding:7px 9px;font:500 10.5px/1.3 var(--f-body);cursor:pointer}
-.preset:hover{color:var(--amber);border-color:var(--amber-line);background:var(--amber-dim)}
+/* Results */
+.ps-results{display:flex;flex-direction:column;gap:var(--s3);min-width:0}
+.ps-box{background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);min-width:0}
+.ps-box .fs-table :is(td,th){white-space:nowrap}
+.ps-box .fs-table th.wrapok{white-space:normal;max-width:150px}
+.ps-box .fs-table tbody tr:last-child td{border-bottom:0}
+.fs-table tr[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.fs-table tr[tabindex]:focus-visible>:first-child{border-left-color:var(--accent)}
+.fs-table th button{min-height:var(--tap)}
+.fs-table th button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pn{font:600 13px/1.4 var(--body)}
+.tm,.rk{color:var(--muted)}
+.ps-pct{font:400 10px/1 var(--mono);font-variant-numeric:tabular-nums;color:var(--muted);margin-left:var(--s1)}
+.ps-pb{display:inline-flex;align-items:center;gap:var(--s2);justify-content:flex-end}
+.ps-pb .fs-bar{width:52px;flex:0 0 52px}
+.ps-skel{padding:var(--s4)}
+.ans-h{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s2) var(--s3);padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule)}
+.parse{font:400 12px/1.4 var(--body);color:var(--muted);flex:1 1 240px;min-width:0}
+.parse b{color:var(--ink);font-weight:600}
+.parse .fs-tag{margin-left:var(--s1)}
+.how{margin:0;padding:var(--s3) var(--s4);border-bottom:1px solid var(--rule);font:400 11px/1.4 var(--body);color:var(--muted)}
+.ans-note{margin:0;padding:var(--s3) var(--s4);border-top:1px solid var(--rule)}
+.foot{margin:0}
 
-.main{border:1px solid var(--line);background:var(--panel);border-radius:3px;overflow:hidden}
-.mh{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.mh-t{font:700 10px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
-.mh-n{font:600 10px/1 var(--f-mono);color:var(--dim)}
-.mh-n b{color:var(--text)}
-.sortsel{width:auto;min-width:190px;margin-left:auto}
-#leagueSel{width:100%;min-width:0;margin-left:0}
-table{width:100%;border-collapse:collapse}
-th{font:700 8.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);
-  text-align:right;padding:9px 8px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--panel2)}
-th.l,td.l{text-align:left}
-td{font:500 11.5px/1.35 var(--f-mono);padding:9px 8px;border-bottom:1px solid var(--line);
-  text-align:right;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--panel2)}
-.rk{color:var(--dim2);font-size:10px}
-.pn{font-family:var(--f-body);font-weight:600;font-size:12.5px}
-.tm{color:var(--dim);font-size:10px}
-.metric{color:var(--amber);font-weight:700}
-.pbar{display:inline-block;width:52px;height:4px;background:var(--line2);border-radius:2px;
-  overflow:hidden;vertical-align:middle;margin-left:6px}
-.pbar i{display:block;height:100%;background:var(--amber)}
-.empty{padding:34px 16px;text-align:center;font:500 11px/1.6 var(--f-mono);color:var(--dim2)}
-.foot{margin-top:14px;font:500 10px/1.7 var(--f-mono);color:var(--dim2)}
-
-/* Selects: the open option list is drawn by the browser on a white base, so a
-   translucent surface colour plus light text renders as white on white. Force an
-   opaque background and colour the options explicitly. */
-select{background-color:var(--bg2,var(--panel,#1a1d24));color:var(--text,#f4f6fb)}
-select option,select optgroup{background-color:var(--bg2,var(--panel,#1a1d24));color:var(--text,#f4f6fb)}
+@media (max-width:760px){
+  .ps-mode .fs-seg{display:flex;width:100%}
+  .ps-mode .fs-seg>button{flex:1 1 0;white-space:normal;min-width:0}
+  .ask{flex-direction:column;align-items:stretch}
+  .fs-btn.askbtn{min-height:var(--tap)}
+  .ps-grid,.ps-traits{grid-template-columns:minmax(0,1fr)}
+  .fs-btn.mobile-filter-toggle{display:inline-flex;align-self:flex-start}
+  #shortlistFilters:not(.filters-open){display:none}
+  .fs-filterbar .fs-push{margin-left:0;width:100%;flex-wrap:wrap}
+  .fs-input.sortsel{flex:1 1 160px;min-width:0}
+}
 </style>
 <script src="gate.js"></script>
 <meta name="robots" content="noindex,nofollow">
-<script src="site-tools.js" defer></script>
+<link rel="stylesheet" href="shell.css?v=pr1">
+<link rel="stylesheet" href="components.css?v=pr1">
 </head>
-<body>
-<div class="wrap">
+<body><script>window.FutScout&&FutScout.mount()</script>
+<div class="fs-slots" hidden><div data-fs-slot="tabs"><a href="search.html" aria-current="page">Player search</a><a href="players.html">Player Fingerprints</a></div></div><script>window.FutScout&&FutScout.adopt()</script>
+<main class="wrap">
 
-  <div class="sys">
-    <div class="sys-top">
-      <span class="dot"></span>
-      <span class="sys-title">FutScout · <b>Player search</b></span>
-      <span class="spacer"></span>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="insights.html">Insights</a>
-        <a href="search.html">Search</a>
-        <a href="players.html">Players</a>
-        <a href="teams.html">Teams</a>
-        <a href="sequences.html">Sequences</a>
-        <a href="guide.html">Guide</a>
-        <a href="methodology.html">Method</a>
-      </nav>
-      <button type="button" class="tbtn" id="themeBtn" aria-label="Toggle light or dark theme">☾</button>
+  <header class="ps-head">
+    <h1 class="fs-title">Player search</h1>
+    <p class="fs-sub" id="sysLine">Loading index…</p>
+  </header>
+
+  <div class="ps-mode">
+    <span class="fs-label" id="modeLab">Mode</span>
+    <div class="fs-seg" id="modeSeg" role="group" aria-labelledby="modeLab">
+      <button type="button" data-mode="query" aria-pressed="false" aria-controls="panelQuery">Plain English · all leagues</button>
+      <button type="button" data-mode="filters" aria-pressed="true" aria-controls="panelFilters">Shortlist filters · one league</button>
     </div>
-    <div class="sys-line" id="sysLine">loading index…</div>
   </div>
 
-  <div class="ask">
-    <input id="askInput" type="text" autocomplete="off"
-      placeholder="Ask in plain English, e.g. ten players most similar to Cade Cowell in expected threat creation">
-    <button class="btn askbtn" id="askGo">Ask</button>
-  </div>
-  <p class="hint">Plain-English answers search all covered leagues and show their actual query threshold. Clear the answer to return to the league-specific shortlist filters.</p>
-  <div id="askOut"></div>
-
-  <button type="button" class="btn mobile-filter-toggle" aria-expanded="false" aria-controls="shortlistFilters" onclick="const open=this.getAttribute('aria-expanded')!=='true';this.setAttribute('aria-expanded',open);document.getElementById('shortlistFilters').classList.toggle('filters-open',open)">Shortlist filters</button>
-  <style>.mobile-filter-toggle{display:none}.layout>.main{min-width:0}#askOut{overflow:auto}@media(max-width:640px){.mobile-filter-toggle{display:block;margin:8px 0}#shortlistFilters:not(.filters-open){display:none}.layout{display:block}.layout>.main{width:100%}.ask input{min-width:0}.nav{flex-wrap:wrap}}</style>
-  <div class="layout" id="facetLayout">
-    <div class="side" id="shortlistFilters">
-      <div class="fg">
-        <div class="fl">Shortcuts</div>
-        <div class="presets" id="presets"></div>
+  <section class="fs-panel ps-panel" id="panelQuery" aria-label="Plain English query" hidden>
+    <div class="ask">
+      <div class="fs-field">
+        <label for="askInput">Ask in plain English</label>
+        <input id="askInput" type="text" autocomplete="off"
+          placeholder="e.g. ten players most similar to Cade Cowell in expected threat creation">
       </div>
+      <button type="button" class="fs-btn primary askbtn" id="askGo">Ask</button>
+    </div>
+    <p class="fs-note hint">Plain-English answers search all covered leagues and show their actual query threshold. They never inherit the shortlist filters.</p>
+    <div class="ex" id="exRow"></div>
+  </section>
 
-      <div class="fg">
-        <label class="fl" for="leagueSel">Competition</label>
-        <select class="sortsel" id="leagueSel"><option value="ALL">All covered leagues</option></select>
-      </div>
+  <section class="fs-panel ps-panel" id="panelFilters" aria-label="Shortlist filters">
+    <div class="fg">
+      <div class="fs-label" id="presetLab">Shortcuts <span class="hint-in">· each runs its plain-English query across all leagues and opens it in Plain English mode</span></div>
+      <div class="presets" id="presets" role="group" aria-labelledby="presetLab"></div>
+    </div>
 
-      <div class="fg">
-        <div class="fl">Position</div>
-        <div class="chips" id="poolChips"></div>
-      </div>
+    <button type="button" class="fs-btn mobile-filter-toggle" aria-expanded="false" aria-controls="shortlistFilters" onclick="const open=this.getAttribute('aria-expanded')!=='true';this.setAttribute('aria-expanded',open);document.getElementById('shortlistFilters').classList.toggle('filters-open',open)">Shortlist filters</button>
 
-      <div class="fg">
-        <div class="fl">Side</div>
-        <div class="chips" id="sideChips"></div>
-      </div>
+    <div class="ps-filters" id="shortlistFilters">
+      <div class="ps-grid">
+        <div class="fs-field">
+          <label for="leagueSel">Competition</label>
+          <select id="leagueSel"><option value="ALL">All covered leagues</option></select>
+          <span class="fs-note" id="leagueNote"></span>
+        </div>
 
-      <div class="fg">
-        <div class="fl">Age <span class="hint">max</span></div>
-        <div class="row">
-          <input aria-label="Maximum age" type="range" id="ageMax" min="16" max="40" value="40">
-          <span class="val" id="ageMaxV">any</span>
+        <div class="fg">
+          <div class="fs-label" id="poolLab">Role <span class="hint-in">· position pool</span></div>
+          <div class="chips" id="poolChips" role="group" aria-labelledby="poolLab"></div>
+        </div>
+
+        <div class="fg">
+          <div class="fs-label" id="sideLab">Side</div>
+          <div class="chips" id="sideChips" role="group" aria-labelledby="sideLab"></div>
+        </div>
+
+        <div class="fg">
+          <label class="fs-label" for="ageMax">Max age</label>
+          <div class="row">
+            <input aria-label="Maximum age" type="range" id="ageMax" min="16" max="40" value="40">
+            <span class="val" id="ageMaxV">any</span>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label class="fs-label" for="minN">Min nineties</label>
+          <div class="row">
+            <input aria-label="Minimum exposure in nineties" type="range" id="minN" min="0" max="25" value="3">
+            <span class="val" id="minNV">3</span>
+          </div>
         </div>
       </div>
 
       <div class="fg">
-        <div class="fl">Minutes <span class="hint">min 90s</span></div>
-        <div class="row">
-          <input aria-label="Minimum exposure in nineties" type="range" id="minN" min="0" max="25" value="3">
-          <span class="val" id="minNV">3</span>
-        </div>
+        <div class="fs-label">Trait thresholds <span class="hint-in">· percentile floor within position pool</span></div>
+        <div class="ps-traits" id="traits"></div>
       </div>
 
-      <div class="fg">
-        <div class="fl">Traits <span class="hint">min pct in pool</span></div>
-        <div id="traits"></div>
-      </div>
-
-      <button class="btn" id="reset">Reset filters</button>
-      <button class="btn" id="copy">Copy shortlist</button>
+      <div><button type="button" class="fs-btn" id="reset">Reset filters</button></div>
     </div>
+  </section>
 
-    <div class="main">
-      <div class="mh">
-        <span class="mh-t">Shortlist</span>
-        <span class="mh-n" id="count">…</span>
-        <select class="sortsel" id="sortSel"></select>
-      </div>
-      <div id="results"><div class="empty">loading…</div></div>
-    </div>
+  <div class="fs-filterbar" id="scopeBar">
+    <span class="fs-label">Active scope</span>
+    <span class="ps-chips"><span class="ps-chips" id="chips"></span><span class="fs-chip" id="count">…</span></span>
+    <span class="fs-push">
+      <label class="fs-label" for="sortSel">Sort</label>
+      <select class="fs-input sortsel" id="sortSel"></select>
+      <button type="button" class="fs-btn k" id="copy">Copy shortlist</button>
+    </span>
   </div>
 
-  <div class="foot" id="foot"></div>
-</div>
+  <section class="ps-results" aria-label="Results">
+    <div id="loadMsg"></div>
+    <div id="askWrap" class="ps-results" hidden>
+      <div class="fs-empty" id="askIdle">
+        <h2>No question asked yet</h2>
+        <p>Plain English mode has not run a query, so there is nothing to rank. Answers cover all leagues and ignore the shortlist filters.</p>
+        <button type="button" class="fs-btn" onclick="document.getElementById('askInput').focus()">Go to the question box</button>
+      </div>
+      <div id="askMsg"></div>
+      <div id="askOut"></div>
+    </div>
+    <div id="results"></div>
+  </section>
+
+  <p class="fs-note foot" id="foot"></p>
+</main>
 
 <script>
 const SB='https://xrsilhiffjoulyoqhdmp.supabase.co';
@@ -287,9 +237,44 @@ const EXAMPLES=[
   'most creative strikers'
 ];
 
+const SKELETON='<div class="ps-box ps-skel" aria-busy="true">'+new Array(9).join('<div class="fs-skel row"></div>')+'</div>';
+const DASH='<span title="No value for this player in the source; a dash is not a zero">—</span>';
+
 function pname(id,nm){
   if(!id) return '<span class="pn">'+esc(nm)+'</span>';
-  return '<a class="pn link" href="players.html?player='+encodeURIComponent(id)+'">'+esc(nm)+'</a>';
+  return '<a class="pn link fs-link" href="players.html?player='+encodeURIComponent(id)+'">'+esc(nm)+'</a>';
+}
+function profileBtn(id,nm){
+  if(!id) return '';
+  return '<button type="button" class="fs-btn sm" data-open="'+esc(id)+'" aria-label="Open the profile of '+esc(nm)+'">Profile</button>';
+}
+function rowOpen(id){return id?' tabindex="0" data-pid="'+esc(id)+'"':''}
+function openPlayer(id){location.href='players.html?player='+encodeURIComponent(id)}
+function leagueName(l){return LEAGUE_LABELS[l]||l||'—'}
+
+/* Percentile presentation. Band colours are reserved for evaluative
+   percentiles; exposure, age, height and carry distance describe, so they stay
+   neutral. */
+const DESCRIPTIVE={nineties:1,age_seen:1,height_cm:1,mean_carry_m:1};
+function band(p){return p>=80?'80':p>=60?'60':p>=40?'40':p>=20?'20':'0'}
+function pctTag(p,f){
+  if(p==null) return '';
+  return '<small class="ps-pct'+(DESCRIPTIVE[f]?'':' fs-band'+band(p))+'" title="Percentile within position pool across covered leagues">P'+p+'</small>';
+}
+function pctBar(p,f){
+  if(p==null) return DASH;
+  return '<span class="ps-pb">'+esc(p)+'<span class="fs-bar'+(DESCRIPTIVE[f]?'':' b'+band(p))+'"><i style="width:'+Math.max(0,Math.min(100,+p||0))+'%"></i></span></span>';
+}
+function valPct(r,f){
+  if(!r||r[f]==null) return DASH;
+  return fmt(r[f],f)+pctTag(pctOf(r,f),f);
+}
+
+/* The plain-English answer prints its own threshold. Nothing is assumed when
+   the response does not report one. */
+function askRule(d){
+  const f=d&&d.filters;
+  return f&&f.min_nineties!=null?'source rule min '+f.min_nineties+' nineties':'source rule for nineties not reported by this answer';
 }
 function parseLine(d){
   if(d.intent==='similar'){
@@ -299,62 +284,91 @@ function parseLine(d){
   }
   const f=d.filters||{};
   let bits=[];
-  if(f.pool) bits.push('<span class="pill">'+esc(f.pool)+'</span>');
-  if(f.side) bits.push('<span class="pill">side '+esc(f.side)+'</span>');
-  if(f.foot) bits.push('<span class="pill">'+esc(f.foot)+' foot</span>');
-  if(f.max_age) bits.push('<span class="pill">under '+esc(f.max_age)+'</span>');
-  bits.push('<span class="pill">min '+esc(f.min_nineties||6)+' 90s</span>');
+  if(f.pool) bits.push('<span class="fs-tag pill">'+esc(f.pool)+'</span>');
+  if(f.side) bits.push('<span class="fs-tag pill">side '+esc(f.side)+'</span>');
+  if(f.foot) bits.push('<span class="fs-tag pill">'+esc(f.foot)+' foot</span>');
+  if(f.max_age) bits.push('<span class="fs-tag pill">under '+esc(f.max_age)+'</span>');
+  bits.push('<span class="fs-tag pill">'+esc(f.min_nineties!=null?'min '+f.min_nineties+' 90s · source rule':'90s rule not reported')+'</span>');
   return 'Ranked on <b>'+esc(d.ranked_on_label||d.ranked_on||'')+'</b> · '+bits.join('');
 }
 
+/* Index lookup for the answer table: the nl_query response carries rank, name,
+   team, role and its own value, so pass xT, progressive carries and xA are read
+   from the already-loaded shortlist index for the same player id. */
+let INDEX_SRC=null,INDEX_MAP={};
+function indexRow(id){
+  if(INDEX_SRC!==ROWS){INDEX_SRC=ROWS;INDEX_MAP={};ROWS.forEach(function(r){INDEX_MAP[String(r.player_id)]=r})}
+  return id==null?null:(INDEX_MAP[String(id)]||null);
+}
+
+const CLEAR_BTN='<button type="button" class="fs-btn sm close" aria-label="Clear this answer" onclick="clearAsk()">Clear answer</button>';
+
 function renderAsk(d){
   const host=document.getElementById('askOut');
+  ASK.state='done';ASK.d=d;
+  document.getElementById('askMsg').innerHTML='';
+  host.hidden=false;
   if(d.error){
-    host.innerHTML='<div class="ans"><div class="ans-h"><span class="ans-t">No answer</span>'
-      +'<button type="button" class="close" aria-label="Clear this answer and go back to the filters" onclick="clearAsk()">clear ✕</button></div>'
-      +'<div class="parse">'+esc(d.error)+'</div></div>';
+    host.innerHTML='<div class="fs-empty ans"><h2>No answer</h2><p>'+esc(d.error)+'</p>'+CLEAR_BTN+'</div>';
+    paintScope();
     return;
   }
   const rows=d.results||[];
-  let h='<div class="ans"><div class="ans-h"><span class="ans-t">'
-    +(d.intent==='similar'?'Similarity':'Ranking')+'</span>'
-    +'<button type="button" class="close" aria-label="Clear this answer and go back to the filters" onclick="clearAsk()">clear ✕</button></div>'
-    +'<div class="parse">'+parseLine(d)+'</div>'
-    +(d.explain?'<div class="how">'+esc(d.explain)+'</div>':'');
-  if(!rows.length){ h+='<div class="empty">nothing matched that</div></div>'; host.innerHTML=h; return; }
-
-  if(d.intent==='similar'){
-    h+='<table><thead><tr><th class="l">#</th><th class="l">Player</th><th class="l">Team</th>'
-      +'<th>Pos</th><th>Match</th></tr></thead><tbody>'
-      +rows.map(function(r){return '<tr><td class="l rk">'+esc(r.rank)+'</td>'
-        +'<td class="l">'+pname(r.player_id,r.player)+'</td>'
-        +'<td class="l tm">'+esc(r.team)+'</td><td>'+esc(r.pos||'')+'</td>'
-        +'<td class="metric">'+esc(r.sim_pct)+'%</td></tr>'}).join('')
-      +'</tbody></table>';
-  } else {
-    h+='<table><thead><tr><th class="l">#</th><th class="l">Player</th><th class="l">Team</th>'
-      +'<th>Pos</th><th>Age</th><th>90s</th><th>Value</th><th>Pct</th></tr></thead><tbody>'
-      +rows.map(function(r){return '<tr><td class="l rk">'+esc(r.rk)+'</td>'
-        +'<td class="l">'+pname(r.player_id,r.player)+'</td>'
-        +'<td class="l tm">'+esc(r.team)+'</td><td>'+esc(r.pos||'')+'</td>'
-        +'<td>'+(r.age_seen==null?'—':esc(r.age_seen))+'</td>'
-        +'<td>'+(r.nineties==null?'—':esc(r.nineties))+'</td>'
-        +'<td class="metric">'+esc(r.value)+'</td>'
-        +'<td>'+esc(r.pct)+'</td></tr>'}).join('')
-      +'</tbody></table>';
+  if(!rows.length){
+    host.innerHTML='<div class="fs-empty ans"><h2>No players match</h2>'
+      +'<p>The query was understood ('+parseLine(d)+') but nothing qualifies at its own thresholds across all leagues.</p>'+CLEAR_BTN+'</div>';
+    paintScope();
+    return;
   }
-  h+='</div>';
+  const similar=d.intent==='similar';
+  let h='<div class="ps-box ans"><div class="ans-h"><span class="fs-tag perf ans-t">'
+    +(similar?'Similarity':'Ranking')+'</span>'
+    +'<div class="parse">'+parseLine(d)+'</div>'+CLEAR_BTN+'</div>'
+    +(d.explain?'<p class="how">'+esc(d.explain)+'</p>':'');
+  h+='<div class="fs-table-wrap" role="region" aria-label="Plain English answer" tabindex="0"><table class="fs-table"><thead><tr>'
+    +'<th class="num">#</th><th>Player</th><th>Team</th><th>League</th><th>Listed role</th>'
+    +'<th class="num">Age</th><th class="num">90s</th>'
+    +'<th class="num" title="From the shortlist index">Pass xT /90</th><th class="num" title="From the shortlist index">Prog carries /90</th><th class="num" title="From the shortlist index">Creation · xA /90</th>'
+    +(similar?'<th class="num" aria-sort="descending">Match</th>'
+             :'<th class="num wrapok">'+esc(d.ranked_on_label||d.ranked_on||'Value')+'</th><th class="num" aria-sort="descending">Sort pct</th>')
+    +'<th><span class="fs-label">Open</span></th></tr></thead><tbody>'
+    +rows.map(function(r){
+      const ix=indexRow(r.player_id);
+      const age=r.age_seen!=null?r.age_seen:(ix?ix.age_seen:null);
+      const n=r.nineties!=null?r.nineties:(ix?ix.nineties:null);
+      const lg=r.league||(ix&&ix.league);
+      return '<tr'+rowOpen(r.player_id)+'><td class="num rk">'+esc(similar?r.rank:r.rk)+'</td>'
+        +'<td>'+pname(r.player_id,r.player)+'</td>'
+        +'<td class="tm">'+esc(r.team)+'</td>'
+        +'<td class="tm">'+(lg?esc(leagueName(lg)):DASH)+'</td>'
+        +'<td class="fs-num">'+esc(r.pos||'')+'</td>'
+        +'<td class="num">'+(age==null?DASH:esc(age))+'</td>'
+        +'<td class="num">'+(n==null?DASH:esc(n))+'</td>'
+        +'<td class="num">'+valPct(ix,'xt_pass_90')+'</td>'
+        +'<td class="num">'+valPct(ix,'prog_carries_90')+'</td>'
+        +'<td class="num">'+valPct(ix,'xa_90')+'</td>'
+        +(similar?'<td class="num metric">'+esc(r.sim_pct)+'%</td>'
+                 :'<td class="num metric">'+esc(r.value)+'</td><td class="num">'+pctBar(r.pct,d.ranked_on)+'</td>')
+        +'<td>'+profileBtn(r.player_id,r.player)+'</td></tr>'}).join('')
+    +'</tbody></table></div>'
+    +'<p class="fs-note ans-note">Rank, role and '+(similar?'match':'the ranked value and its percentile')+' are the answer’s own. Pass xT, progressive carries and xA '
+    +'(and age, nineties or league where the answer omits them) are read from the shortlist index for the same player, with pool percentiles across covered leagues; a dash means no value, not zero.</p>'
+    +'</div>';
   host.innerHTML=h;
-  document.getElementById('facetLayout').style.display='none';
-  window.scrollTo({top:0,behavior:'smooth'});
+  paintScope();
 }
 
 let askGeneration=0, shortlistRows=[];
+let MODE='filters';
+let ASK={state:'idle',d:null,q:''};
 function clearAsk(){
   askGeneration++;
+  ASK={state:'idle',d:null,q:''};
   document.getElementById('askOut').innerHTML='';
-  document.getElementById('facetLayout').style.display='';
+  document.getElementById('askOut').hidden=false;
+  document.getElementById('askMsg').innerHTML='';
   document.getElementById('askInput').value='';
+  paintScope();
 }
 
 async function runAsk(){
@@ -362,17 +376,42 @@ async function runAsk(){
   const q=document.getElementById('askInput').value.trim();
   if(!q) return;
   saveSearchState(false);
-  document.getElementById('askOut').innerHTML=
-    '<div class="ans"><div class="parse">thinking…</div></div>';
+  const hadAnswer=ASK.d!=null;
+  ASK.state='loading';ASK.q=q;
+  /* The last good answer is kept in the DOM and only covered while the new
+     request is in flight, so a failure can put it back. */
+  document.getElementById('askOut').hidden=true;
+  document.getElementById('askMsg').innerHTML=SKELETON;
+  paintScope();
   try{
     const d=await sbRpc('nl_query',{q:q,p_limit:12});
     if(generation!==askGeneration)return;
     renderAsk(d);
   }catch(e){
     if(generation!==askGeneration)return;
-    document.getElementById('askOut').innerHTML=
-      '<div class="ans"><div class="parse">could not run that ('+esc(e.message)+')</div></div>';
+    ASK.state='error';
+    document.getElementById('askOut').hidden=false;
+    document.getElementById('askMsg').innerHTML=
+      '<div class="fs-banner fs-banner-warn" role="alert"><span class="fs-banner-label">Query failed</span>'
+      +'<span class="fs-banner-text">Could not run “'+esc(q)+'” ('+esc(e.message)+'). Nothing on the page changed'
+      +(hadAnswer?'; the previous answer is still shown below.':'.')+'</span>'
+      +'<button type="button" class="fs-btn k" id="askRetry">Retry</button></div>';
+    document.getElementById('askRetry').addEventListener('click',function(){
+      document.getElementById('askInput').value=q;runAsk();
+    });
+    paintScope();
   }
+}
+function askFromControl(){setMode('query');return runAsk()}
+
+function setMode(m){
+  MODE=m==='query'?'query':'filters';
+  document.getElementById('panelQuery').hidden=MODE!=='query';
+  document.getElementById('panelFilters').hidden=MODE!=='filters';
+  document.getElementById('askWrap').hidden=MODE!=='query';
+  document.getElementById('results').hidden=MODE!=='filters';
+  document.querySelectorAll('#modeSeg button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.mode===MODE))});
+  paintScope();
 }
 
 /* traits = the 11 chain roles; filtering is on within-pool percentile */
@@ -391,8 +430,11 @@ const SORTS=[
   ['Progression',[['prog_cmp_90','Progressive passes'],['into_box_90','Passes into box'],['final_third_90','Final-third passes'],['through_90','Through balls'],['cross_90','Crosses']]],
   ['Shooting',[['xg_90','xG per 90'],['goals_90','Goals'],['shots_90','Shots'],['xg_per_shot','xG per shot'],['finishing','Finishing over xG']]],
   ['Defending',[['def_action_90','Defensive actions'],['tackle_90','Tackles'],['int_90','Interceptions'],['recov_90','Recoveries'],['counterpress_90','Counterpressures'],['aerial_90','Aerials won']]],
-  ['Other',[['nineties','Minutes (90s)'],['age_seen','Age'],['height_cm','Height']]]
+  ['Exposure, age and build',[['nineties','Minutes (90s)'],['age_seen','Age'],['height_cm','Height']]]
 ];
+/* Sorts the brief asks for that the player_search rows cannot support. They
+   are offered disabled, with the reason, rather than left out or faked. */
+const UNAVAILABLE_SORTS=[['Market value','not in the player_search index']];
 
 const POOLS=['CB','FB','CM','AM','W','ST'];
 const SIDES=[['L','Left'],['C','Central'],['R','Right']];
@@ -411,6 +453,32 @@ const PRESETS=[
 
 const LEAGUE_LABELS={'ENG-Premier League':'Premier League','ESP-La Liga':'La Liga','GER-Bundesliga':'Bundesliga','ITA-Serie A':'Serie A','FRA-Ligue 1':'Ligue 1','USA-MLS':'MLS'};
 let ROWS=[],PCT={},STATE={league:'ALL',pools:[],sides:[],age:40,minN:3,traits:{},sort:'xt_90'};
+
+/* League scope. SCOPE is the shell's shared scope (localStorage.leagueScope).
+   When it names one league the page's Competition select is disabled and
+   inherits it; when it is ALL the select narrows this page only. */
+let SCOPE='ALL',LEAGUES=[];
+function storedScope(){try{return localStorage.getItem('leagueScope')||'ALL'}catch(e){return 'ALL'}}
+function validScope(v){return v==='ALL'||LEAGUES.indexOf(v)>=0?v:'ALL'}
+function defaultState(){return {league:SCOPE,pools:[],sides:[],age:40,minN:3,traits:{},sort:'xt_90'}}
+function onShellScope(v){
+  SCOPE=validScope(v);
+  try{localStorage.setItem('leagueScope',SCOPE)}catch(e){}
+  STATE.league=SCOPE;
+  paintAll();
+}
+function syncScope(){
+  const sel=document.getElementById('leagueSel');
+  sel.value=STATE.league;
+  sel.disabled=SCOPE!=='ALL';
+  sel.title=SCOPE!=='ALL'?'Inherited from SCOPE in the top bar. Change SCOPE to change the competition.':'';
+  document.getElementById('leagueNote').textContent=SCOPE!=='ALL'
+    ?'Inherited from SCOPE: '+leagueName(SCOPE)+'. Change it in the top bar.'
+    :'SCOPE is all leagues; this narrows the shortlist only.';
+  if(window.FutScout&&LEAGUES.length)FutScout.registerScope({
+    options:[{value:'ALL',label:'All leagues'}].concat(LEAGUES.map(function(l){return {value:l,label:leagueName(l)}})),
+    value:SCOPE,onChange:onShellScope});
+}
 
 /* percentile of every numeric field, computed WITHIN position pool */
 function buildPct(rows){
@@ -451,6 +519,7 @@ function sortLabel(k){
   let l=k;SORTS.forEach(function(g){g[1].forEach(function(m){if(m[0]===k)l=m[1]})});return l;
 }
 
+let passedFilters=0;
 function apply(){
   let out=ROWS.filter(function(r){
     if(STATE.league!=='ALL'&&r.league!==STATE.league)return false;
@@ -464,52 +533,140 @@ function apply(){
     }
     return true;
   });
+  passedFilters=out.length;
   const s=STATE.sort;
   out=out.filter(function(r){return r[s]!=null})
          .sort(function(a,b){return b[s]-a[s]});
   render(out);
 }
 
+/* Columns the table always carries. When the sort is one of them its own header
+   takes aria-sort and no duplicate value column is added. */
+const FIXED_COLS=['age_seen','nineties','xt_pass_90','prog_carries_90','xa_90'];
+function sortTh(label,key){
+  return '<th class="num" aria-sort="'+(STATE.sort===key?'descending':'none')+'">'
+    +'<button type="button" data-sort="'+key+'" title="Sort by '+esc(sortLabel(key))+', highest first">'+esc(label)+'</button></th>';
+}
+function filterWords(){
+  const w=[];
+  if(STATE.league!=='ALL')w.push(leagueName(STATE.league));
+  if(STATE.pools.length)w.push('role '+STATE.pools.join('/'));
+  if(STATE.sides.length)w.push('side '+STATE.sides.join('/'));
+  if(STATE.age<40)w.push('age '+STATE.age+' or under');
+  if(STATE.minN>0)w.push('at least '+STATE.minN+' nineties');
+  TRAITS.forEach(function(t){if(STATE.traits[t[0]])w.push(t[1]+' at P'+STATE.traits[t[0]]+' or above')});
+  return w;
+}
+
 function render(rows){
   shortlistRows=rows;
   document.getElementById('count').innerHTML='<b>'+rows.length+'</b> players';
+  paintScope();
   const host=document.getElementById('results');
-  if(!rows.length){host.innerHTML='<div class="empty">no players match these filters<br>try widening age, minutes, or trait thresholds</div>';return;}
-  const s=STATE.sort;
-  let h='<table><thead><tr>'
-    +'<th class="l">#</th><th class="l">Player</th><th class="l">Team</th><th class="l">League</th><th>Pos</th>'
-    +'<th>Age</th><th>90s</th><th>'+esc(sortLabel(s))+'</th><th>Pool pct</th></tr></thead><tbody>';
+  if(!rows.length){
+    const w=filterWords();
+    const why=!ROWS.length?'The player index holds no rows, so there is nothing to filter.'
+      :passedFilters?passedFilters+' players pass the filters but none has a value for '+sortLabel(STATE.sort)+', the current sort.'
+      :'Nothing in the index qualifies at these thresholds'+(w.length?': '+w.join(', ')+'.':'.')+' Widen age, nineties or the trait floors, or clear the filters.';
+    host.innerHTML='<div class="fs-empty"><h2>No players match</h2><p>'+esc(why)+'</p>'
+      +'<button type="button" class="fs-btn" data-clear="1">Clear filters</button></div>';
+    return;
+  }
+  const s=STATE.sort,extra=FIXED_COLS.indexOf(s)<0;
+  let h='<table class="fs-table"><thead><tr>'
+    +'<th class="num">#</th><th>Player</th><th>Team</th><th>League</th><th>Listed role</th>'
+    +sortTh('Age','age_seen')+sortTh('90s','nineties')
+    +sortTh('Pass xT /90','xt_pass_90')+sortTh('Prog carries /90','prog_carries_90')+sortTh('Creation · xA /90','xa_90')
+    +(extra?'<th class="num" aria-sort="descending">'+esc(sortLabel(s))+'</th>':'')
+    +'<th class="num" title="Percentile of the sort metric within position pool across covered leagues">Sort pct</th>'
+    +'<th><span class="fs-label">Open</span></th></tr></thead><tbody>';
   rows.forEach(function(r,i){
     const p=pctOf(r,s);
-    h+='<tr>'
-      +'<td class="l rk">'+(i+1)+'</td>'
-      +'<td class="l">'+pname(r.player_id,r.player)+'</td>'
-      +'<td class="l tm">'+esc(r.team)+'</td>'
-      +'<td class="l tm">'+esc(LEAGUE_LABELS[r.league]||r.league||'—')+'</td>'
-      +'<td>'+esc(r.pos)+'</td>'
-      +'<td>'+(r.age_seen==null?'—':r.age_seen)+'</td>'
-      +'<td>'+(r.nineties==null?'—':(+r.nineties).toFixed(1))+'</td>'
-      +'<td class="metric">'+fmt(r[s],s)+'</td>'
-      +'<td>'+(p==null?'—':p)+'<span class="pbar"><i style="width:'+(p||0)+'%"></i></span></td>'
+    h+='<tr'+rowOpen(r.player_id)+'>'
+      +'<td class="num rk">'+(i+1)+'</td>'
+      +'<td>'+pname(r.player_id,r.player)+'</td>'
+      +'<td class="tm">'+esc(r.team)+'</td>'
+      +'<td class="tm">'+esc(leagueName(r.league))+'</td>'
+      +'<td class="fs-num">'+esc(r.pos)+'</td>'
+      +'<td class="num">'+(r.age_seen==null?DASH:r.age_seen)+'</td>'
+      +'<td class="num">'+(r.nineties==null?DASH:(+r.nineties).toFixed(1))+'</td>'
+      +'<td class="num">'+valPct(r,'xt_pass_90')+'</td>'
+      +'<td class="num">'+valPct(r,'prog_carries_90')+'</td>'
+      +'<td class="num">'+valPct(r,'xa_90')+'</td>'
+      +(extra?'<td class="num metric">'+fmt(r[s],s)+'</td>':'')
+      +'<td class="num">'+pctBar(p,s)+'</td>'
+      +'<td>'+profileBtn(r.player_id,r.player)+'</td>'
       +'</tr>';
   });
   h+='</tbody></table>';
-  host.innerHTML='<div role="region" aria-label="Player shortlist results" tabindex="0" style="overflow:auto;max-width:100%">'+h+'</div>';
+  host.innerHTML='<div class="ps-box"><div class="fs-table-wrap" role="region" aria-label="Player shortlist results" tabindex="0">'+h+'</div></div>';
 }
 
+/* ---------- Active-scope line ---------- */
+function rmChip(key,label){
+  return '<button type="button" class="fs-chip" data-rm="'+esc(key)+'" aria-label="Remove filter: '+esc(label)+'">'+esc(label)+' <span aria-hidden="true">×</span></button>';
+}
+function paintScope(){
+  document.getElementById('askIdle').hidden=ASK.state!=='idle';
+  const host=document.getElementById('chips'),count=document.getElementById('count');
+  const sort=document.getElementById('sortSel'),copy=document.getElementById('copy');
+  if(MODE==='query'){
+    const d=ASK.d,rows=d&&!d.error?(d.results||[]):null;
+    let tail;
+    if(ASK.state==='loading')tail='running “'+ASK.q+'”';
+    else if(!d)tail=ASK.state==='error'?'last query failed · no answer':'nineties rule is set by each query · no answer yet';
+    else if(d.error)tail='no answer';
+    else tail=askRule(d)+' · '+rows.length+(rows.length===1?' row':' rows')+(d.pool_size!=null?' of '+d.pool_size+' qualified':'');
+    host.innerHTML='<span class="fs-chip">All covered leagues · '+esc(tail)+'</span>';
+    count.hidden=true;
+    sort.disabled=true;
+    sort.title='Plain-English answers are ranked by the query itself. Sorting applies to the shortlist filters.';
+    copy.textContent='Copy answer';
+  }else{
+    const c=[];
+    if(STATE.league==='ALL')c.push('<span class="fs-chip muted">All covered leagues</span>');
+    else if(SCOPE!=='ALL')c.push('<span class="fs-chip" title="Inherited from SCOPE in the top bar">'+esc(leagueName(STATE.league))+' · from scope</span>');
+    else c.push(rmChip('league',leagueName(STATE.league)));
+    STATE.pools.forEach(function(p){c.push(rmChip('pool:'+p,'Role '+p))});
+    STATE.sides.forEach(function(v){const s=SIDES.filter(function(x){return x[0]===v})[0];c.push(rmChip('side:'+v,'Side '+(s?s[1]:v)))});
+    if(STATE.age<40)c.push(rmChip('age','Max age '+STATE.age));
+    if(STATE.minN>0)c.push(rmChip('minN','Min '+STATE.minN+' nineties'+(STATE.minN===3?' · page default':'')));
+    TRAITS.forEach(function(t){const v=STATE.traits[t[0]];if(v)c.push(rmChip('trait:'+t[0],t[1]+' ≥ P'+v))});
+    host.innerHTML=c.join('');
+    count.hidden=false;
+    sort.disabled=false;
+    sort.title='';
+    copy.textContent='Copy shortlist';
+  }
+  paintPresets();
+}
+document.getElementById('chips').addEventListener('click',function(e){
+  const b=e.target.closest('[data-rm]'); if(!b)return;
+  const k=b.dataset.rm.split(':');
+  if(k[0]==='league')STATE.league='ALL';
+  else if(k[0]==='pool')STATE.pools=STATE.pools.filter(function(p){return p!==k[1]});
+  else if(k[0]==='side')STATE.sides=STATE.sides.filter(function(p){return p!==k[1]});
+  else if(k[0]==='age')STATE.age=40;
+  else if(k[0]==='minN')STATE.minN=0;
+  else if(k[0]==='trait')delete STATE.traits[k[1]];
+  paintAll();
+  document.getElementById('scopeBar').querySelector('button,select').focus();
+});
+
 /* ---------- UI wiring ---------- */
-function chip(label,on){return '<button type="button" aria-pressed="'+on+'" class="chip'+(on?' on':'')+'" data-v="'+esc(label)+'">'+esc(label)+'</button>'}
+function chip(label,on){return '<button type="button" aria-pressed="'+on+'" class="fs-btn chip'+(on?' on':'')+'" data-v="'+esc(label)+'">'+esc(label)+'</button>'}
 function paintChips(){
   document.getElementById('poolChips').innerHTML=POOLS.map(function(p){return chip(p,STATE.pools.indexOf(p)>=0)}).join('');
   document.getElementById('sideChips').innerHTML=SIDES.map(function(s){
-    return '<button type="button" aria-pressed="'+(STATE.sides.indexOf(s[0])>=0)+'" class="chip'+(STATE.sides.indexOf(s[0])>=0?' on':'')+'" data-v="'+s[0]+'">'+s[1]+'</button>'}).join('');
+    return '<button type="button" aria-pressed="'+(STATE.sides.indexOf(s[0])>=0)+'" class="fs-btn chip'+(STATE.sides.indexOf(s[0])>=0?' on':'')+'" data-v="'+s[0]+'">'+s[1]+'</button>'}).join('');
 }
+function traitText(v){return v?('≥ P'+v+' · top '+(100-v)+'%'):'any'}
 function paintTraits(){
   document.getElementById('traits').innerHTML=TRAITS.map(function(t){
     const v=STATE.traits[t[0]]||0;
     return '<div class="trait-row'+(v?' on':'')+'">'
       +'<div class="trait-head"><span class="trait-name">'+esc(t[1])+'</span>'
-      +'<span class="tval">'+(v?('top '+(100-v)+'%'):'any')+'</span></div>'
+      +'<span class="tval">'+traitText(v)+'</span></div>'
       +'<div class="mini"><input aria-label="Minimum '+esc(t[1])+' percentile" type="range" min="0" max="95" step="5" value="'+v+'" data-t="'+t[0]+'"></div>'
       +'</div>';
   }).join('');
@@ -518,7 +675,8 @@ function paintSorts(){
   document.getElementById('sortSel').innerHTML=SORTS.map(function(g){
     return '<optgroup label="'+esc(g[0])+'">'+g[1].map(function(m){
       return '<option value="'+m[0]+'"'+(m[0]===STATE.sort?' selected':'')+'>'+esc(m[1])+'</option>'}).join('')+'</optgroup>';
-  }).join('');
+  }).join('')+'<optgroup label="Not available from this index">'+UNAVAILABLE_SORTS.map(function(m){
+    return '<option disabled>'+esc(m[0]+' · '+m[1])+'</option>'}).join('')+'</optgroup>';
 }
 function paintRanges(){
   document.getElementById('ageMax').value=STATE.age;
@@ -526,19 +684,26 @@ function paintRanges(){
   document.getElementById('minN').value=STATE.minN;
   document.getElementById('minNV').textContent=STATE.minN;
 }
-function paintAll(){paintChips();paintTraits();paintSorts();paintRanges();apply();}
+function paintPresets(){
+  const live=ASK.state==='loading'||ASK.state==='done'?ASK.q:'';
+  document.getElementById('presets').innerHTML=PRESETS.map(function(p,i){
+    return '<button type="button" class="fs-btn preset" data-i="'+i+'" aria-pressed="'+(live===p.q)+'" title="Runs: '+esc(p.q)+'">'+esc(p.n)+'</button>'}).join('');
+}
+function paintAll(){syncScope();paintChips();paintTraits();paintSorts();paintRanges();apply();}
 
 document.getElementById('poolChips').addEventListener('click',function(e){
   const c=e.target.closest('.chip'); if(!c)return;
   const v=c.dataset.v,i=STATE.pools.indexOf(v);
   if(i>=0)STATE.pools.splice(i,1);else STATE.pools.push(v);
   paintChips();apply();
+  document.querySelector('#poolChips [data-v="'+v+'"]').focus();
 });
 document.getElementById('sideChips').addEventListener('click',function(e){
   const c=e.target.closest('.chip'); if(!c)return;
   const v=c.dataset.v,i=STATE.sides.indexOf(v);
   if(i>=0)STATE.sides.splice(i,1);else STATE.sides.push(v);
   paintChips();apply();
+  document.querySelector('#sideChips [data-v="'+v+'"]').focus();
 });
 document.getElementById('traits').addEventListener('input',function(e){
   const r=e.target; if(r.type!=='range')return;
@@ -546,7 +711,7 @@ document.getElementById('traits').addEventListener('input',function(e){
   if(v>0)STATE.traits[t]=v;else delete STATE.traits[t];
   const row=r.closest('.trait-row');
   row.classList.toggle('on',v>0);
-  row.querySelector('.tval').textContent=v?('top '+(100-v)+'%'):'any';
+  row.querySelector('.tval').textContent=traitText(v);
   apply();
 });
 document.getElementById('ageMax').addEventListener('input',function(e){
@@ -558,77 +723,151 @@ document.getElementById('minN').addEventListener('input',function(e){
 });
 document.getElementById('sortSel').addEventListener('change',function(e){STATE.sort=e.target.value;apply();});
 document.getElementById('leagueSel').addEventListener('change',function(e){STATE.league=e.target.value;apply();});
-document.getElementById('reset').addEventListener('click',function(){
-  STATE={league:'ALL',pools:[],sides:[],age:40,minN:3,traits:{},sort:'xt_90'};
-  document.getElementById('leagueSel').value='ALL';paintAll();
+function resetFilters(){STATE=defaultState();paintAll();}
+document.getElementById('reset').addEventListener('click',resetFilters);
+
+/* Results: header sort buttons, Clear filters, Profile, row click and Enter. */
+document.getElementById('results').addEventListener('click',function(e){
+  const sb=e.target.closest('[data-sort]');
+  if(sb){
+    STATE.sort=sb.dataset.sort;paintSorts();apply();
+    const again=document.querySelector('#results [data-sort="'+STATE.sort+'"]');if(again)again.focus();
+    return;
+  }
+  if(e.target.closest('[data-clear]')){resetFilters();document.getElementById('reset').focus();}
 });
+document.addEventListener('click',function(e){
+  const open=e.target.closest('[data-open]');
+  if(open){openPlayer(open.dataset.open);return;}
+  if(e.target.closest('a,button,input,select'))return;
+  const row=e.target.closest('tr[data-pid]');
+  if(row)openPlayer(row.dataset.pid);
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&e.target.matches&&e.target.matches('tr[data-pid]')){e.preventDefault();openPlayer(e.target.dataset.pid);}
+});
+document.getElementById('modeSeg').addEventListener('click',function(e){
+  const b=e.target.closest('[data-mode]'); if(!b)return;
+  setMode(b.dataset.mode);
+});
+
+function snapshotText(){
+  const s=window.FutScout&&FutScout.snapshot&&FutScout.snapshot();
+  return s?s.snapshot+' ('+s.age+')':'not reported';
+}
+function deliver(txt,what,n){
+  const say=function(m){if(window.FutScout&&FutScout.toast)FutScout.toast(m)};
+  Promise.resolve().then(function(){if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');return navigator.clipboard.writeText(txt)}).then(function(){
+    say(what+' copied · '+n+(n===1?' row':' rows'));
+  }).catch(function(){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([txt],{type:'text/tab-separated-values;charset=utf-8'}));a.href=url;a.download='futscout-shortlist.tsv';a.click();setTimeout(function(){URL.revokeObjectURL(url)},1000);say('Clipboard denied — TSV downloaded');});
+}
 document.getElementById('copy').addEventListener('click',function(){
   const clean=function(v){return String(v==null?'Unavailable':v).replace(/[\t\r\n]/g,' ')};
-  let txt='FutScout — all '+shortlistRows.length+' eligible results\nSource: '+location.href+'\nExported: '+new Date().toISOString()+'\nFilters: '+JSON.stringify(STATE)+'\nPercentiles: within position pool across covered leagues, not rebased by filters\n';
+  if(MODE==='query'){
+    const d=ASK.d,rows=d&&!d.error?(d.results||[]):[];
+    if(!rows.length){if(window.FutScout&&FutScout.toast)FutScout.toast('No answer to copy yet');return;}
+    const similar=d.intent==='similar';
+    let txt='FutScout — plain-English answer, '+rows.length+' rows\n'
+      +'Mode: Plain English | League: All covered leagues | Data snapshot: '+snapshotText()+'\n'
+      +'Source: '+location.href+'\nExported: '+new Date().toISOString()+'\n'
+      +'Query: '+clean(ASK.q)+'\n'
+      +'Answer: '+(similar?'similarity, compared on '+clean(d.compared_on||'overall style'):'ranked on '+clean(d.ranked_on_label||d.ranked_on))+' | '+askRule(d)+' | shortlist filters not applied\n';
+    txt+=['Rank','Player','Team','League','Position','Age','Exposure (90s)'].concat(similar?['Match %']:[clean(d.ranked_on_label||d.ranked_on||'Value'),'Pool percentile']).join('\t')+'\n';
+    rows.forEach(function(r){txt+=[similar?r.rank:r.rk,r.player,r.team,r.league,r.pos,r.age_seen,r.nineties].concat(similar?[r.sim_pct]:[r.value,r.pct]).map(clean).join('\t')+'\n'});
+    deliver(txt,'Answer',rows.length);
+    return;
+  }
+  let txt='FutScout — all '+shortlistRows.length+' eligible results\n'
+    +'Mode: Shortlist filters | League: '+(STATE.league==='ALL'?'All covered leagues':leagueName(STATE.league))+' | Data snapshot: '+snapshotText()+'\n'
+    +'Source: '+location.href+'\nExported: '+new Date().toISOString()+'\nFilters: '+JSON.stringify(STATE)+'\nPercentiles: within position pool across covered leagues, not rebased by filters\n';
   txt+=['Player','Team','League','Position','Age','Exposure (90s)',sortLabel(STATE.sort).replace(/ per 90$/,'')+' ('+(STATE.sort.endsWith('_90')?'per 90':({mean_carry_m:'metres',nineties:'90s',age_seen:'years',height_cm:'cm',xg_per_shot:'xG / shot',finishing:'goals minus xG',player_xt:'total xT'}[STATE.sort]||'raw value'))+')','Pool percentile'].join('\t')+'\n';
   shortlistRows.forEach(function(r){txt+=[r.player,r.team,r.league,r.pos,r.age_seen,r.nineties,r[STATE.sort],pctOf(r,STATE.sort)].map(clean).join('\t')+'\n'});
-  Promise.resolve().then(function(){if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');return navigator.clipboard.writeText(txt)}).then(function(){
-    const b=document.getElementById('copy');b.textContent='Copied';setTimeout(function(){b.textContent='Copy shortlist'},1400);
-  }).catch(function(){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([txt],{type:'text/tab-separated-values;charset=utf-8'}));a.href=url;a.download='futscout-shortlist.tsv';a.click();setTimeout(function(){URL.revokeObjectURL(url)},1000);document.getElementById('copy').textContent='Clipboard denied — TSV downloaded';});
+  deliver(txt,'Shortlist',shortlistRows.length);
 });
-document.getElementById('presets').innerHTML=PRESETS.map(function(p,i){
-  return '<button class="preset" data-i="'+i+'">'+esc(p.n)+'</button>'}).join('');
 document.getElementById('presets').addEventListener('click',function(e){
   const b=e.target.closest('.preset'); if(!b)return;
   const q=PRESETS[+b.dataset.i].q;
   const inp=document.getElementById('askInput');
   inp.value=q;
+  setMode('query');
   inp.focus();
   runAsk();
 });
-function paintThemeBtn(){document.getElementById('themeBtn').textContent=document.documentElement.classList.contains('dark')?'☀':'☾';}
-document.getElementById('themeBtn').addEventListener('click',function(){
-  const d=document.documentElement.classList.toggle('dark');
-  try{localStorage.setItem('theme',d?'dark':'light')}catch(e){}
-  paintThemeBtn();
-});
 
-document.addEventListener('DOMContentLoaded',function(){});
-async function init(){
-  paintThemeBtn();
-  document.getElementById('askGo').addEventListener('click',runAsk);
-  document.getElementById('askInput').addEventListener('keydown',function(e){
-    if(e.key==='Enter') runAsk();
-  });
-  document.getElementById('askOut').insertAdjacentHTML('beforebegin',
-    '<div class="ex" id="exRow">try: '+EXAMPLES.map(function(x){
-      return '<button type="button" aria-label="Run the example search: '+esc(x)+'"'
-        +' onclick="document.getElementById(\'askInput\').value=this.textContent;runAsk()">'
-        +esc(x)+'</button>'}).join(' · ')+'</div>');
+function loadFailed(err){
+  document.getElementById('loadMsg').innerHTML=
+    '<div class="fs-banner fs-banner-warn" role="alert"><span class="fs-banner-label">Load failed</span>'
+    +'<span class="fs-banner-text">Could not load the player index ('+esc(err.message)+'). Nothing on the page changed'
+    +(ROWS.length?'; the last loaded shortlist is still shown.':'; no shortlist has loaded yet.')+'</span>'
+    +'<button type="button" class="fs-btn k" id="loadRetry">Retry</button></div>';
+  document.getElementById('loadRetry').addEventListener('click',loadIndex);
+  if(!ROWS.length){
+    document.getElementById('results').innerHTML='';
+    document.getElementById('count').textContent='index not loaded';
+    document.getElementById('sysLine').textContent='Player index not loaded.';
+  }
+}
+async function loadIndex(){
+  const first=!ROWS.length;
+  document.getElementById('loadMsg').innerHTML='';
+  if(first)document.getElementById('results').innerHTML=SKELETON;
   try{
-    ROWS=await sbAll('player_search',{select:'*'});
+    const rows=await sbAll('player_search',{select:'*'});
+    ROWS=rows;
     PCT=buildPct(ROWS);
     const leagues=[...new Set(ROWS.map(function(r){return r.league}).filter(Boolean))].sort();
+    LEAGUES=leagues;
     document.getElementById('leagueSel').innerHTML='<option value="ALL">All covered leagues</option>'+
       leagues.map(function(l){return '<option value="'+esc(l)+'">'+esc(LEAGUE_LABELS[l]||l)+'</option>'}).join('');
     const withAge=ROWS.filter(function(r){return r.age_seen!=null}).length;
     document.getElementById('sysLine').innerHTML=
       '<b>'+ROWS.length+'</b> outfield players · <b>'+withAge+'</b> with age · '
       +'traits ranked within position pool · min 3 nineties by default';
+    if(window.FutScout)FutScout.setPopulation(ROWS.length+' outfield players · pct within position pool');
     document.getElementById('foot').textContent=
       'Percentiles are computed within position pool across all covered leagues; the competition filter does not rebase them. '
       +'Three nineties is an early-season minimum, not a guarantee of stable rankings. '
-      +'Age is a snapshot at match time, not date of birth.';
-    restoreSearchState();
+      +'Age is a snapshot at match time, not date of birth. A dash means the index has no value for that player; it is not a zero.';
+    if(first){
+      SCOPE=validScope(storedScope());
+      STATE.league=SCOPE;
+      restoreSearchState();
+    }
     paintAll();
   }catch(err){
-    document.getElementById('results').innerHTML='<div class="empty">could not load index ('+esc(err.message)+')</div>';
-    document.getElementById('sysLine').textContent='load failed';
+    loadFailed(err);
   }
+  indexSettled=true;
 }
-let restoringSearch=false;
-function saveSearchState(replace){if(restoringSearch)return;const u=new URL(location.href);u.searchParams.set('state',JSON.stringify({v:1,filters:STATE,query:document.getElementById('askInput').value}));if(u.href!==location.href)history[replace?'replaceState':'pushState']({},'',u);}
-function restoreSearchState(){let s;try{s=JSON.parse(new URLSearchParams(location.search).get('state')||'null')}catch(e){return}if(!s||s.v!==1||!s.filters)return;restoringSearch=true;const f=s.filters;STATE={league:typeof f.league==='string'?f.league:'ALL',pools:(f.pools||[]).filter(function(p){return POOLS.includes(p)}),sides:(f.sides||[]).filter(function(p){return ['L','C','R'].includes(p)}),age:Math.max(16,Math.min(40,+f.age||40)),minN:Math.max(0,Math.min(25,+f.minN||0)),traits:{},sort:SORTS.some(function(g){return g[1].some(function(m){return m[0]===f.sort})})?f.sort:'xt_90'};TRAITS.forEach(function(t){if(f.traits&&Number.isFinite(f.traits[t[0]]))STATE.traits[t[0]]=Math.max(0,Math.min(95,f.traits[t[0]]))});document.getElementById('leagueSel').value=STATE.league;clearAsk();document.getElementById('askInput').value=typeof s.query==='string'?s.query:'';paintAll();if(s.query)runAsk();restoringSearch=false;}
+async function init(){
+  document.getElementById('askGo').addEventListener('click',askFromControl);
+  document.getElementById('askInput').addEventListener('keydown',function(e){
+    if(e.key==='Enter') askFromControl();
+  });
+  document.getElementById('exRow').innerHTML=
+    '<span class="fs-label">Try</span>'+EXAMPLES.map(function(x){
+      return '<button type="button" class="fs-btn" aria-label="Run the example search: '+esc(x)+'"'
+        +' onclick="document.getElementById(\'askInput\').value=this.textContent;askFromControl()">'
+        +esc(x)+'</button>'}).join('');
+  paintPresets();paintSorts();setMode('filters');
+  await loadIndex();
+}
+/* Nothing is written to the URL until the first index load has settled, so a
+   click made while it is in flight cannot overwrite the deep link being restored. */
+let restoringSearch=false,indexSettled=false;
+/* mode is an additive key: a link written before it existed carries none, and
+   restores exactly as it did (a query opens the answer, otherwise the filters). */
+function saveSearchState(replace){if(restoringSearch||!indexSettled)return;const u=new URL(location.href);u.searchParams.set('state',JSON.stringify({v:1,filters:STATE,query:document.getElementById('askInput').value,mode:MODE}));if(u.href!==location.href)history[replace?'replaceState':'pushState']({},'',u);}
+function restoreSearchState(){let s;try{s=JSON.parse(new URLSearchParams(location.search).get('state')||'null')}catch(e){return}if(!s||s.v!==1||!s.filters)return;restoringSearch=true;const f=s.filters;STATE={league:typeof f.league==='string'?f.league:'ALL',pools:(f.pools||[]).filter(function(p){return POOLS.includes(p)}),sides:(f.sides||[]).filter(function(p){return ['L','C','R'].includes(p)}),age:Math.max(16,Math.min(40,+f.age||40)),minN:Math.max(0,Math.min(25,+f.minN||0)),traits:{},sort:SORTS.some(function(g){return g[1].some(function(m){return m[0]===f.sort})})?f.sort:'xt_90'};TRAITS.forEach(function(t){if(f.traits&&Number.isFinite(f.traits[t[0]]))STATE.traits[t[0]]=Math.max(0,Math.min(95,f.traits[t[0]]))});
+  /* The link's league wins over the stored scope, as it does on the player
+     page; the stored scope itself is not rewritten by following a link. */
+  const st=validScope(storedScope());SCOPE=st!=='ALL'&&STATE.league!==st?validScope(STATE.league):st;
+  clearAsk();document.getElementById('askInput').value=typeof s.query==='string'?s.query:'';setMode(s.mode==='query'||s.mode==='filters'?s.mode:(s.query?'query':'filters'));paintAll();if(s.query)runAsk();restoringSearch=false;}
 document.addEventListener('change',function(){saveSearchState(false)});
 document.addEventListener('input',function(){saveSearchState(true)});
-document.addEventListener('click',function(e){if(e.target.closest('.chip,#reset,#askGo,.preset,.ex button,.close'))queueMicrotask(function(){saveSearchState(false)})});
-window.addEventListener('popstate',function(){if(!new URLSearchParams(location.search).has('state')){restoringSearch=true;STATE={league:'ALL',pools:[],sides:[],age:40,minN:3,traits:{},sort:'xt_90'};clearAsk();document.getElementById('leagueSel').value='ALL';paintAll();restoringSearch=false}else restoreSearchState()});
-window.futScoutExportContext=function(){return {workspace:'Player search',filters:STATE,eligible:shortlistRows.length,shown:shortlistRows.length,cohort:'Across covered leagues within position pool',query:document.getElementById('askInput').value};};
+document.addEventListener('click',function(e){if(e.target.closest('.chip,#reset,#askGo,.preset,.ex button,.close,[data-rm],[data-sort],[data-mode],[data-clear]'))queueMicrotask(function(){saveSearchState(false)})});
+window.addEventListener('popstate',function(){if(!new URLSearchParams(location.search).has('state')){restoringSearch=true;SCOPE=validScope(storedScope());STATE=defaultState();clearAsk();setMode('filters');paintAll();restoringSearch=false}else restoreSearchState()});
+window.futScoutExportContext=function(){return {workspace:'Player search',mode:MODE==='query'?'Plain English':'Shortlist filters',league:MODE==='query'||STATE.league==='ALL'?'All covered leagues':leagueName(STATE.league),filters:STATE,eligible:shortlistRows.length,shown:shortlistRows.length,cohort:'Across covered leagues within position pool',query:document.getElementById('askInput').value};};
 init();
 </script>
 </body>

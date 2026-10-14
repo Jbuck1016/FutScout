@@ -4,7 +4,7 @@ const fs=require('fs'),assert=require('assert/strict');
 for(const theme of ['light','dark']){
  const c=await browser.newContext({viewport:{width:1440,height:900}});await c.addInitScript(t=>localStorage.setItem('theme',t),theme);
  await c.route('**/*',r=>{const u=new URL(r.request().url());if(u.hostname==='127.0.0.1')return r.continue();const lib=u.pathname.split('/').pop();if(['html2canvas.min.js','jspdf.umd.min.js'].includes(lib))return r.fulfill({path:'artifacts/ux-audit-writing/vendor/'+lib,contentType:'application/javascript'});if(u.pathname.includes('/rest/v1/'))return r.fulfill({json:[]});return r.abort();});
- const p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto('http://127.0.0.1:8765/match.html');await p.waitForTimeout(500);
+ const p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto((process.env.AUDIT_ORIGIN||'http://127.0.0.1:8765')+'/match.html');await p.waitForTimeout(500);
  await p.evaluate(()=>{
   TEAMS.__ALL__={name:'__ALL__',display:'All teams',color:'#1256a3',comps:[]};TEAMS.Seattle={name:'Seattle',display:'Seattle',color:'#1256a3',comps:[]};TEAMS.Kansas={name:'Kansas',display:'Kansas',color:'#a32145',comps:[]};MATCH2EV['Seattle Sounders FC']='Seattle';MATCH2EV['Kansas City']='Kansas';
   S.team='__ALL__';S.matchTeams=['Seattle','Kansas'];S.viewTeam='Seattle';S.oppTeam='Kansas';S.selMatch=1;S.matches=[{game_id:1,home_team:'Seattle Sounders FC',away_team:'Kansas City',home_score:2,away_score:1,date:'2026-09-01',competition:'Synthetic fixture'}];
@@ -18,7 +18,7 @@ for(const theme of ['light','dark']){
  await p.evaluate(()=>{S.activeVizs=['network'];renderAll();});for(const format of ['PNG','PDF']){const download=p.waitForEvent('download');await p.evaluate(f=>window['download'+f](document.querySelector('.pitch-canvas'),'Pass Network'),format);await(await download).saveAs(`artifacts/ux-audit/match-download-${theme}.${format.toLowerCase()}`);results.push({theme,matchDownload:format});}
  for(const width of [320,375,390,640,768,1024,1440,1920]){await p.setViewportSize({width,height:900});assert(await p.locator('#hdrTabs').isVisible());results.push({theme,width,matchTabs:true});}
  await p.evaluate(()=>{S.selPlayer='Alex Roldan';S.cmpPlayer='Cristian Roldan';showComparison();});await p.waitForTimeout(50);assert(await p.locator('#cmpClose').evaluate(el=>document.activeElement===el));await p.keyboard.press('Escape');assert(!(await p.locator('#cmpOverlay').getAttribute('class')).includes('show'));
- await p.goto('http://127.0.0.1:8765/teams.html');await p.waitForTimeout(300);
+ await p.goto((process.env.AUDIT_ORIGIN||'http://127.0.0.1:8765')+'/teams.html');await p.waitForTimeout(300);
  await p.evaluate(async()=>{TEAMS=[{team:'A',matches:6},{team:'B',matches:6}];SEL='A';TAB='Maps';LG='ALL';MP.kind='against';
    const against=MAPS.find(m=>/against|conced/i.test(m.k+' '+m.l));MP.kind=against.k;
    sbAll=async table=>table==='mv_team_match'?[{game_id:1}]:table==='v_team_shots'?[{game_id:1,team:'B',player:'One',x:90,y:50,xg:0,outcome:'off'},{game_id:1,team:'B',player:'Two',x:91,y:51,xg:null,outcome:'saved'},{game_id:1,team:'B',player:'Three',x:92,y:52,xg:.3,outcome:'goal',is_goal:true}]:[];

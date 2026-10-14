@@ -1,186 +1,179 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Field Guide · FutScout</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<script>
-(function(){try{var t=localStorage.getItem('theme');if(t==='light')document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}})();
-</script>
-<link rel="stylesheet" href="theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css?v=pr1">
+<script src="site-tools.js?v=pr1"></script>
 <style>
-/* Canvas, surfaces, lines, text, green and red come from theme.css, which
-   carries this page's token names as aliases onto the shared palette. What is
-   left is this page's own accent family, its blue, and the reading serif. */
-:root{
-  --f-read:'Newsreader',Georgia,serif;
-  /* Light amber is a step darker than the hue this page shipped with:
-     #9c6b1e sat at 4.36:1 on the canvas and 3.84:1 on the recessed surface,
-     so the small headings and labels set in it were under AA on the page that
-     states the limitations. #8a5e1a clears 4.5:1 on every shared surface, and
-     at 36 degrees it is still the same amber, nowhere near the brand red.
-     The tints keep their alphas and move to the new base. Dark mode amber is
-     unchanged: it is already light on a dark ground. */
-  --amber:#8a5e1a;--amber-dim:rgba(138,94,26,.10);--amber-line:rgba(138,94,26,.32);
-  --blue:#2f6aa8;
-}
-html.dark{
-  --bg:#0e1219;--panel:#161b24;--panel2:#1e242e;
-  --line:#272e3a;--line2:#3a4351;
-  --text:#f2f5fa;--dim:#b6c2d4;--dim2:#8b98ab;
-  --amber:#e2b877;--amber-dim:rgba(226,184,119,.10);--amber-line:rgba(226,184,119,.32);
-  --green:#3ddc97;--red:#ff5f56;--blue:#5aa9ff;
-}
+/* Learn reading layout. Tokens come from theme.css, chrome from shell.css and
+   the fs- components from components.css; this page declares no palette.
+   Every rule is scoped to .wrap so nothing here can restyle the shell.
+
+   .doc is a two-track grid: running text sits in the first track, a
+   65-character measure; wide tables and figures span both tracks and scroll
+   inside their own box. */
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);line-height:1.6;
-  -webkit-font-smoothing:antialiased}
-a{color:var(--amber);text-decoration:none}
-a:hover{text-decoration:underline}
-.wrap{max-width:1180px;margin:0 auto;padding:20px 18px 80px;display:grid;
-  grid-template-columns:230px 1fr;gap:26px;align-items:start}
-@media(max-width:900px){.wrap{grid-template-columns:1fr}}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 13px/1.45 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding:var(--s6) var(--s6) 60px;display:grid;
+  grid-template-columns:230px minmax(0,1fr);gap:var(--s5) 32px;align-items:start}
+.wrap.one{grid-template-columns:minmax(0,1fr);max-width:920px}
+.wrap a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:2px}
+.wrap a:hover{text-decoration-color:var(--ink)}
 
-/* header */
-.sys{grid-column:1/-1;border:1px solid var(--line);background:var(--panel);border-radius:3px;
-  padding:13px 16px;margin-bottom:6px}
-.sys-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
-.sys-title{font:700 13px/1 var(--f-mono)}
-.sys-title b{color:var(--amber)}
-.spacer{flex:1}
-.nav{display:flex;gap:2px;flex-wrap:wrap}
-.nav a{font:600 9.5px/1 var(--f-mono);color:var(--dim);border:1px solid var(--line2);
-  border-radius:3px;padding:6px 9px;text-transform:uppercase;letter-spacing:.06em}
-.nav a:hover{color:var(--amber);border-color:var(--amber-line);text-decoration:none}
-.tbtn{cursor:pointer;border:1px solid var(--line2);background:var(--panel2);border-radius:3px;
-  width:30px;height:26px;display:grid;place-items:center;color:var(--dim);font-size:13px}
-.sys-line{font:500 11px/1.7 var(--f-mono);color:var(--dim);margin-top:8px}
+/* strapline across the top of the page */
+.sys{grid-column:1/-1;padding-bottom:var(--s4);border-bottom:1px solid var(--ink)}
+.sys-line{max-width:90ch;font:400 12px/1.4 var(--body);color:var(--muted)}
 
-/* table of contents */
-.toc{position:sticky;top:14px;border:1px solid var(--line);background:var(--panel);
-  border-radius:3px;padding:13px 14px}
-@media(max-width:900px){.toc{position:static}}
-.toc h4{font:700 9px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;
-  color:var(--amber);margin:0 0 10px}
-.toc ol{margin:0;padding-left:17px}
-.toc li{margin-bottom:5px}
-.toc a{font:500 11.5px/1.4 var(--f-body);color:var(--dim)}
-.toc a:hover{color:var(--amber)}
-.toc .sub{list-style:none;padding-left:8px;margin:4px 0 0}
-.toc .sub a{font-size:10.5px;color:var(--dim2)}
+/* side navigation */
+.toc{position:sticky;top:var(--s5);max-height:calc(100vh - 28px);overflow:auto;padding:var(--s4);
+  background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.toc h4{margin:0 0 var(--s3);font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc ol,.toc ul{margin:0;padding:0;list-style:none}
+.toc ol{counter-reset:toc}
+.toc ol>li{counter-increment:toc}
+.toc ol>li>a::before{content:counter(toc,decimal-leading-zero);flex:0 0 auto;font:400 10px/1.9 var(--mono);color:var(--muted)}
+.toc a{display:flex;align-items:baseline;gap:var(--s3);min-height:var(--tap);padding:var(--s2) var(--s3);border-left:3px solid transparent;
+  font:400 12px/1.4 var(--body);color:var(--ink);text-decoration:none}
+.toc a:hover{background:var(--panel2)}
+.toc a:focus-visible{outline-offset:-2px}
+.toc .sub a{padding-left:28px;font-size:11px;color:var(--muted)}
+.toc .grp{margin:var(--s4) 0 var(--s1);padding:0 var(--s3);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
-/* content */
-.doc{min-width:0}
-h2{font:700 22px/1.25 var(--f-body);letter-spacing:-.02em;margin:34px 0 4px;
-  padding-top:16px;border-top:1px solid var(--line)}
-h2:first-child{margin-top:0;border-top:none;padding-top:0}
-h2 .n{font:700 11px/1 var(--f-mono);color:var(--amber);display:block;margin-bottom:7px;letter-spacing:.1em}
-h3{font:700 15px/1.3 var(--f-body);margin:24px 0 6px;color:var(--text)}
-h4{font:700 12px/1.3 var(--f-mono);letter-spacing:.05em;margin:18px 0 5px;color:var(--amber)}
-p{margin:0 0 12px;font-size:14.5px;color:var(--text)}
-.lead{font-family:var(--f-read);font-size:17px;line-height:1.6;color:var(--dim)}
-ul,ol{margin:0 0 13px;padding-left:20px}
-li{margin-bottom:6px;font-size:14.5px}
-code{font:600 12.5px var(--f-mono);background:var(--panel2);border:1px solid var(--line);
-  border-radius:3px;padding:1px 5px;color:var(--amber)}
-strong{font-weight:700}
-em{font-style:italic;color:var(--dim)}
+/* the document */
+.doc{min-width:0;font-size:15px;display:grid;grid-template-columns:minmax(0,65ch) minmax(0,1fr);align-content:start}
+.doc>*{grid-column:1;min-width:0;margin-top:0;margin-bottom:var(--s5)}
+.doc>:is(table,.fs-table-scroll):has(th:nth-child(4)),.doc>.wide{grid-column:1/-1}
+.doc h1{margin:0 0 var(--s4);font:600 30px/1.05 var(--display);letter-spacing:-.01em}
+.doc h2{margin:32px 0 var(--s3);padding-top:var(--s5);border-top:1px solid var(--ink);font:600 24px/1.1 var(--display);scroll-margin-top:var(--s4)}
+.doc h2 .n{display:block;margin-bottom:var(--s3);font:500 10px/1 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.doc h3{margin:var(--s6) 0 var(--s2);font:500 20px/1.2 var(--display);scroll-margin-top:var(--s4)}
+.doc h4{margin:var(--s5) 0 var(--s1);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc h5{margin:0 0 var(--s3);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc>h3,.doc>h4{margin-bottom:var(--s2)}
+.doc p{margin-top:0;margin-bottom:var(--s4);font-size:15px;line-height:1.6}
+.doc>p{margin-bottom:var(--s5)}
+.doc .lead{font:500 16px/1.45 var(--display);color:var(--ink)}
+.doc ul,.doc ol{padding-left:20px}
+.doc :is(ul,ol) :is(ul,ol){margin:var(--s2) 0 0}
+.doc li{margin-bottom:var(--s2);font-size:15px;line-height:1.6}
+.doc strong,.doc b{font-weight:600}
+.doc em{font-style:italic}
+.doc code{padding:0 4px;background:var(--panel2);border:1px solid var(--rule);border-radius:var(--radius);font:400 .87em var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.doc pre{padding:var(--s4) var(--s5);background:var(--panel2);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto}
+.doc pre code{padding:0;background:none;border:0;font:400 12px/1.6 var(--mono);overflow-wrap:normal}
+.doc :target{scroll-margin-top:var(--s4)}
+/* the anchor a link landed on: the same 3px accent rule a selected row carries */
+.doc :is(h2,h3,p,dt,dd):target,.doc dt:target+dd{margin-left:-11px;padding-left:var(--s3);border-left:3px solid var(--accent)}
 
-.box{border:1px solid var(--line);background:var(--panel);border-radius:3px;
-  padding:13px 15px;margin:14px 0}
-.box.warn{border-color:var(--amber-line);background:var(--amber-dim)}
-.box.data{background:var(--panel2)}
-.box h5{font:700 9px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;
-  color:var(--amber);margin:0 0 8px}
-.box p:last-child,.box ul:last-child,.box ol:last-child{margin-bottom:0}
+/* tables: mono header labels on an ink rule, digits in mono */
+.doc table{width:100%;border-collapse:collapse;margin:0;font:400 12px/1.4 var(--body)}
+.doc :is(.box,.tier,.card) :is(table,.fs-table-scroll){margin:var(--s3) 0 var(--s4)}
+.doc th{padding:var(--s2) var(--s3);border-bottom:1px solid var(--ink);text-align:left;vertical-align:bottom;
+  font:500 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc td{padding:var(--s2) var(--s3);border-bottom:1px solid var(--rule2);vertical-align:top}
+.doc :is(td,th).num{text-align:right}
+.doc td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.doc table:has(th:nth-child(4)){min-width:520px}
+.lv,.kfig{font-family:var(--mono);font-variant-numeric:tabular-nums}
 
-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
-th{font:700 8.5px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);
-  text-align:left;padding:8px;border-bottom:1px solid var(--line2);background:var(--panel2)}
-td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
-td.num,th.num{text-align:right;font-family:var(--f-mono);font-size:12px}
-tbody tr:last-child td{border-bottom:none}
+/* notes */
+.box,.callout,.card,.tier,.snap{padding:var(--s4) var(--s5);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.box.data,.callout{background:var(--panel2)}
+/* a limitation or caution: the gold rule, never the accent */
+.box.warn,.callout.warn,.snap{border-color:var(--gold)}
+.doc :is(.box,.callout,.card,.tier,.snap)>:last-child{margin-bottom:0}
+.doc :is(.box,.callout,.card,.tier,.snap) :is(p,li){font-size:13px;line-height:1.45}
+.unavail{color:var(--p0-text);font-weight:600}
+.foot{grid-column:1/-1;margin-top:var(--s6);padding-top:var(--s4);border-top:1px solid var(--rule);font:400 11px/1.6 var(--mono);color:var(--muted)}
 
-.steps{counter-reset:s;list-style:none;padding-left:0}
-.steps li{counter-increment:s;position:relative;padding-left:30px;margin-bottom:10px}
-.steps li:before{content:counter(s);position:absolute;left:0;top:1px;width:20px;height:20px;
-  border-radius:50%;background:var(--amber-dim);border:1px solid var(--amber-line);
-  color:var(--amber);font:700 10px/19px var(--f-mono);text-align:center}
+@media (max-width:900px){
+  /* one column, the side navigation above the content */
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .toc{position:static;max-height:none}
+}
+@media (max-width:760px){
+  .wrap{padding:var(--s5) var(--s5) 48px}
+  .toc{max-height:168px}
+  .doc{grid-template-columns:minmax(0,1fr)}
+  .doc>:is(table,.fs-table-scroll):has(th:nth-child(4)),.doc>.wide{grid-column:1}
+  .doc h1{font-size:24px}
+}
+@media print{
+  .fs-shell,.fs-bottom,.fs-toast,.fs-palette,.toc,.noprint{display:none!important}
+  html,body{background:none}
+  .wrap{display:block;max-width:none;padding:0}
+  .doc h2{break-after:avoid}
+  .doc :is(pre,table,.box,.callout,.card,.tier,.snap,.q,details,.m){break-inside:avoid}
+  .wrap a{text-decoration:none}
+}
+
+/* ---- Field guide ---- */
+/* numbered steps */
+.doc .steps{counter-reset:s;list-style:none;padding-left:0}
+.steps li{counter-increment:s;position:relative;padding-left:36px;margin-bottom:var(--s4)}
+.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:3px;padding:3px 4px;
+  border:1px solid var(--ink);border-radius:var(--radius);font:500 10px/1 var(--mono);letter-spacing:.08em;color:var(--ink)}
 
 /* quiz */
-.q{border:1px solid var(--line);background:var(--panel);border-radius:3px;padding:14px 15px;margin:12px 0}
-.q-t{font-weight:600;font-size:14.5px;margin-bottom:10px}
-.opt{display:block;border:1px solid var(--line2);background:var(--panel2);border-radius:3px;
-  padding:9px 11px;margin-bottom:6px;cursor:pointer;font-size:13.5px;transition:.12s}
-.opt:hover{border-color:var(--amber-line)}
-.opt.correct{border-color:var(--green);background:color-mix(in srgb,var(--green) 12%,transparent)}
-.opt.wrong{border-color:var(--red);background:color-mix(in srgb,var(--red) 10%,transparent)}
+.q{margin:0 0 var(--s4);padding:var(--s5);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.q-t{margin-bottom:var(--s4);font:600 13px/1.45 var(--body)}
+.opt{appearance:none;display:flex;align-items:center;flex-wrap:wrap;gap:var(--s2) var(--s4);width:100%;min-height:var(--tap);margin:0 0 var(--s2);
+  padding:var(--s2) var(--s4);background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-left-width:3px;border-radius:var(--radius);
+  font:400 13px/1.45 var(--body);text-align:left;cursor:pointer}
+.opt:hover{background:var(--panel2)}
 .opt.locked{cursor:default}
-.exp{display:none;margin-top:9px;padding-top:9px;border-top:1px solid var(--line);
-  font-size:13px;color:var(--dim)}
+.opt.locked:hover{background:var(--panel)}
+/* The verdict is carried by words and by the rule, never by a percentile
+   colour: the answer picked takes the accent rule, the right answer an ink
+   border and a label, a wrong pick a dashed warning border and a label. */
+.opt[aria-pressed="true"]{border-left-color:var(--accent)}
+.opt.correct{border-top-color:var(--ink);border-right-color:var(--ink);border-bottom-color:var(--ink);font-weight:600}
+.opt.correct:not([aria-pressed="true"]){border-left-color:var(--ink)}
+.opt.wrong{border-style:dashed;border-top-color:var(--p0);border-right-color:var(--p0);border-bottom-color:var(--p0)}
+.opt.correct::after,.opt.wrong::after{margin-left:auto;padding:1px 5px;border:1px solid currentColor;border-radius:var(--radius);
+  font:500 9px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.opt.correct::after{content:"Correct answer"}
+.opt.wrong::after{content:"Your answer \00B7  not correct";color:var(--p0-text)}
+.exp{display:none;margin-top:var(--s4);padding-top:var(--s4);border-top:1px solid var(--rule);font:400 13px/1.45 var(--body);color:var(--ink)}
 .exp.show{display:block}
-.score{position:static;border:1px solid var(--amber-line);background:var(--panel);
-  border-radius:3px;padding:11px 14px;margin-top:16px;font:600 12px var(--f-mono);
-  display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.score b{color:var(--amber);font-size:15px}
-.btn{border:1px solid var(--line2);background:var(--panel2);color:var(--dim);border-radius:3px;
-  padding:7px 12px;font:600 10px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
-.btn:hover{color:var(--amber);border-color:var(--amber-line)}
+.score{display:flex;align-items:center;gap:var(--s3) var(--s5);flex-wrap:wrap;padding:var(--s4) var(--s5);background:var(--panel);
+  border:1px solid var(--ink);border-radius:var(--radius);font:400 12px/1.4 var(--mono)}
+.score b{font-weight:500;font-variant-numeric:tabular-nums}
+#scoreMsg{color:var(--muted)}
+.score .fs-btn{margin-left:auto}
 
-details{border:1px solid var(--line);border-radius:3px;background:var(--panel);
-  padding:10px 13px;margin-bottom:9px}
-details summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--text)}
-details[open] summary{margin-bottom:9px;padding-bottom:8px;border-bottom:1px solid var(--line)}
-details p:last-child{margin-bottom:0}
+/* worked cases and model answers */
+.doc details{padding:var(--s3) var(--s5);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.doc details summary{display:list-item;min-height:var(--tap);padding:var(--s2) 0;cursor:pointer;font:600 13px/1.45 var(--body)}
+.doc details[open] summary{margin-bottom:var(--s4);border-bottom:1px solid var(--rule)}
+.doc details :is(p,li){font-size:13px;line-height:1.45}
+.doc details>:last-child{margin-bottom:var(--s2)}
 
-.cred{border:1px solid var(--line);background:var(--panel);border-radius:3px;
-  padding:13px 15px;margin-bottom:11px}
-.cred-n{font:700 14.5px/1.3 var(--f-body);margin-bottom:2px}
-.cred-h{font:500 11px/1 var(--f-mono);color:var(--dim2);margin-bottom:9px}
-.cred p{font-size:13.5px;margin-bottom:7px}
-.cred p:last-child{margin-bottom:0}
-.cred b.lab{font:700 9px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;
-  color:var(--amber);display:block;margin-bottom:3px}
-.foot{grid-column:1/-1;margin-top:30px;padding-top:14px;border-top:1px solid var(--line);
-  font:500 10.5px/1.8 var(--f-mono);color:var(--dim2)}
+/* credits */
+.cred{padding-top:var(--s4);border-top:1px solid var(--rule)}
+.cred-n{font:500 16px/1.2 var(--display)}
+.cred-h{margin:var(--s1) 0 var(--s3);font:400 11px/1.4 var(--mono);color:var(--muted)}
+.doc .cred p{margin-bottom:var(--s3);font-size:13px;line-height:1.45}
+.cred b.lab{display:block;margin-bottom:var(--s1);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
 @media print{
-  .toc,.nav,.tbtn,.score,.btn,.noprint{display:none!important}
-  .wrap{display:block;max-width:100%;padding:0}
-  body{background:#fff;color:#000}
-  h2{page-break-after:avoid;border-top:1px solid #ccc}
-  .q,.box,table,details{page-break-inside:avoid}
-  details{border:1px solid #ccc}
-  details:not([open]) > *:not(summary){display:block!important}
-  a{color:#000;text-decoration:none}
+  .score{display:none!important}
 }
-.unavail{color:var(--red,#ff5f56);font-weight:600}
 </style>
 <script src="gate.js"></script>
 <meta name="robots" content="noindex,nofollow">
-<script src="site-tools.js" defer></script>
+<link rel="stylesheet" href="shell.css?v=pr1">
+<link rel="stylesheet" href="components.css?v=pr1">
 </head>
-<body>
+<body><script>window.FutScout&&FutScout.mount()</script>
 <div class="wrap">
 
   <div class="sys">
-    <div class="sys-top">
-      <span class="dot"></span>
-      <span class="sys-title">FutScout · <b>Field Guide</b></span>
-      <span class="spacer"></span>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="insights.html">Insights</a>
-        <a href="search.html">Search</a>
-        <a href="players.html">Players</a>
-        <a href="teams.html">Teams</a>
-        <a href="sequences.html">Sequences</a>
-        <a href="methodology.html">Method</a>
-      </nav>
-      <button class="tbtn" id="themeBtn" type="button" aria-label="Toggle light/dark theme">☾</button>
-      <button class="btn noprint" onclick="window.print()">Save as PDF</button>
-    </div>
+    <div class="fs-slots" hidden><span data-fs-slot="actions"><button type="button" class="noprint" onclick="window.print()">Save as PDF</button></span></div><script>window.FutScout&&FutScout.adopt()</script>
     <div class="sys-line">
       A working manual for the platform: what each metric means, how to read the maps,
       how to build a shortlist, and where the numbers will mislead you.
@@ -638,8 +631,8 @@ details p:last-child{margin-bottom:0}
   <div id="quiz"></div>
   <div class="score noprint" id="score">
     <span>Score: <b id="scoreVal">0 / 0</b></span>
-    <span id="scoreMsg" style="color:var(--dim)"></span>
-    <button class="btn" onclick="resetQuiz()">Reset</button>
+    <span id="scoreMsg"></span>
+    <button type="button" class="btn fs-btn k" onclick="resetQuiz()">Reset</button>
   </div>
 
   <h3>Part B · Reasoning exercises</h3>
@@ -872,6 +865,7 @@ details p:last-child{margin-bottom:0}
   <div class="foot">
     Built from <span class="lv" data-k="matches_analysed">…</span> matches and <span class="lv" data-k="events">…</span> events · <span id="gAsOf">as of …</span> · every live figure in this guide is drawn
     from the live database and will drift as the season progresses.
+    How the metrics behind this guide were checked: <a href="validation.html">Metrics validation</a>.
   </div>
 </div>
 
@@ -946,7 +940,7 @@ function renderQuiz(){
     return '<div class="q" role="group" aria-labelledby="qt'+i+'" id="q'+i+'">'
       +'<div class="q-t" id="qt'+i+'">'+(i+1)+'. '+item.q+'</div>'
       +item.a.map(function(opt,j){
-        return '<button type="button" class="opt" style="display:block;width:100%;text-align:left;font:inherit;color:inherit" aria-pressed="false" data-q="'+i+'" data-o="'+j+'">'+opt+'</button>'}).join('')
+        return '<button type="button" class="opt" aria-pressed="false" data-q="'+i+'" data-o="'+j+'">'+opt+'</button>'}).join('')
       +'<div class="exp" role="status" id="e'+i+'">'+item.e+'</div></div>';
   }).join('');
 }
@@ -985,14 +979,6 @@ function resetQuiz(){ answered={}; renderQuiz(); document.getElementById('scoreV
   document.getElementById('scoreMsg').textContent=''; }
 renderQuiz();
 
-function paintThemeBtn(){document.getElementById('themeBtn').textContent=
-  document.documentElement.classList.contains('dark')?'☀':'☾';}
-document.getElementById('themeBtn').addEventListener('click',function(){
-  const d=document.documentElement.classList.toggle('dark');
-  try{localStorage.setItem('theme',d?'dark':'light')}catch(e){}
-  paintThemeBtn();
-});
-paintThemeBtn();
 </script>
 
 <script>
@@ -1046,6 +1032,12 @@ paintThemeBtn();
     document.getElementById('availText').innerHTML=h;
   }).catch(unavailable);
 })();
+</script>
+<script>
+/* Printing is always on the light palette, whatever the screen theme: the
+   root theme is set to light for the print and put back afterwards. */
+window.addEventListener('beforeprint',function(){var r=document.documentElement;if(!r.hasAttribute('data-print-theme')){r.setAttribute('data-print-theme',r.getAttribute('data-theme')||'');r.setAttribute('data-theme','light')};document.querySelectorAll('.doc details:not([open])').forEach(function(d){d.open=true;d.setAttribute('data-print-open','')})});
+window.addEventListener('afterprint',function(){var r=document.documentElement;if(r.hasAttribute('data-print-theme')){var t=r.getAttribute('data-print-theme');if(t)r.setAttribute('data-theme',t);else r.removeAttribute('data-theme');r.removeAttribute('data-print-theme')};document.querySelectorAll('.doc details[data-print-open]').forEach(function(d){d.open=false;d.removeAttribute('data-print-open')})});
 </script>
 </body>
 </html>

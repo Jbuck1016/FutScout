@@ -78,16 +78,16 @@ async function main(){
     executablePath:process.env.CHROME_PATH||'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'});
   try{
     const cases=[
-      {name:'player-desktop-dark',url:`players.html?player=${player}`,size:{width:1440,height:950},ready:'.pname',act:()=>`setGrp('Defending')`,sel:'#main'},
-      {name:'player-mobile-dark',url:`players.html?player=${player}`,size:{width:390,height:844},ready:'.pname',act:()=>`setGrp('Tempo')`,sel:'#main'},
-      {name:'team-tablet-light',url:'teams.html?team=Arsenal',size:{width:900,height:1050},theme:'light',ready:'.tname',act:()=>`setTab('Maps')`,sel:'#main'},
-      {name:'team-desktop-monochrome',url:'teams.html?team=Arsenal',size:{width:1440,height:950},ready:'.tname',act:()=>`setTab('Maps')`,mono:true,sel:'#main'},
+      {name:'player-desktop-dark',url:`players.html?player=${player}`,size:{width:1440,height:950},ready:'.fs-identity-name',act:()=>`setGrp('Defending')`,sel:'#main'},
+      {name:'player-mobile-dark',url:`players.html?player=${player}`,size:{width:390,height:844},ready:'.fs-identity-name',act:()=>`setGrp('Tempo')`,sel:'#main'},
+      {name:'team-tablet-light',url:'teams.html?team=Arsenal',size:{width:900,height:1050},theme:'light',ready:'.fs-identity-name',act:()=>`setTab('Maps')`,sel:'#main'},
+      {name:'team-desktop-monochrome',url:'teams.html?team=Arsenal',size:{width:1440,height:950},ready:'.fs-identity-name',act:()=>`setTab('Maps')`,mono:true,sel:'#main'},
       {name:'match-desktop-dark',url:`match.html?game=${game}`,size:{width:1440,height:950},ready:'.pitch-canvas',sel:'#pitchArea'},
       {name:'match-mobile-light',url:`match.html?game=${game}`,size:{width:390,height:844},theme:'light',ready:'.pitch-canvas',sel:'#pitchArea'},
       {name:'insights-desktop-light',url:'insights.html',size:{width:1280,height:900},theme:'light',ready:'.card',css:'#content .sec:first-child .card:nth-child(n+7){display:none}',sel:'#content .sec'},
       {name:'sequences-desktop-dark',url:'sequences.html',size:{width:1280,height:900},ready:'.scard',sel:'#main'},
-      {name:'player-compare-desktop',url:`players.html?player=${player}`,size:{width:1280,height:900},ready:'.pname',act:()=>`setTab('Compare')`,after:'.cmp-row',sel:'#main'},
-      {name:'team-rankings-mobile',url:'teams.html?team=Arsenal',size:{width:390,height:844},ready:'.tname',act:()=>`setTab('Rankings')`,after:'#main table',sel:'#main'},
+      {name:'player-compare-desktop',url:`players.html?player=${player}`,size:{width:1280,height:900},ready:'.fs-identity-name',act:()=>`setTab('Compare')`,after:'.cmp-card',sel:'#main'},
+      {name:'team-rankings-mobile',url:'teams.html?team=Arsenal',size:{width:390,height:844},ready:'.fs-identity-name',act:()=>`setTab('Rankings')`,after:'#main table',sel:'#main'},
       {name:'validation-desktop-light',url:'validation.html',size:{width:1280,height:900},theme:'light',ready:'#msStatus',viewport:true},
       {name:'methodology-desktop-dark',url:'methodology.html',size:{width:1280,height:900},ready:'#mGoals',viewport:true}
     ];
@@ -120,12 +120,12 @@ async function main(){
       page.on('pageerror',e=>console.error(`EXPORT PAGE: ${e.message}`));
       await page.addInitScript(()=>{localStorage.setItem('theme','dark');localStorage.setItem('siteAccess','granted-v1')});
       await page.goto(`${base}/players.html?player=${player}`,{waitUntil:'domcontentloaded'});
-      await page.locator('.pname').waitFor({timeout:45000});await page.evaluate(()=>setGrp('Defending'));
+      await page.locator('.fs-identity-name').waitFor({timeout:45000});await page.evaluate(()=>setGrp('Defending'));
       await page.locator('.pitch-box').waitFor();
       await exportBaseline(page,'player-export-png',()=>page.locator('.viz-exp button').nth(0).click(),false);
       await exportBaseline(page,'player-export',()=>page.locator('.viz-exp button').nth(1).click(),true);
       await page.goto(`${base}/teams.html?team=Arsenal`,{waitUntil:'domcontentloaded'});
-      await page.locator('.tname').waitFor({timeout:45000});await page.evaluate(()=>setTab('Maps'));await page.locator('.pitch-box').waitFor();
+      await page.locator('.fs-identity-name').waitFor({timeout:45000});await page.evaluate(()=>setTab('Maps'));await page.locator('.fs-pitchbox').waitFor();
       await exportBaseline(page,'team-export-png',()=>page.evaluate(()=>exportPNG()),false);
       await exportBaseline(page,'team-export',()=>page.evaluate(()=>exportPDF()),true);
       await page.goto(`${base}/match.html?game=${game}`,{waitUntil:'domcontentloaded'});

@@ -8,8 +8,8 @@ const chrome=process.env.CHROME_PATH||'C:\\Program Files\\Google\\Chrome\\Applic
 const checks=[
   ['Validation','validation.html','#liveSub'],
   ['Methodology','methodology.html','#mGoals'],
-  ['Player','players.html?player=367185','.pname'],
-  ['Team','teams.html?team=Arsenal','.tname'],
+  ['Player','players.html?player=367185','.fs-identity-name'],
+  ['Team','teams.html?team=Arsenal','.fs-identity-name'],
   ['Match','match.html?game=1993913','.pitch-canvas'],
   ['Insights','insights.html','#content'],
   ['Sequences','sequences.html','#main'],

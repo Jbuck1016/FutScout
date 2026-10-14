@@ -1,59 +1,132 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-<script>(function(){try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.remove('dark')}catch(e){}})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Domestic forecast lab · Private review</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="gate.js"></script>
 <script src="model-review-data.js?v=20260930T040030Z"></script>
 <script src="model-review-archive-data.js"></script>
 <script src="model-lab-data.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css?v=pr1">
+<script src="site-tools.js?v=pr1"></script>
 <style>
-:root{--bg:#f1efe8;--paper:#fbfaf6;--ink:#171b22;--muted:#667080;--faint:#929aa6;--line:#d8d3c8;--gold:#96681c;--gold2:#d9ac62;--green:#087854;--red:#ba3f38;--blue:#2766b0;--mono:'JetBrains Mono',Consolas,monospace;--display:'Archivo',sans-serif;--body:'Inter',sans-serif}
-html.dark{--bg:#0b1017;--paper:#141a23;--ink:#f3f5f8;--muted:#aeb9c8;--faint:#778395;--line:#2a323e;--gold:#edbd70;--gold2:#8e6326;--green:#42d89c;--red:#ff746b;--blue:#70b4ff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);background-image:linear-gradient(90deg,transparent 49.8%,color-mix(in srgb,var(--line) 18%,transparent) 50%,transparent 50.2%),radial-gradient(circle at 12% -10%,color-mix(in srgb,var(--gold) 12%,transparent),transparent 38%)}
-.wrap{max-width:1360px;margin:auto;padding:24px 24px 70px}.top{display:flex;align-items:flex-start;gap:16px;border-top:4px solid var(--gold);padding-top:16px}.eyebrow{font:700 10px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}h1{font:800 clamp(27px,4vw,52px)/.95 var(--display);letter-spacing:-.045em;margin:7px 0 0;max-width:780px}.actions{margin-left:auto;display:flex;gap:8px}.action{border:1px solid var(--line);background:var(--paper);color:var(--muted);font:600 10px/1 var(--mono);padding:9px 11px;text-decoration:none;cursor:pointer}.action:hover,.action:focus-visible{border-color:var(--gold);color:var(--ink)}
-.status{margin:22px 0;display:grid;grid-template-columns:1fr auto;gap:18px;padding:14px 16px;border:1px solid var(--gold2);background:color-mix(in srgb,var(--gold) 7%,var(--paper))}.status strong{font:800 12px/1 var(--mono);letter-spacing:.12em;color:var(--gold)}.status p{margin:6px 0 0;color:var(--muted);font-size:12px}.stamp{text-align:right;font:600 10px/1.6 var(--mono);color:var(--muted)}
-.section-head{display:flex;align-items:end;gap:12px;margin:30px 0 12px}.section-head h2{margin:0;font:800 22px/1 var(--display);letter-spacing:-.03em}.section-head span{font:600 10px/1 var(--mono);color:var(--faint);text-transform:uppercase;letter-spacing:.1em}.filters{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.chip{border:1px solid var(--line);background:var(--paper);color:var(--muted);padding:7px 9px;font:700 9px/1 var(--mono);cursor:pointer}.chip.on{border-color:var(--gold);color:var(--gold);background:color-mix(in srgb,var(--gold) 8%,var(--paper))}
-.fixtures{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:start}.match{position:relative;background:var(--paper);border:1px solid var(--line);padding:14px;min-height:176px;overflow:hidden}.match:before{content:'';position:absolute;left:0;top:0;width:3px;height:100%;background:var(--gold);opacity:.6}.meta{display:flex;justify-content:space-between;color:var(--faint);font:600 9px/1.3 var(--mono);text-transform:uppercase}.teams{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin:15px 0 13px;align-items:baseline}.team{font:700 14px/1.15 var(--display)}.xg{font:700 15px/1 var(--mono);color:var(--gold)}.xg:after{content:' xG';font-size:7px;color:var(--faint)}.probs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.prob{background:var(--bg);padding:8px 7px}.prob b{display:block;font:700 14px/1 var(--mono)}.prob small{font:600 8px/1 var(--mono);color:var(--faint);letter-spacing:.1em}.prob.pick{outline:1px solid var(--gold);color:var(--gold)}
-.why{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}.why summary{cursor:pointer;color:var(--gold);font:700 9px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}.why-copy{margin:10px 0 8px;font-size:11px;line-height:1.55;color:var(--ink)}.driver{padding:8px 0;border-top:1px solid var(--line)}.driver-head{display:flex;justify-content:space-between;gap:8px;font:700 9px/1.2 var(--mono);text-transform:uppercase}.driver-head span:last-child{color:var(--gold)}.driver p{margin:4px 0 0;color:var(--muted);font-size:10px;line-height:1.45}.scope{margin:8px 0 0;color:var(--faint);font:500 9px/1.5 var(--mono)}
-.evidence{display:grid;grid-template-columns:1fr auto auto;gap:5px 8px;margin:10px 0;padding:9px;background:var(--bg);font:500 9px/1.35 var(--mono)}.evidence b{color:var(--faint);font-size:8px;text-transform:uppercase}.evidence .metric{font-family:var(--body);color:var(--muted)}
-.table-wrap{border:1px solid var(--line);background:var(--paper);overflow:auto}table{border-collapse:collapse;width:100%;font:500 11px/1.2 var(--mono)}th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}th{font-size:8px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);position:sticky;top:0;background:var(--paper)}th:nth-child(2),td:nth-child(2){text-align:left;font-family:var(--body)}tr:hover td{background:color-mix(in srgb,var(--gold) 5%,transparent)}.rank{color:var(--faint)}.note{color:var(--muted);font:500 10px/1.7 var(--mono);margin:10px 0 0}.empty{grid-column:1/-1;border:1px dashed var(--line);padding:30px;text-align:center;color:var(--muted)}
-@media(max-width:980px){.fixtures{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.wrap{padding:16px 12px 50px}.top{display:block}.actions{margin-top:14px}.status{grid-template-columns:1fr}.stamp{text-align:left}.section-head{align-items:flex-start;flex-direction:column}.filters{margin-left:0;justify-content:flex-start}.fixtures{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:no-preference){.match{animation:rise .35s ease both}.match:nth-child(2n){animation-delay:.035s}.match:nth-child(3n){animation-delay:.07s}@keyframes rise{from{opacity:0;transform:translateY(6px)}}}
-/* Keep the forecast reading scale aligned with the match and research pages. */
-:root{--bg:#faf8f3;--paper:#fffdf8;--ink:#1b222b;--muted:#536170;--faint:#63707e;--line:#d5d0c5;--gold:#865715;--gold2:#b48742}
-html.dark{--bg:#0e1219;--paper:#1a2029;--ink:#eef3f7;--muted:#b6c4d0;--faint:#a0afbd;--line:#35404d;--gold:#e8bc74;--gold2:#866838}
-body{background-image:radial-gradient(circle at 10% -12%,color-mix(in srgb,var(--gold) 9%,transparent),transparent 38%)}
-.eyebrow,.action,.section-head span,.stamp,.chip,.note{font-size:12px}
-.status p{font-size:14px;line-height:1.5}.status strong{font-size:13px}
-.match{padding:16px;min-height:190px}.meta{font-size:11px;color:var(--muted)}
-.team{font-size:16px}.xg{font-size:17px}.xg:after{font-size:10px;color:var(--muted)}
-.prob{padding:9px}.prob b{font-size:17px}.prob small{font-size:11px;color:var(--muted);line-height:1.3}
-.result{margin:0 0 12px;padding:8px 10px;border:1px solid var(--line);background:var(--bg);font:700 12px/1.3 var(--mono);color:var(--ink)}.result.pending{color:var(--muted);font-weight:500}
-.why summary,.driver-head{font-size:11px}.why-copy{font-size:14px;line-height:1.6}
-.driver p{font-size:12px;line-height:1.55}.scope,.evidence{font-size:11px}.evidence b{font-size:10px;color:var(--muted)}
-table{font-size:12px}th{font-size:11px;color:var(--muted)}th,td{padding:11px 12px}.empty{font-size:14px}
-.action:focus-visible,.chip:focus-visible,.why summary:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-.review-health{border:1px solid var(--gold2);background:color-mix(in srgb,var(--gold) 5%,var(--paper));margin:0 0 22px;padding:17px}.review-health h2{margin:0 0 14px;font:800 20px/1.15 var(--display)}.health-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.health-item{border-left:3px solid var(--gold);padding:2px 13px}.health-item strong{display:block;font:700 13px/1.4 var(--mono);color:var(--ink)}.health-item p{margin:7px 0 0;font:500 14px/1.55 var(--body);color:var(--muted)}.health-item small{display:block;margin-top:7px;font:600 12px/1.5 var(--mono);color:var(--muted)}.health-item a{color:var(--gold);text-decoration:underline;text-underline-offset:2px}.table-caution{margin:0 0 12px;border-left:3px solid var(--gold);padding:10px 14px;background:color-mix(in srgb,var(--gold) 6%,var(--paper));font:500 14px/1.55 var(--body);color:var(--ink)}
-@media(max-width:850px){.health-grid{grid-template-columns:1fr}}
-.top h1{font-size:36px;line-height:1.1}.wrap{padding-top:16px}.status{margin:14px 0 10px;padding:10px 14px}.review-health{padding:10px 14px;margin-bottom:12px}.review-health summary{cursor:pointer;font-size:14px;font-weight:600}.review-health[open] .health-grid{margin-top:14px}.section-head{margin-top:18px}.action{white-space:nowrap}.actions{flex-wrap:wrap}@media(max-width:650px){.top h1{font-size:30px}}
+/* Domestic forecasts. Editorial family: the canvas carries the --paper ground
+   and the --display reading face; chrome comes from the shared shell. Every
+   value is a token. Nothing here signals validation with colour: status is a
+   tag and plain words. Frozen archive = --rule border + FROZEN tag; current
+   research = paper ground under an ink rule. */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink)}
+.wrap{max-width:1360px;margin:0 auto;padding:var(--s6) var(--s6) 48px;font-size:13px;line-height:1.45;min-width:0}
+.review-head .fs-label{display:block;margin-bottom:var(--s2)}
+.review-head .fs-identity-meta{font:400 13px/1.45 var(--body);max-width:70ch}
+.review-head .fs-dl{max-width:560px}
+.review-head .fs-dl dd{font:400 12px/1.4 var(--body)}
+.review-head .fs-dl dd.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.fs-tag.lifecycle{border-color:var(--ink);color:var(--ink);white-space:normal}
+.fs-tag.lifecycle.warn{border-color:var(--p0);color:var(--p0-text)}
+
+.review-health{margin:var(--s5) 0 0;background:var(--paper)}
+.review-health>summary{text-transform:none;letter-spacing:0;font:600 13px/1.3 var(--body)}
+.health-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);padding:var(--s4)}
+.health-item{border-left:1px solid var(--ink);padding:0 0 0 var(--s4);min-width:0}
+.health-item strong{display:block;font:500 10px/1.5 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.health-item p{margin:var(--s2) 0 0;font:400 15px/1.6 var(--display);color:var(--ink)}
+.health-item small{display:block;margin-top:var(--s2);font:400 11px/1.4 var(--body);color:var(--muted)}
+.health-item a,.why a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:2px}
+.review-health>.scope{padding:0 var(--s4) var(--s4);margin:0}
+
+.section-head{display:flex;align-items:flex-end;flex-wrap:wrap;gap:var(--s3) var(--s5);margin:var(--s6) 0 var(--s4);padding-bottom:var(--s3);border-bottom:1px solid var(--ink)}
+.section-title{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s2) var(--s4);min-width:0}
+.section-head h2{margin:0;font:600 24px/1.1 var(--display)}
+.section-head .fs-label{line-height:1.5}
+.section-title .status-select{width:auto;max-width:100%}
+.fs-tag[hidden]{display:none}
+.filters{margin-left:auto;display:flex;gap:var(--s2);flex-wrap:wrap;justify-content:flex-end}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.feed-status{margin:0 0 var(--s4);display:flex;align-items:center;flex-wrap:wrap;gap:var(--s3);font:400 11px/1.4 var(--mono);color:var(--muted)}
+
+.fixtures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);align-items:start}
+/* Current research: paper ground, one ink rule above. */
+.match{min-width:0;padding:var(--s4) 0 var(--s3);background:var(--paper);border-top:1px solid var(--ink)}
+/* Frozen archive: boxed with a --rule border and tagged FROZEN. */
+[data-kind="frozen"] .match{padding:var(--s4);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:var(--s3);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.teams{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s1) var(--s4);margin:var(--s3) 0;align-items:baseline}
+.team{font:600 16px/1.2 var(--display);overflow-wrap:anywhere}
+.xg{font:500 16px/1 var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.xg:after{content:' xG';font-size:10px;color:var(--muted)}
+.probs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s2)}
+.prob{padding:var(--s2) var(--s3);border:1px solid var(--rule);border-radius:var(--radius);min-width:0}
+.prob b{display:block;font:400 16px/1.2 var(--mono);font-variant-numeric:tabular-nums}
+.prob small{font:500 10px/1.4 var(--mono);letter-spacing:.08em;color:var(--muted)}
+/* The single most likely outcome: an ink rule and weight, never a colour. */
+.prob.pick{border-color:var(--ink)}.prob.pick b{font-weight:500}.prob.pick small{color:var(--ink)}
+.result{margin:0 0 var(--s3);padding:var(--s2) var(--s3);border:1px solid var(--rule);border-radius:var(--radius);background:var(--panel2);font:500 12px/1.3 var(--mono);color:var(--ink)}
+.result.pending{color:var(--muted);font-weight:400}
+.why{border-top:1px solid var(--rule);margin-top:var(--s3)}
+.why>summary{display:flex;align-items:center;min-height:var(--tap);cursor:pointer;font:500 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink);text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:3px}
+.why-copy{margin:var(--s2) 0 var(--s3);font:400 15px/1.6 var(--display);color:var(--ink)}
+.driver{padding:var(--s3) 0;border-top:1px solid var(--rule2)}
+.driver-head{display:flex;justify-content:space-between;gap:var(--s3);font:500 10px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.driver p{margin:var(--s1) 0 0;font:400 12px/1.5 var(--body);color:var(--muted)}
+.scope{margin:var(--s3) 0 0;font:400 11px/1.5 var(--body);color:var(--muted)}
+.copy.scope{font:400 11px/1.5 var(--body)}
+.evidence{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:var(--s1) var(--s4);margin:var(--s3) 0;padding:var(--s3);background:var(--panel2);border-radius:var(--radius);font:400 11px/1.4 var(--mono);font-variant-numeric:tabular-nums}
+.evidence b{font:500 10px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.evidence .metric{font-family:var(--body);color:var(--muted)}
+.feature-ledger{margin:var(--s3) 0}
+.feature-ledger>summary{min-height:var(--tap);display:flex;align-items:center;cursor:pointer;font:500 12px/1.3 var(--body)}
+.feature-ledger p{font:400 11px/1.5 var(--body);color:var(--muted);margin:var(--s2) 0}
+[data-fs-canvas] .fs-table th{background:none}
+
+.outlook-box{background:var(--paper)}
+[data-kind="frozen"] .outlook-box{background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.outlook-table{font:400 12px/1.3 var(--mono);font-variant-numeric:tabular-nums}
+.outlook-table th,.outlook-table td{text-align:right;white-space:nowrap}
+.outlook-table th:nth-child(2),.outlook-table td:nth-child(2){text-align:left;font-family:var(--body)}
+.outlook-table td:nth-child(2){font-size:13px}
+.rank{color:var(--muted)}
+.table-caution{margin:0 0 var(--s4);background:var(--paper)}
+.table-caution .fs-banner-text{font:400 15px/1.6 var(--display)}
+.note{margin:var(--s4) 0 0;font:400 11px/1.6 var(--body);color:var(--muted)}
+.empty{grid-column:1/-1;border:1px dashed var(--rule);border-radius:var(--radius);padding:var(--s6);color:var(--muted);font:400 13px/1.45 var(--body)}
+:is(.chip,.why>summary,.feature-ledger>summary,.review-health>summary,select):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+@media(max-width:980px){.fixtures{grid-template-columns:repeat(2,minmax(0,1fr))}.health-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:760px){
+  .wrap{padding:var(--s5) 16px 40px}
+  .fixtures{grid-template-columns:minmax(0,1fr)}
+  .section-head{align-items:flex-start;flex-direction:column}
+  .filters{margin-left:0;justify-content:flex-start}
+  .section-head h2{font-size:20px}
+}
+@media print{
+  html,body{background:none}
+  body>.fs-shell,body>.fs-bottom,.fs-toast,.filters,.status-select{display:none}
+  .wrap{max-width:none;padding:0}
+  .match,.driver,.health-item{break-inside:avoid}
+}
+
 </style>
-<script src="site-tools.js?v=20261001-density" defer></script><script src="forecast-evidence.js"></script>
+<script src="forecast-evidence.js"></script>
+<link rel="stylesheet" href="shell.css?v=pr1">
+<link rel="stylesheet" href="components.css?v=pr1">
 </head>
-<body><main class="wrap">
-<header class="top"><div><div class="eyebrow">Private model room · domestic v2</div><h1>Match forecasts</h1></div><div class="actions"><a class="action" id="archiveToggle" href="model-review.html?view=archive">frozen archive</a><a class="action" href="model-lab.html">model lab →</a><a class="action" href="index.html">← analytics</a><button class="action" id="theme">light / dark</button></div></header>
-<section class="status"><div><strong id="statusLabel">SHADOW · PRIVATE</strong><p id="statusDetail">Experimental review output. These forecasts cannot activate or promote the model.</p></div><div class="stamp" id="stamp"></div></section>
+<body><script>window.FutScout&&FutScout.mount()</script><main class="wrap" data-fs-canvas="editorial" data-kind="research">
+<header class="fs-identity review-head"><div class="fs-identity-main"><span class="fs-label">Private model room · domestic v2</span><h1 class="fs-identity-name">Match forecasts</h1><p class="fs-identity-meta" id="statusDetail">Experimental review output. These forecasts cannot activate or promote the model.</p><div class="fs-chips"><span class="fs-tag frozen" id="frozenTag" hidden>Frozen</span><span class="fs-tag">Experimental</span><span class="fs-tag">Private shadow</span><span class="fs-tag">Read-only</span></div></div>
+<dl class="fs-dl" aria-label="Forecast status and boundaries"><dt>Lifecycle</dt><dd><strong class="fs-tag lifecycle" id="statusLabel">SHADOW · PRIVATE</strong></dd><dt>Snapshot</dt><dd class="num" id="stamp">Not supplied</dd><dt>Evidence dates</dt><dd id="stripDates">Not supplied</dd><dt>Research counts</dt><dd id="stripCounts">Not supplied</dd><dt>Season table</dt><dd>Monte Carlo projection, not live standings</dd><dt>Boundary</dt><dd>Read-only review output. No promotion: these forecasts cannot activate or promote the model.</dd></dl>
+<div class="fs-slots" hidden><span data-fs-slot="actions"><a id="archiveToggle" href="model-review.html?view=archive">frozen archive</a><a href="model-lab.html">Model lab</a></span></div><script>window.FutScout&&FutScout.adopt()</script></header>
 <details class="review-health" id="reviewHealth" aria-label="Forecast evidence and uncertainty"></details>
-<div class="section-head"><div><h2>Match probabilities</h2><span id="fixtureCount"></span></div><div class="filters" id="leagueFilters"></div></div>
+<div class="section-head"><div class="section-title"><h2>Match probabilities</h2><span class="fs-tag frozen" id="fixturesFrozenTag" hidden>Frozen</span><span class="fs-label" id="fixtureCount"></span></div><div class="filters" id="leagueFilters"></div></div>
 <section class="fixtures" id="fixtures" aria-live="polite"></section>
-<div class="section-head"><div><h2 id="outlookHeading">Season outlook</h2><span id="outlookContext">Monte Carlo projection · not live standings</span></div><div class="filters" id="tableFilters"></div></div>
-<p class="table-caution" id="tableCaution"></p>
-<div class="table-wrap"><table><thead><tr><th>#</th><th>club</th><th>played</th><th>current pts</th><th>current pace</th><th>projected remaining</th><th>model final</th><th>exp pos</th><th>title</th><th>top 4</th><th>relegation</th></tr></thead><tbody id="tableBody"></tbody></table></div>
+<div class="section-head"><div class="section-title"><h2 id="outlookHeading">Season outlook</h2><span class="fs-tag frozen" id="outlookFrozenTag" hidden>Frozen</span><span class="fs-label" id="outlookContext">Monte Carlo projection · not live standings</span></div><div class="filters" id="tableFilters"></div></div>
+<div class="fs-banner table-caution"><span class="fs-banner-label">Estimate</span><span class="fs-banner-text" id="tableCaution"></span></div>
+<div class="fs-table-wrap outlook-box"><table class="fs-table outlook-table"><thead><tr><th>#</th><th>club</th><th>played</th><th>current pts</th><th>current pace</th><th>projected remaining</th><th>model final</th><th>exp pos</th><th>title</th><th>top 4</th><th>relegation</th></tr></thead><tbody id="tableBody"></tbody></table></div>
 <p class="note" id="rulesNote"></p>
 </main><script>
 function bootModelReview(D){
@@ -71,7 +144,7 @@ document.getElementById('outlookContext').textContent=isFrozen?'Historical Monte
 const recordedResults=new Map();
 const resultKey=r=>[r.league,String(r.date).slice(0,10),r.home_team,r.away_team].join('|');
 function resultFor(r){return recordedResults.get(resultKey(r))||recordedResults.get(String(r.game_id));}
-async function loadRecordedResults(){let status=document.getElementById('resultFeedStatus');if(!status){status=document.createElement('p');status.id='resultFeedStatus';status.setAttribute('role','status');document.getElementById('fixtures').before(status)}status.textContent='Checking recorded results… Forecast snapshot unchanged.';
+async function loadRecordedResults(){let status=document.getElementById('resultFeedStatus');if(!status){status=document.createElement('p');status.id='resultFeedStatus';status.className='feed-status';status.setAttribute('role','status');document.getElementById('fixtures').before(status)}status.textContent='Checking recorded results… Forecast snapshot unchanged.';
   const key='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc2lsaGlmZmpvdWx5b3FoZG1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2Nzc5NDAsImV4cCI6MjEwMDI1Mzk0MH0.3_ccOJi0SBKOwHGxhJL3fsWCSSLoxZumzt-KH4wO8OU';
   const url='https://xrsilhiffjoulyoqhdmp.supabase.co/rest/v1/matches?select=game_id,league,date,home_team,away_team,home_score,away_score&season=eq.2627&home_score=not.is.null&away_score=not.is.null&limit=1000';
   try{
@@ -82,17 +155,28 @@ async function loadRecordedResults(){let status=document.getElementById('resultF
     rows.forEach(row=>{recordedResults.set(String(row.game_id),row);if(!recordedResults.has(resultKey(row)))recordedResults.set(resultKey(row),row)});
     const notice=document.getElementById('resultFeedStatus');if(notice)notice.textContent='Results checked '+new Date().toLocaleString()+'; forecast snapshot unchanged.';
     renderFixtures();
-  }catch(err){let notice=document.getElementById('resultFeedStatus');if(!notice){notice=document.createElement('p');notice.id='resultFeedStatus';notice.setAttribute('role','status');document.getElementById('fixtures').before(notice)}notice.textContent='Result ledger unavailable. Forecasts are unchanged. ';const retry=document.createElement('button');retry.textContent='Retry results';retry.onclick=loadRecordedResults;notice.appendChild(retry)}
+  }catch(err){let notice=document.getElementById('resultFeedStatus');if(!notice){notice=document.createElement('p');notice.id='resultFeedStatus';notice.className='feed-status';notice.setAttribute('role','status');document.getElementById('fixtures').before(notice)}notice.textContent='Result ledger unavailable. Forecasts are unchanged. ';const retry=document.createElement('button');retry.type='button';retry.className='fs-btn';retry.textContent='Retry results';retry.onclick=loadRecordedResults;notice.appendChild(retry)}
 }
 const pct=n=>(n*100).toFixed(1)+'%'; const dt=s=>new Intl.DateTimeFormat(undefined,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(s));
-document.getElementById('stamp').innerHTML=`${isFrozen?'frozen':'updated'} ${new Date(D.as_of).toLocaleString()}<br>${D.predictions.length.toLocaleString()} fixtures · ${leagues.length} leagues`;
+document.getElementById('stamp').textContent=`${isFrozen?'Frozen':'Updated'} ${new Date(D.as_of).toLocaleString()}`;
+renderStrip();
 document.getElementById('statusDetail').textContent=`${isFrozen?'Frozen weekly':'Latest research'} ${D.status} forecast · schema v${D.feature_schema_version} · ${D.feature_count} audited inputs · trained through ${D.trained_through}.`;
 if(!isFrozen){document.getElementById('statusLabel').textContent=futurePredictions.length?'LATEST RESEARCH · NOT FROZEN':'STALE LATEST VIEW · NO UPCOMING MATCHES';}
 if(archiveOnly){
   document.getElementById('statusLabel').textContent='FROZEN ARCHIVE · NOT UPCOMING';
   document.getElementById('statusDetail').textContent='This slate was frozen on '+new Date(D.as_of).toLocaleDateString()+'. Its fixtures have passed. Probabilities and table projections below are the original pre-match snapshot, not current forecasts or standings.';
 }
-if(!D.review_ready){document.getElementById('statusLabel').textContent='BLOCKED · STALE INPUT';document.getElementById('statusDetail').textContent='Do not use these forecasts: '+D.review_blockers.join(' · ');}
+if(!D.review_ready){document.getElementById('statusLabel').classList.add('warn');document.getElementById('statusLabel').textContent='BLOCKED · STALE INPUT';document.getElementById('statusDetail').textContent='Do not use these forecasts: '+D.review_blockers.join(' · ');}
+function renderStrip(){
+  /* Presentation only: restates values already in the saved bundles. */
+  const day=value=>new Date(value).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'});
+  const parts=[[isFrozen?'forecasts frozen':'forecast bundle',D.as_of],['input drift check',H?.drift?.checked_at],['live scorecard',H?.shadow?.generated_at]].filter(p=>p[1]);
+  const mixed=new Set(parts.map(p=>String(p[1]).slice(0,10))).size>1;
+  document.getElementById('stripDates').textContent=(mixed?'Mixed-date · ':'')+parts.map(p=>p[0]+' '+day(p[1])).join(' · ')+' (UTC dates)'+(H?'':' · health evidence dates not supplied');
+  document.getElementById('stripCounts').textContent=D.predictions.length.toLocaleString()+' fixtures · '+leagues.length+' leagues · '+D.feature_count+' audited inputs'+(H?.shadow?.resolved!=null?' · '+H.shadow.resolved+' live calls scored':' · scored-call count not supplied');
+  const canvas=document.querySelector('main.wrap');canvas.dataset.kind=isFrozen?'frozen':'research';
+  document.getElementById('frozenTag').hidden=!isFrozen;document.getElementById('outlookFrozenTag').hidden=!isFrozen;document.getElementById('fixturesFrozenTag').hidden=!isFrozen;
+}
 function renderReviewHealth(){
   const dateLabel=value=>value?new Date(value).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'}):'date unavailable';
   const drift=H?.drift,shadow=H?.shadow,early=H?.legitimacy?.table_backtests?.summary?.find(r=>Math.abs(r.checkpoint-.25)<.001),research=H?.challenger_research?.table_uncertainty;
@@ -100,16 +184,19 @@ function renderReviewHealth(){
   const driftSummary=severe.length?`Severe flags: ${severe.some(x=>x.includes('rest_days'))?'rest-day context':''}${severe.some(x=>x.includes('rest_days'))&&severe.some(x=>x.startsWith('elo_'))?' and ':''}${severe.some(x=>x.startsWith('elo_'))?'Elo/team-strength distribution':''}.`:'No severe feature flags in this snapshot.';
   document.getElementById('reviewHealth').innerHTML=`<summary>Model health: ${drift?.decision?.replaceAll('_',' ')||'unavailable'} · ${shadow?.resolved??'—'} scored · evidence details</summary><div class="health-grid"><div class="health-item"><strong>Input health · ${drift?.decision?.replaceAll('_',' ')||'audit unavailable'}</strong><p>${drift?`${drift.current_matches} completed current-season matches audited. ${driftSummary} This is a shadow-only investigation flag, not a claim that an individual forecast is wrong.`:'Current input-drift evidence is unavailable. Do not infer that data health passed.'}</p><small>${drift?'Drift checked '+dateLabel(drift.checked_at):'No audit timestamp'} · <a href="model-lab.html?tab=monitoring">inspect data health</a></small></div><div class="health-item"><strong>Live proof · ${shadow?.resolved??'—'} scored</strong><p>${shadow?`Promotion gate: ${shadow.sample_gate?.decision?.replaceAll('_',' ')||'undetermined'}. ${shadow.sample_gate?.complete_frozen_weekends??0} complete frozen weekends; the current sample is not a final calibration verdict.`:'The current scored-call sample is unavailable.'}</p><small>${shadow?'Scorecard '+dateLabel(shadow.generated_at):'No scorecard timestamp'} · <a href="model-lab.html?tab=monitoring">inspect scorecard</a></small></div><div class="health-item"><strong>Early-season table uncertainty</strong><p>${early?`At the historical 25% checkpoint, a nominal 80% position set contained the final position ${Math.round(early.position_80pct_coverage*1000)/10}% of the time.`:'Early-season interval coverage is unavailable.'} The points and title columns below are simulation estimates; this bundle has no calibrated team-level interval.</p><small>${research?.selected_team_strength_uncertainty_sd!=null?`Wider team-strength spread ${research.selected_team_strength_uncertainty_sd.toFixed(2)} remains research-only · `:''}<a href="model-lab.html?tab=legitimacy">inspect table tests</a></small></div></div>${isFrozen?'<p class="scope">This archive preserves the original frozen probabilities. Later health checks are retrospective context, not inputs known at that freeze.</p>':''}`;
 }
-function buttons(id,includeAll,selected,setter){const values=includeAll?['ALL',...leagues]:leagues;document.getElementById(id).innerHTML=values.map(v=>`<button class="chip ${v===selected?'on':''}" aria-pressed="${v===selected}" data-v="${v}">${v==='ALL'?'all leagues':labels[v]}</button>`).join('');document.querySelectorAll(`#${id} .chip`).forEach(b=>b.onclick=()=>{setter(b.dataset.v);saveForecastState()});}
+function buttons(id,includeAll,selected,setter){const values=includeAll?['ALL',...leagues]:leagues;document.getElementById(id).innerHTML=values.map(v=>`<button type="button" class="chip fs-btn ${v===selected?'on':''}" aria-pressed="${v===selected}" data-v="${v}">${v==='ALL'?'all leagues':labels[v]}</button>`).join('');document.querySelectorAll(`#${id} .chip`).forEach(b=>b.onclick=()=>{setter(b.dataset.v);saveForecastState()});}
 function saveForecastState(){const u=new URL(location);u.searchParams.set('league',fixtureLeague);u.searchParams.set('table',tableLeague);u.searchParams.set('status',fixtureStatus);if(u.href!==location.href)history.pushState(null,'',u);}
 function restoreForecastState(){const q=new URL(location).searchParams;fixtureLeague=['ALL',...leagues].includes(q.get('league'))?q.get('league'):'ALL';tableLeague=leagues.includes(q.get('table'))?q.get('table'):leagues[0];fixtureStatus=['all','upcoming','completed'].includes(q.get('status'))?q.get('status'):'all';if(typeof status!=='undefined')status.value=fixtureStatus;renderFixtures();renderTable();}
 window.addEventListener('popstate',restoreForecastState);
-window.futScoutExportContext=()=>({snapshot:D.as_of,kind:D.forecast_kind,league:fixtureLeague,status:fixtureStatus,table_league:tableLeague,model_version:D.feature_schema_version,scope:'Saved forecast; result ledger loaded separately'});
+window.futScoutExportContext=()=>({entity:'Domestic match forecasts · fixtures: '+(fixtureLeague==='ALL'?'all leagues':labels[fixtureLeague])+' ('+fixtureStatus+') · outlook table: '+labels[tableLeague],scope:(isFrozen?'Frozen weekly':'Latest research')+' '+D.status+' forecast, saved bundle; result ledger loaded separately; Monte Carlo projection, not live standings; read-only, cannot activate or promote the model',snapshot:(isFrozen?'Frozen ':'Forecast bundle ')+D.as_of,health_dates:document.getElementById('stripDates').textContent,kind:String(D.forecast_kind),league:String(fixtureLeague),status:String(fixtureStatus),table_league:String(tableLeague),model_version:'feature schema v'+D.feature_schema_version});
 function evidence(e,r){const v=n=>n==null?'—':Number(n).toFixed(1);return `<div class="evidence"><b>rolling last 3</b><b>${r.home_team}</b><b>${r.away_team}</b><span class="metric">Field tilt</span><span>${v(e.inputs.home_field_tilt_last_3)}%</span><span>${v(e.inputs.away_field_tilt_last_3)}%</span><span class="metric">Pass entries to box</span><span>${v(e.inputs.home_box_entries_last_3)}</span><span>${v(e.inputs.away_box_entries_last_3)}</span><span class="metric">Shots</span><span>${v(e.inputs.home_shots_last_3)}</span><span>${v(e.inputs.away_shots_last_3)}</span><span class="metric">Shots allowed</span><span>${v(e.inputs.home_shots_allowed_last_3)}</span><span>${v(e.inputs.away_shots_allowed_last_3)}</span><span class="metric">Pre-match rating</span><span>${v(e.inputs.home_rating)}</span><span>${v(e.inputs.away_rating)}</span></div>`;}
-function renderFixtures(){buttons('leagueFilters',true,fixtureLeague,v=>{fixtureLeague=v;renderFixtures()});const source=D.predictions.filter(r=>fixtureStatus==='all'||(fixtureStatus==='upcoming'?Date.parse(r.date)>now:Date.parse(r.date)<=now));const scoped=source.filter(r=>fixtureLeague==='ALL'||r.league===fixtureLeague);const rows=scoped.sort((a,b)=>archiveOnly?b.date.localeCompare(a.date):a.date.localeCompare(b.date));document.getElementById('fixtureCount').textContent=`${isFrozen?'frozen':'research'} · ${fixtureStatus} · ${rows.length} of ${D.predictions.length} fixtures`;document.getElementById('fixtures').innerHTML=rows.length?rows.map((r,i)=>{const p=[r.home_win_probability,r.draw_probability,r.away_win_probability],m=Math.max(...p),e=r.explanation,final=resultFor(r);const result=Date.parse(r.date)<now?`<div class="result ${final?'':'pending'}">${final?'Final score · '+final.home_score+'–'+final.away_score:'Final score not available in the match ledger'}</div>`:'';const why=e?`<details class="why"><summary>Why this forecast?</summary><p class="why-copy">${e.summary}</p>${window.forecastEvidence(e)}${evidence(e,r)}${e.drivers.map(d=>`<div class="driver"><div class="driver-head"><span>${d.label} · ${d.strength}</span><span>favors ${d.favors}</span></div><p>${d.detail}</p></div>`).join('')}<p class="scope">${e.method}<br>${e.scope}<br>Current-season sample at ${isFrozen?'freeze':'forecast'}: ${e.inputs.home_current_season_matches} ${r.home_team} matches · ${e.inputs.away_current_season_matches} ${r.away_team} matches.</p></details>`:'';return `<article class="match" style="animation-delay:${Math.min(i,9)*.025}s"><div class="meta"><span>${labels[r.league]}</span><time>${dt(r.date)}</time></div><div class="teams"><div class="team">${r.home_team}</div><div class="xg">${r.home_expected_goals.toFixed(2)}</div><div class="team">${r.away_team}</div><div class="xg">${r.away_expected_goals.toFixed(2)}</div></div>${result}<div class="probs"><div class="prob ${p[0]===m?'pick':''}"><b>${pct(p[0])}</b><small>HOME</small></div><div class="prob ${p[1]===m?'pick':''}"><b>${pct(p[1])}</b><small>DRAW</small></div><div class="prob ${p[2]===m?'pick':''}"><b>${pct(p[2])}</b><small>AWAY</small></div></div>${why}</article>`}).join(''):'<div class="empty">No fixtures match the selected status and league.</div>';}
+function renderFixtures(){buttons('leagueFilters',true,fixtureLeague,v=>{fixtureLeague=v;renderFixtures()});const source=D.predictions.filter(r=>fixtureStatus==='all'||(fixtureStatus==='upcoming'?Date.parse(r.date)>now:Date.parse(r.date)<=now));const scoped=source.filter(r=>fixtureLeague==='ALL'||r.league===fixtureLeague);const rows=scoped.sort((a,b)=>archiveOnly?b.date.localeCompare(a.date):a.date.localeCompare(b.date));document.getElementById('fixtureCount').textContent=`${isFrozen?'frozen':'research'} · ${fixtureStatus} · ${rows.length} of ${D.predictions.length} fixtures`;document.getElementById('fixtures').innerHTML=rows.length?rows.map((r,i)=>{const p=[r.home_win_probability,r.draw_probability,r.away_win_probability],m=Math.max(...p),e=r.explanation,final=resultFor(r);const result=Date.parse(r.date)<now?`<div class="result ${final?'':'pending'}">${final?'Final score · '+final.home_score+'–'+final.away_score:'Final score not available in the match ledger'}</div>`:'';const why=e?`<details class="why"><summary>Why this forecast?</summary><p class="why-copy">${e.summary}</p>${window.forecastEvidence(e)}${evidence(e,r)}${e.drivers.map(d=>`<div class="driver"><div class="driver-head"><span>${d.label} · ${d.strength}</span><span>favors ${d.favors}</span></div><p>${d.detail}</p></div>`).join('')}<p class="scope">${e.method}<br>${e.scope}<br>Current-season sample at ${isFrozen?'freeze':'forecast'}: ${e.inputs.home_current_season_matches} ${r.home_team} matches · ${e.inputs.away_current_season_matches} ${r.away_team} matches.</p></details>`:'';return `<article class="match"><div class="meta"><span>${labels[r.league]}${isFrozen?' <span class="fs-tag frozen">Frozen</span>':''}</span><time>${dt(r.date)}</time></div><div class="teams"><div class="team">${r.home_team}</div><div class="xg">${r.home_expected_goals.toFixed(2)}</div><div class="team">${r.away_team}</div><div class="xg">${r.away_expected_goals.toFixed(2)}</div></div>${result}<div class="probs"><div class="prob ${p[0]===m?'pick':''}"><b>${pct(p[0])}</b><small>HOME</small></div><div class="prob ${p[1]===m?'pick':''}"><b>${pct(p[1])}</b><small>DRAW</small></div><div class="prob ${p[2]===m?'pick':''}"><b>${pct(p[2])}</b><small>AWAY</small></div></div>${why}</article>`}).join(''):'<div class="empty">No fixtures match the selected status and league.</div>';}
 function renderTable(){buttons('tableFilters',false,tableLeague,v=>{tableLeague=v;renderTable()});const sim=D.simulations[tableLeague],rows=[...sim.teams].sort((a,b)=>a.expected_position-b.expected_position);document.getElementById('tableBody').innerHTML=rows.map((r,i)=>`<tr><td class="rank">${i+1}</td><td>${r.team}</td><td>${r.current_played}</td><td>${r.current_points}</td><td>${r.current_points_pace==null?'—':r.current_points_pace.toFixed(1)}</td><td>+${r.projected_remaining_points.toFixed(1)}</td><td>${r.expected_points.toFixed(1)}</td><td>${r.expected_position.toFixed(1)}</td><td>${pct(r.champion_probability)}</td><td>${pct(r.top_four_probability)}</td><td>${pct(r.relegation_probability)}</td></tr>`).join('');document.getElementById('tableCaution').textContent=`${labels[tableLeague]} · The model-final column is current points already won plus simulated remaining points—not a straight-line extrapolation of early results. Current pace is shown only as a comparison. At this stage, treat exact totals and title chances as uncertain estimates, not precise targets.`;document.getElementById('rulesNote').textContent=`${labels[tableLeague]} · “current pace” simply extends points per game across the schedule; “model final” adds simulated remaining points to points already won · ${sim.simulations.toLocaleString()} runs · rules v${sim.rules_version} · ${sim.ranking_method.replaceAll('_',' ')}${sim.special_playoff_policy?' · Serie A playoffs: neutral 50/50 prior':''}`;}
-document.getElementById('theme').onclick=()=>{document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',document.documentElement.classList.contains('dark')?'dark':'light')}catch(e){}};const status=document.createElement('select');status.setAttribute('aria-label','Fixture status');status.innerHTML='<option value="all">All fixtures</option><option value="upcoming">Upcoming</option><option value="completed">Past kickoffs / results</option>';status.onchange=()=>{fixtureStatus=status.value;saveForecastState();renderFixtures()};document.getElementById('fixtureCount').after(status);renderReviewHealth();restoreForecastState();loadRecordedResults();
+const status=document.createElement('select');status.className='fs-input status-select';status.setAttribute('aria-label','Fixture status');status.innerHTML='<option value="all">All fixtures</option><option value="upcoming">Upcoming</option><option value="completed">Past kickoffs / results</option>';status.onchange=()=>{fixtureStatus=status.value;saveForecastState();renderFixtures()};document.getElementById('fixtureCount').after(status);renderReviewHealth();restoreForecastState();loadRecordedResults();
 }
+/* Print is always light, whatever the page theme. */
+window.addEventListener('beforeprint',()=>document.body.classList.add('fs-light'));window.addEventListener('afterprint',()=>document.body.classList.remove('fs-light'));
+document.getElementById('reviewHealth').classList.add('fs-details');
 const archiveRequested=new URLSearchParams(location.search).get('view')==='archive';
 const reviewData=archiveRequested?window.MODEL_REVIEW_ARCHIVE_DATA:window.MODEL_REVIEW_DATA;
 if(reviewData)bootModelReview(reviewData);

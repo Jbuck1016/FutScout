@@ -1,8 +1,168 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Evidence definitions · FutScout</title><script src="gate.js"></script><style>
-:root{color-scheme:light;--paper:#fff;--ink:#17202c;--muted:#435267;--line:#c8d0db}body{margin:0;background:#f1f4f7;color:var(--ink);font:18px/1.65 'Segoe UI',sans-serif}main,nav{max-width:960px;margin:auto;padding:24px}main{background:var(--paper)}nav{display:flex;justify-content:space-between;align-items:center}a{color:#145bbb}h1,h2{font-family:Georgia,serif;line-height:1.2}h1{font-size:44px}section{border-top:1px solid var(--line);padding:24px 0}dt{font-weight:700}dd{margin:8px 0 22px}p{max-width:80ch}code{overflow-wrap:anywhere}.note{padding:16px;border-left:4px solid #145bbb;background:#eaf1fa}button{padding:10px 14px;font:600 14px sans-serif}footer{font-size:14px;color:var(--muted)}</style><script src="site-tools.js" defer></script></head><body><nav><a href="model-lab.html?tab=matches">← Model Lab</a><button onclick="window.print()">Print / PDF</button></nav><main><h1>Same name is not always the same measure.</h1><p>Use this contract when comparing a saved forecast, an event map and a retrospective match review. Definitions were traced to the implemented database and model code on 30 September 2026.</p>
-<style>body{background:var(--bg,#f1f4f7);color:var(--ink);font-size:16px}main{background:var(--paper,var(--bg2))}nav{flex-wrap:wrap;gap:12px}main,nav{box-sizing:border-box}h1{font-size:clamp(26px,4vw,36px)}a{color:#145bbb}html.dark a{color:#8fc8ff}.note{background:var(--bg3,#eaf1fa);color:var(--ink)}html.dark main{background:var(--bg2)}button{background:var(--bg2,#fff);color:var(--ink);border:1px solid var(--line);border-radius:4px}button:focus-visible,a:focus-visible{outline:2px solid currentColor;outline-offset:3px}@media(max-width:600px){main,nav{padding:16px}}</style>
-<section id="eligibility"><h2>Eligibility is specific to the source</h2><p>Repository definitions checked 2 October 2026; deployed database settings were not re-audited for this documentation change. A frontend minimum is not proof of a database eligibility rule.</p><dl><dt>Player percentiles: six nineties in the committed definition</dt><dd><code>mv_player_percentiles</code> in the 31 August baseline and generated cup-isolation SQL requires six nineties and a non-null metric. It partitions by league, role pool and metric. This is the view queried by Player Fingerprints.</dd><dt>Separate player percentile view: three nineties</dt><dd><code>mv_player_pct</code>, defined in the 7 August multileague migration, uses three nineties. It is a different source; the two thresholds must not be described as one universal site rule.</dd><dt>Other samples</dt><dd>Chain-role profiles require 120 involvements in their documented source. Team insights use their returned club-match threshold. Worked searches can deliberately use stricter filters, including six nineties. Check the actual returned cohort and metric coverage; eligibility alone does not establish reliability.</dd></dl></section>
-<section><h2>Expected threat: two valid totals</h2><dl><dt>Net successful-pass xT · all phases</dt><dd>For every successful pass with an endpoint, subtract grid value at the start from grid value at the end. Keep negative changes. Aggregate across every phase. The saved sequence-based team measure uses this definition.</dd><dt>Positive successful-pass xT · open play</dt><dd>Use only open-play successful passes, discard negative gains, and sum the rest. Some maps show only gains above 0.02: that display threshold is not the total's filter. Inferred carry xT is separate and must not silently be added to pass xT.</dd></dl><p class="note">Historical worked example — Brighton–Arsenal, 19 September 2026, audit captured 30 September: net all-phase pass xT is <strong>2.997–3.431</strong>; positive open-play pass xT is <strong>3.073–4.405</strong>. These saved totals reconcile under their own definitions; they are not a live feed.</p></section>
-<section><h2>Expected goals: fitted version matters</h2><p>The live shot view uses distance/angle/header/big-chance bins, with a 20-shot base-rate smoothing term; penalties use 0.76. Its bin pool includes all available non-penalty shots and can change after refresh. These are FutScout fitted estimates, not provider-branded xG.</p><p>Always retain the observation date and snapshot. A freshly fitted value for an old shot is retrospective evidence, not proof of what was available before kickoff. Point-in-time training requires its own cutoff-controlled fit.</p><p>The saved Brighton–Arsenal report has non-penalty xG of 1.7225–1.0978. The captured shot feed totals 1.7156–1.0923. Neither snapshot has been overwritten to hide the difference.</p></section>
-<section><h2>Feature effects: not extra goals</h2><p>The Poisson models estimate log goal rates. A numeric feature's contribution is its transformed value multiplied by its coefficient. The displayed directional balance subtracts the away contribution from the home contribution. It is <strong>not</strong> literal goals, probability points, or causality.</p><p>Rolling suffixes 3, 5 and 10 mean trailing-match windows. New explanations retain the raw input, model input, scaled value and coefficients. Legacy explanations that lack this ledger remain clearly marked; they are not reconstructed with newer data.</p></section>
-<section><h2>Research versus frozen evidence</h2><p>Same fixture names alone do not make a fair live comparison. Frozen candidates need matching fixture manifests, feature bundles and source-row hashes, capture within the declared cutoff window, complete eligible fixture coverage, and a successful tournament audit. Research comparisons do not establish promotion eligibility.</p><p>Postponements remain explicitly accounted for. Missing leagues, duplicate identities, changed kickoffs and late backfills fail validation. A genuinely empty week is not a new scored weekend.</p></section><footer>Sources in this project: public.build_sequences_for, public.xt_val, public.mv_shot_xg, public.mv_xg_bins; pipeline/model_artifact.py; pipeline/frozen_slate_contract.py. No model or forecast was changed by these definitions.</footer></main></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Evidence definitions · FutScout</title><script src="gate.js"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css?v=pr1">
+<script src="site-tools.js?v=pr1"></script>
+<style>
+/* Learn reading layout. Tokens come from theme.css, chrome from shell.css and
+   the fs- components from components.css; this page declares no palette.
+   Every rule is scoped to .wrap so nothing here can restyle the shell.
+
+   .doc is a two-track grid: running text sits in the first track, a
+   65-character measure; wide tables and figures span both tracks and scroll
+   inside their own box. */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 13px/1.45 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding:var(--s6) var(--s6) 60px;display:grid;
+  grid-template-columns:230px minmax(0,1fr);gap:var(--s5) 32px;align-items:start}
+.wrap.one{grid-template-columns:minmax(0,1fr);max-width:920px}
+.wrap a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:2px}
+.wrap a:hover{text-decoration-color:var(--ink)}
+
+/* strapline across the top of the page */
+.sys{grid-column:1/-1;padding-bottom:var(--s4);border-bottom:1px solid var(--ink)}
+.sys-line{max-width:90ch;font:400 12px/1.4 var(--body);color:var(--muted)}
+
+/* side navigation */
+.toc{position:sticky;top:var(--s5);max-height:calc(100vh - 28px);overflow:auto;padding:var(--s4);
+  background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.toc h4{margin:0 0 var(--s3);font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc ol,.toc ul{margin:0;padding:0;list-style:none}
+.toc ol{counter-reset:toc}
+.toc ol>li{counter-increment:toc}
+.toc ol>li>a::before{content:counter(toc,decimal-leading-zero);flex:0 0 auto;font:400 10px/1.9 var(--mono);color:var(--muted)}
+.toc a{display:flex;align-items:baseline;gap:var(--s3);min-height:var(--tap);padding:var(--s2) var(--s3);border-left:3px solid transparent;
+  font:400 12px/1.4 var(--body);color:var(--ink);text-decoration:none}
+.toc a:hover{background:var(--panel2)}
+.toc a:focus-visible{outline-offset:-2px}
+.toc .sub a{padding-left:28px;font-size:11px;color:var(--muted)}
+.toc .grp{margin:var(--s4) 0 var(--s1);padding:0 var(--s3);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* the document */
+.doc{min-width:0;font-size:15px;display:grid;grid-template-columns:minmax(0,65ch) minmax(0,1fr);align-content:start}
+.doc>*{grid-column:1;min-width:0;margin-top:0;margin-bottom:var(--s5)}
+.doc>:is(table,.fs-table-scroll):has(th:nth-child(4)),.doc>.wide{grid-column:1/-1}
+.doc h1{margin:0 0 var(--s4);font:600 30px/1.05 var(--display);letter-spacing:-.01em}
+.doc h2{margin:32px 0 var(--s3);padding-top:var(--s5);border-top:1px solid var(--ink);font:600 24px/1.1 var(--display);scroll-margin-top:var(--s4)}
+.doc h2 .n{display:block;margin-bottom:var(--s3);font:500 10px/1 var(--mono);letter-spacing:.08em;color:var(--muted)}
+.doc h3{margin:var(--s6) 0 var(--s2);font:500 20px/1.2 var(--display);scroll-margin-top:var(--s4)}
+.doc h4{margin:var(--s5) 0 var(--s1);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc h5{margin:0 0 var(--s3);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc>h3,.doc>h4{margin-bottom:var(--s2)}
+.doc p{margin-top:0;margin-bottom:var(--s4);font-size:15px;line-height:1.6}
+.doc>p{margin-bottom:var(--s5)}
+.doc .lead{font:500 16px/1.45 var(--display);color:var(--ink)}
+.doc ul,.doc ol{padding-left:20px}
+.doc :is(ul,ol) :is(ul,ol){margin:var(--s2) 0 0}
+.doc li{margin-bottom:var(--s2);font-size:15px;line-height:1.6}
+.doc strong,.doc b{font-weight:600}
+.doc em{font-style:italic}
+.doc code{padding:0 4px;background:var(--panel2);border:1px solid var(--rule);border-radius:var(--radius);font:400 .87em var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.doc pre{padding:var(--s4) var(--s5);background:var(--panel2);border:1px solid var(--rule);border-radius:var(--radius);overflow-x:auto}
+.doc pre code{padding:0;background:none;border:0;font:400 12px/1.6 var(--mono);overflow-wrap:normal}
+.doc :target{scroll-margin-top:var(--s4)}
+/* the anchor a link landed on: the same 3px accent rule a selected row carries */
+.doc :is(h2,h3,p,dt,dd):target,.doc dt:target+dd{margin-left:-11px;padding-left:var(--s3);border-left:3px solid var(--accent)}
+
+/* tables: mono header labels on an ink rule, digits in mono */
+.doc table{width:100%;border-collapse:collapse;margin:0;font:400 12px/1.4 var(--body)}
+.doc :is(.box,.tier,.card) :is(table,.fs-table-scroll){margin:var(--s3) 0 var(--s4)}
+.doc th{padding:var(--s2) var(--s3);border-bottom:1px solid var(--ink);text-align:left;vertical-align:bottom;
+  font:500 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.doc td{padding:var(--s2) var(--s3);border-bottom:1px solid var(--rule2);vertical-align:top}
+.doc :is(td,th).num{text-align:right}
+.doc td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.doc table:has(th:nth-child(4)){min-width:520px}
+.lv,.kfig{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* notes */
+.box,.callout,.card,.tier,.snap{padding:var(--s4) var(--s5);background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius)}
+.box.data,.callout{background:var(--panel2)}
+/* a limitation or caution: the gold rule, never the accent */
+.box.warn,.callout.warn,.snap{border-color:var(--gold)}
+.doc :is(.box,.callout,.card,.tier,.snap)>:last-child{margin-bottom:0}
+.doc :is(.box,.callout,.card,.tier,.snap) :is(p,li){font-size:13px;line-height:1.45}
+.unavail{color:var(--p0-text);font-weight:600}
+.foot{grid-column:1/-1;margin-top:var(--s6);padding-top:var(--s4);border-top:1px solid var(--rule);font:400 11px/1.6 var(--mono);color:var(--muted)}
+
+@media (max-width:900px){
+  /* one column, the side navigation above the content */
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .toc{position:static;max-height:none}
+}
+@media (max-width:760px){
+  .wrap{padding:var(--s5) var(--s5) 48px}
+  .toc{max-height:168px}
+  .doc{grid-template-columns:minmax(0,1fr)}
+  .doc>:is(table,.fs-table-scroll):has(th:nth-child(4)),.doc>.wide{grid-column:1}
+  .doc h1{font-size:24px}
+}
+@media print{
+  .fs-shell,.fs-bottom,.fs-toast,.fs-palette,.toc,.noprint{display:none!important}
+  html,body{background:none}
+  .wrap{display:block;max-width:none;padding:0}
+  .doc h2{break-after:avoid}
+  .doc :is(pre,table,.box,.callout,.card,.tier,.snap,.q,details,.m){break-inside:avoid}
+  .wrap a{text-decoration:none}
+}
+
+/* ---- Evidence definitions ---- */
+.doc>section{margin-bottom:0;scroll-margin-top:var(--s4)}
+.doc section>:is(p,dl){margin-bottom:var(--s5)}
+/* a section a link landed on: the 3px accent rule on its heading */
+.doc section:target>h2{margin-left:-11px;padding-left:var(--s3);border-left:3px solid var(--accent)}
+/* a definition: the term is the label, the statement follows it */
+.doc dl{margin-top:0}
+.doc dt{margin:0 0 var(--s2);font:500 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink);scroll-margin-top:var(--s4)}
+.doc dd{margin:0 0 var(--s5);font-size:15px;line-height:1.6}
+.doc dd:last-child{margin-bottom:0}
+.doc p.note{padding:var(--s4) var(--s5);background:var(--panel2);border:1px solid var(--rule);border-radius:var(--radius);font-size:13px;line-height:1.45}
+.doc footer{margin-top:var(--s6);padding-top:var(--s4);border-top:1px solid var(--rule);font:400 11px/1.6 var(--mono);color:var(--muted);overflow-wrap:anywhere}
+</style><link rel="stylesheet" href="shell.css?v=pr1">
+<link rel="stylesheet" href="components.css?v=pr1">
+</head><body><script>window.FutScout&&FutScout.mount()</script><div class="fs-slots" hidden><span data-fs-slot="actions"><a href="model-lab.html?tab=matches">Model Lab</a><button type="button" onclick="window.print()">Print / PDF</button></span></div><script>window.FutScout&&FutScout.adopt()</script>
+<div class="wrap one">
+<main class="doc">
+<h1>Same name is not always the same measure.</h1><p>Use this contract when comparing a saved forecast, an event map and a retrospective match review. Definitions were traced to the implemented database and model code on 30 September 2026.</p>
+<section id="eligibility">
+<h2>Eligibility is specific to the source</h2>
+<p>Repository definitions checked 2 October 2026; deployed database settings were not re-audited for this documentation change. A frontend minimum is not proof of a database eligibility rule.</p>
+<dl>
+<dt id="eligibility-mv-player-percentiles">Player percentiles: six nineties in the committed definition</dt><dd><code>mv_player_percentiles</code> in the 31 August baseline and generated cup-isolation SQL requires six nineties and a non-null metric. It partitions by league, role pool and metric. This is the view queried by Player Fingerprints.</dd>
+<dt id="eligibility-mv-player-pct">Separate player percentile view: three nineties</dt><dd><code>mv_player_pct</code>, defined in the 7 August multileague migration, uses three nineties. It is a different source; the two thresholds must not be described as one universal site rule.</dd>
+<dt id="eligibility-other-samples">Other samples</dt><dd>Chain-role profiles require 120 involvements in their documented source. Team insights use their returned club-match threshold. Worked searches can deliberately use stricter filters, including six nineties. Check the actual returned cohort and metric coverage; eligibility alone does not establish reliability.</dd>
+</dl>
+</section>
+<section id="zone-definitions">
+<h2>Expected threat: two valid totals</h2>
+<dl>
+<dt id="zone-xt-net-all-phases">Net successful-pass xT · all phases</dt><dd>For every successful pass with an endpoint, subtract grid value at the start from grid value at the end. Keep negative changes. Aggregate across every phase. The saved sequence-based team measure uses this definition.</dd>
+<dt id="zone-xt-positive-open-play">Positive successful-pass xT · open play</dt><dd>Use only open-play successful passes, discard negative gains, and sum the rest. Some maps show only gains above 0.02: that display threshold is not the total's filter. Inferred carry xT is separate and must not silently be added to pass xT.</dd>
+</dl>
+<p class="note">Historical worked example — Brighton–Arsenal, 19 September 2026, audit captured 30 September: net all-phase pass xT is <strong>2.997–3.431</strong>; positive open-play pass xT is <strong>3.073–4.405</strong>. These saved totals reconcile under their own definitions; they are not a live feed.</p>
+</section>
+<section id="expected-goals">
+<h2>Expected goals: fitted version matters</h2>
+<p>The live shot view uses distance/angle/header/big-chance bins, with a 20-shot base-rate smoothing term; penalties use 0.76. Its bin pool includes all available non-penalty shots and can change after refresh. These are FutScout fitted estimates, not provider-branded xG.</p>
+<p>Always retain the observation date and snapshot. A freshly fitted value for an old shot is retrospective evidence, not proof of what was available before kickoff. Point-in-time training requires its own cutoff-controlled fit.</p>
+<p>The saved Brighton–Arsenal report has non-penalty xG of 1.7225–1.0978. The captured shot feed totals 1.7156–1.0923. Neither snapshot has been overwritten to hide the difference.</p>
+</section>
+<section id="feature-effects">
+<h2>Feature effects: not extra goals</h2>
+<p>The Poisson models estimate log goal rates. A numeric feature's contribution is its transformed value multiplied by its coefficient. The displayed directional balance subtracts the away contribution from the home contribution. It is <strong>not</strong> literal goals, probability points, or causality.</p>
+<p>Rolling suffixes 3, 5 and 10 mean trailing-match windows. New explanations retain the raw input, model input, scaled value and coefficients. Legacy explanations that lack this ledger remain clearly marked; they are not reconstructed with newer data.</p>
+</section>
+<section id="frozen-evidence">
+<h2>Research versus frozen evidence</h2>
+<p>Same fixture names alone do not make a fair live comparison. Frozen candidates need matching fixture manifests, feature bundles and source-row hashes, capture within the declared cutoff window, complete eligible fixture coverage, and a successful tournament audit. Research comparisons do not establish promotion eligibility.</p>
+<p>Postponements remain explicitly accounted for. Missing leagues, duplicate identities, changed kickoffs and late backfills fail validation. A genuinely empty week is not a new scored weekend.</p>
+</section>
+<footer>Sources in this project: public.build_sequences_for, public.xt_val, public.mv_shot_xg, public.mv_xg_bins; pipeline/model_artifact.py; pipeline/frozen_slate_contract.py. No model or forecast was changed by these definitions.</footer>
+</main>
+</div>
+<script>
+/* Printing is always on the light palette, whatever the screen theme: the
+   root theme is set to light for the print and put back afterwards. */
+window.addEventListener('beforeprint',function(){var r=document.documentElement;if(!r.hasAttribute('data-print-theme')){r.setAttribute('data-print-theme',r.getAttribute('data-theme')||'');r.setAttribute('data-theme','light')}});
+window.addEventListener('afterprint',function(){var r=document.documentElement;if(r.hasAttribute('data-print-theme')){var t=r.getAttribute('data-print-theme');if(t)r.setAttribute('data-theme',t);else r.removeAttribute('data-theme');r.removeAttribute('data-print-theme')}});
+</script>
+</body></html>
