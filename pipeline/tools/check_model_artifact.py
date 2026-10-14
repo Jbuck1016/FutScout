@@ -84,7 +84,7 @@ def main() -> None:
     )
     rich_prediction = model_artifact.predict_rows(rich_artifact, fixtures, observations, matches)[0]
     assert any(
-        driver["label"] in {"Field tilt", "Box entries"}
+        driver["label"] in {"Field tilt", "Completed box passes"}
         for driver in rich_prediction["explanation"]["drivers"]
     ), "rich territory inputs were not available to prediction explanations"
     v2_artifact = model_artifact.train_poisson(

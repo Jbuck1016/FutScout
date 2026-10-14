@@ -7,3 +7,4 @@ _old_desktop_versions/
 __pycache__/
 *.log
 artifacts/transfermarkt/
+artifacts/soccer_research_*/

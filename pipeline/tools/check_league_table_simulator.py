@@ -1,4 +1,4 @@
-"""Deterministic, dependency-free checks for simulate_league_table.py."""
+"""Deterministic offline checks for simulate_league_table.py."""
 
 from __future__ import annotations
 

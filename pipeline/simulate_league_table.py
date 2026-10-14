@@ -30,6 +30,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
+from score_probabilities import score_matrix
+
 
 STANDARD_FIELDS = ("played", "wins", "draws", "losses", "goals_for", "goals_against", "points")
 LEAGUE_RULES = {
@@ -68,17 +70,6 @@ def validate_standings(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     return table
 
 
-def _poisson_probabilities(mean: float, max_goals: int) -> list[float]:
-    if not math.isfinite(mean) or mean < 0:
-        raise ValueError("expected goals must be finite and non-negative")
-    probabilities = [math.exp(-mean)]
-    for goals in range(1, max_goals):
-        probabilities.append(probabilities[-1] * mean / goals)
-    # The final bucket includes the tail so sampling always sums exactly to one.
-    probabilities.append(max(0.0, 1.0 - sum(probabilities)))
-    return probabilities
-
-
 def _score_distribution(fixture: dict[str, Any], max_goals: int) -> list[tuple[int, int, float]]:
     explicit = fixture.get("score_probabilities")
     if explicit is not None:
@@ -99,12 +90,11 @@ def _score_distribution(fixture: dict[str, Any], max_goals: int) -> list[tuple[i
 
     if "expected_home_goals" not in fixture or "expected_away_goals" not in fixture:
         raise ValueError("fixture needs expected goals or an explicit score distribution")
-    home_probs = _poisson_probabilities(float(fixture["expected_home_goals"]), max_goals)
-    away_probs = _poisson_probabilities(float(fixture["expected_away_goals"]), max_goals)
+    matrix = score_matrix(float(fixture["expected_home_goals"]),
+                          float(fixture["expected_away_goals"]), max_goals)
     scores = [
-        (home, away, home_probability * away_probability)
-        for home, home_probability in enumerate(home_probs)
-        for away, away_probability in enumerate(away_probs)
+        (home, away, float(matrix[home, away]))
+        for home in range(len(matrix)) for away in range(len(matrix))
     ]
     return _align_result_probabilities(scores, fixture)
 

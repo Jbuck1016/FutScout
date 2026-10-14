@@ -13,7 +13,7 @@ from typing import Any, Iterable
 
 import numpy as np
 import pandas as pd
-from scipy.stats import poisson
+from score_probabilities import MINIMUM_SCORE, SCORE_CONTRACT_VERSION, score_dict
 
 import evaluate_multiseason_model as multiseason
 import train_match_baselines as baseline
@@ -255,7 +255,7 @@ def _explanation_group(feature_name: str) -> str | None:
     if "field_tilt_pct_" in name:
         return "Field tilt"
     if "box_entries_pass_" in name:
-        return "Box entries"
+        return "Completed box passes"
     if "npxg_" in name or "set_piece_xg_" in name:
         return "Chance quality"
     if "xt_" in name:
@@ -327,8 +327,8 @@ def _match_explanation(artifact: dict[str, Any], model_frame: pd.DataFrame,
             f"Last 3 territorial share: {home_team} {number(row.get('team.field_tilt_pct_3'))}%, "
             f"{away_team} {number(row.get('opponent.field_tilt_pct_3'))}%."
         ),
-        "Box entries": (
-            f"Last 3 completed pass entries into the box per match: {home_team} "
+        "Completed box passes": (
+            f"Last 3 completed open-play passes ending in the box (including passes starting there) per match: {home_team} "
             f"{number(row.get('team.box_entries_pass_3'))}, {away_team} "
             f"{number(row.get('opponent.box_entries_pass_3'))}."
         ),
@@ -439,15 +439,9 @@ def _match_explanation(artifact: dict[str, Any], model_frame: pd.DataFrame,
     }
 
 
-def scoreline_distribution(home_xg: float, away_xg: float, maximum: int = 8) -> dict[str, float]:
-    values: dict[str, float] = {}
-    total = 0.0
-    for home in range(maximum + 1):
-        for away in range(maximum + 1):
-            probability = float(poisson.pmf(home, home_xg) * poisson.pmf(away, away_xg))
-            values[f"{home}-{away}"] = probability
-            total += probability
-    return {score: probability / total for score, probability in values.items()}
+def scoreline_distribution(home_xg: float, away_xg: float,
+                           maximum: int = MINIMUM_SCORE) -> dict[str, float]:
+    return score_dict(home_xg, away_xg, maximum)
 
 
 def predict_rows(artifact: dict[str, Any], fixtures: list[dict[str, Any]],
@@ -475,12 +469,13 @@ def predict_rows(artifact: dict[str, Any], fixtures: list[dict[str, Any]],
         output.append({
             "game_id": row["game_id"], "league": row["league"], "date": row["date"].isoformat(),
             "home_team": row["home_team"], "away_team": row["away_team"],
-            "home_expected_goals": round(float(home[index]), 4),
-            "away_expected_goals": round(float(away[index]), 4),
-            "home_win_probability": round(float(probabilities[index, 0]), 7),
-            "draw_probability": round(float(probabilities[index, 1]), 7),
-            "away_win_probability": round(float(probabilities[index, 2]), 7),
+            "home_expected_goals": float(home[index]),
+            "away_expected_goals": float(away[index]),
+            "home_win_probability": float(probabilities[index, 0]),
+            "draw_probability": float(probabilities[index, 1]),
+            "away_win_probability": float(probabilities[index, 2]),
             "scoreline_distribution": scoreline_distribution(float(home[index]), float(away[index])),
+            "score_distribution_contract": SCORE_CONTRACT_VERSION,
             "explanation": _match_explanation(artifact, one_row, row, probabilities[index]),
         })
     return output
