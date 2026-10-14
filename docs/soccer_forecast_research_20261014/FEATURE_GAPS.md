@@ -2,6 +2,8 @@
 
 Follow-up supersedes the xG/xT availability and legacy phase assumptions below: [local reconstruction, seven comparisons and exact remaining gaps](../soccer_local_features_20261014/README.md). The v1 snapshot box-pass values reconcile to all-phase completed passes; the SQL open-play predicate did not prove the stored flags were correct. The earlier findings below are retained as checkpoint history.
 
+The [player-layer report](../soccer_player_strength_20261014/README.md) now documents 162,592 historical appearances, an expected-minute-weighted lagged rating layer, four ablations and exact remaining availability/role gaps. It does not claim a validated causal player-impact or confirmed-lineup model.
+
 This audit concerns the existing private local soccer data and offline research. It does not certify provider licensing or the current production database. No external provider-key calls, purchases, export uploads or database changes were made.
 
 ## Metric contract

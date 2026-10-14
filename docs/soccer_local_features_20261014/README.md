@@ -1,5 +1,7 @@
 # Local advanced-feature reconstruction - 14 October 2026
 
+Player follow-up: the [player-to-team strength layer](../soccer_player_strength_20261014/README.md) is now implemented and evaluated with explicit expected-minute assumptions, uncertainty and baseline fallback. Its first rating proxy failed validation and remains research-only.
+
 The existing cache resolves the historical xG/xT export gap. Seven fixed comparisons are complete. None improves both seasons, and every non-baseline log-loss interval crosses zero. No candidate is promoted.
 
 ## Sources and lineage
