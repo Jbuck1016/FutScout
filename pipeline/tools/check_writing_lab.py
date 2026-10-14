@@ -19,7 +19,9 @@ def main() -> None:
         ROOT / "supabase" / "migrations" / "20260915224025_writing_lab_projects.sql"
     ).read_text(encoding="utf-8")
 
-    require('href="writing-lab.html"' in home, "homepage exposes the Writing Lab")
+    shell = (ROOT / "dashboard" / "site-tools.js").read_text(encoding="utf-8")
+    require("'writing-lab.html':{d:" in home and "['Writing lab', 'writing-lab.html']" in shell,
+            "homepage and shell registry expose the Writing Lab")
     require("x-writing-key" in page and "crypto.subtle.digest" in page,
             "browser workspaces use an unguessable scoped key")
     require(all(term in page for term in ("Article leads", "Team evidence", "Plot desk")),
@@ -30,8 +32,9 @@ def main() -> None:
             "article-ready team and player plot families are available")
     require(all(term in page for term in ("Premier League", "Champions League", "Europa League", "La Liga")),
             "competition selector covers domestic and European analysis")
-    require("select option,select optgroup" in page and "#edf0e9" in page,
-            "native dropdown choices remain legible in the dark interface")
+    theme = (ROOT / "dashboard" / "theme.css").read_text(encoding="utf-8")
+    require(theme.count("color-scheme:dark") >= 2 and "#edf0e9" not in page,
+            "native dropdown choices follow the theme colour scheme, not a page palette")
     require("retryScrape" in page, "failed match requests can be re-queued in place")
     require("events_cup" in page and "matches_cup" in worker,
             "cup writing evidence stays outside league-only analytics")

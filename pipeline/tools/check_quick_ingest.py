@@ -20,7 +20,9 @@ def main() -> None:
         (ROOT / "supabase" / "migrations").glob("*_quick_ingest_identity.sql")
     ).read_text(encoding="utf-8")
 
-    require('href="quick-ingest.html"' in home, "homepage exposes Quick ingest")
+    shell = (ROOT / "dashboard" / "site-tools.js").read_text(encoding="utf-8")
+    require("'quick-ingest.html':{d:" in home and "['Quick ingest', 'quick-ingest.html']" in shell,
+            "homepage and shell registry expose Quick ingest")
     require("x-writing-key" in page and "crypto.subtle.digest" in page,
             "browser queue uses the existing unguessable private scope")
     require("/matches\\/(\\d+)" in page.lower(), "only a WhoScored match id is accepted")

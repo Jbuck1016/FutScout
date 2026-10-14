@@ -41,14 +41,14 @@ assert "player_transfer_events" in history_restore
 assert "v_player_market_value_history" in history_restore
 assert "v_player_transfer_history" in history_restore
 assert history_restore.count("security_invoker = true") == 2
-assert "11 · market intelligence" in index_page
+assert "['Market values', 'market-values.html']" in (ROOT / "dashboard" / "site-tools.js").read_text(encoding="utf-8")
 assert "market-values.html" in index_page
 assert 'src="gate.js' in market_page
 assert "v_player_market_values_latest" in market_page
 assert "mv_player_season" in market_page
 assert "mv_player_role" in market_page
 assert "v_team_directory" not in market_page
-assert "The market," in market_page
+assert 'id="mvTitle">Market values</h1>' in market_page
 assert "not a quality score" in market_page.lower()
 assert "SUPABASE_SERVICE_KEY" not in market_page
 assert "PARSE_API_KEY" not in market_page
