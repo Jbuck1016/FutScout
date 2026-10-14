@@ -1,5 +1,6 @@
 """Reconcile player lineage, independent usage weights and saved held-out predictions."""
 import argparse
+from bisect import bisect_left
 from collections import defaultdict
 import json
 from pathlib import Path
@@ -11,7 +12,7 @@ import pandas as pd
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import research_player_strength as research
-from local_player_strength import scenario_delta
+from local_player_strength import scenario_delta, validate_lineup
 
 
 def rows(path):
@@ -24,11 +25,17 @@ def validate(source,export,players,output):
     observations=rows(players/'player_observations.jsonl')
     features=rows(players/'player_features.jsonl')
     by_team=defaultdict(list)
+    by_player=defaultdict(list)
     for row in observations:
         by_team[row['team']].append(row)
+        if row['quality_status']=='complete':
+            for player in row['players']:
+                by_player[player['player_id']].append((row['match_date'],row['team'],player['role'],row['game_id']))
+    by_player={pid:sorted(history,key=lambda r:r[0]) for pid,history in by_player.items()}
+    dates={pid:[r[0] for r in history] for pid,history in by_player.items()}
     feature_by_key={(r['game_id'],r['team']):r for r in features}
     assert len(feature_by_key)==10510
-    rating_rows=0; ready=0
+    rating_rows=0; ready=0; maximum_minutes=0.; replacement_plans=0; membership_removal_plans=0
     for plan in plans:
         key=(plan['game_id'],plan['team']); feature=feature_by_key[key]
         historical=sorted((r for r in by_team[plan['team']] if r['match_date']<plan['cutoff_date']),key=lambda r:(r['match_date'],r['game_id']))[-10:]
@@ -40,14 +47,41 @@ def validate(source,export,players,output):
         if len(recent):
             weights/=weights.sum()
         for row,weight in zip(recent,weights):
-            total=sum(p['minutes_equivalent90'] for p in row['players'])
             for player in row['players']:
-                actual[player['player_id']]+=float(weight)*player['minutes_equivalent90']/total*990
+                actual[player['player_id']]+=float(weight)*player['minutes_equivalent90']
+        # Independently query each player's latest strictly earlier appearance,
+        # grouping equal dates so the source row order cannot resolve conflicts.
+        roles={}; clubs={}
+        for pid in plan['roles']:
+            end=bisect_left(dates.get(pid,[]),plan['cutoff_date'])
+            prior=by_player.get(pid,[])[:end]
+            if prior:
+                last_date=prior[-1][0]
+                latest=[r for r in prior if r[0]==last_date]
+                clubs[pid]=sorted({r[1] for r in latest})
+                role=next((r[2] for r in reversed(prior) if r[2]!='unknown'),'unknown')
+                roles[pid]=role
+                evidence=plan['membership_evidence'][pid]
+                assert evidence['observed_date']==last_date and evidence['teams']==clubs[pid]
+                assert set(evidence['source_game_ids'])=={r[3] for r in latest}
+        actual={pid:m for pid,m in actual.items() if clubs.get(pid)==[plan['team']] and roles.get(pid) in ('GK','D','M','F') and m>0}
+        for goalkeeper,budget in ((True,90.),(False,900.)):
+            selected=[pid for pid in actual if (roles[pid]=='GK')==goalkeeper]
+            total=sum(actual[pid] for pid in selected)
+            if total>budget:
+                for pid in selected:
+                    actual[pid]*=budget/total
         assert set(actual)==set(plan['expected_minutes'])
         for pid,value in actual.items():
             assert abs(value-plan['expected_minutes'][pid])<1e-9
-        if recent:
-            assert abs(sum(actual.values())-990)<1e-8
+        pools=plan['expected_replacement_by_role']
+        validate_lineup(plan['expected_minutes'],roles,sum(pools.values()),pools)
+        reference_pool=plan['reference_replacement_by_role']
+        validate_lineup(plan['reference_minutes'],roles,sum(reference_pool.values()),reference_pool)
+        maximum_minutes=max(maximum_minutes,max(plan['expected_minutes'].values(),default=0.))
+        replacement_plans+=int(sum(pools.values())>1e-8)
+        membership_removal_plans+=int(bool(plan['membership_removed_minutes']))
+        assert all(clubs[pid]==[plan['team']] for pid in plan['expected_minutes'])
         for rating in plan['ratings'].values():
             assert rating['rating_fit_through']<plan['cutoff_date']
             assert 0<rating['shrinkage_weight']<1
@@ -58,7 +92,7 @@ def validate(source,export,players,output):
             assert feature['rating_delta']==0.
         else:
             ready+=1
-            check=scenario_delta(plan,plan['expected_minutes'],plan['cutoff_date'])
+            check=scenario_delta(plan,plan['expected_minutes'],plan['cutoff_date'],sum(pools.values()),pools)
             assert abs(check['rating_delta']-feature['rating_delta'])<1e-12
     report=json.loads((output/'report.json').read_text(encoding='utf-8'))
     predictions=pd.read_csv(output/'historical_predictions.csv',dtype={'fold':str,'game_id':str})
@@ -95,7 +129,7 @@ def validate(source,export,players,output):
         pid=max(known,key=lambda p:known[p]*plan['ratings'][p]['excess_rating'])
         minutes=known[pid]
         proposed=dict(plan['expected_minutes']); proposed.pop(pid)
-        delta=scenario_delta(plan,proposed,plan['cutoff_date'],replacement_minutes=minutes)
+        delta=scenario_delta(plan,proposed,plan['cutoff_date'],replacement_minutes=minutes+sum(plan['expected_replacement_by_role'].values()))
         model=pickle.loads((output/'fold_models'/'2526_ratings31.pkl').read_bytes())
         control=pickle.loads((output/'fold_models'/'2526_baseline29.pkl').read_bytes())
         before=research.predict(model,example,control)
@@ -111,6 +145,8 @@ def validate(source,export,players,output):
     for name,meta in report['models'].items():
         assert research.core.sha256(output/f'{name}.pkl')==meta['sha256']
     result={'status':'passed','expected_player_plans':len(plans),'lagged_player_ratings_checked':rating_rows,
+            'maximum_expected_minutes':maximum_minutes,'over90_allocations':0,'ineligible_club_allocations':0,
+            'plans_with_replacement_pool':replacement_plans,'plans_with_membership_removal':membership_removal_plans,
             'ready_team_targets':ready,'heldout_prediction_rows':len(predictions),'fold_models_reloaded':8,
             'final_model_hashes_checked':4,'metrics':checked,'hypothetical_scenario':scenario,
             'player_manifest_sha256':research.core.sha256(players/'manifest.json'),

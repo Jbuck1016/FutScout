@@ -10,6 +10,7 @@ import pandas as pd
 
 import research_local_rich_features as rich
 import research_soccer_forecasts as core
+from local_player_strength import VERSION
 
 CANDIDATES=('baseline29','usage33','ratings31','ratings_usage35')
 
@@ -17,6 +18,8 @@ CANDIDATES=('baseline29','usage33','ratings31','ratings_usage35')
 def load_players(source,export,players):
     frame,quality=rich.load_export(source,export)
     manifest=json.loads((players/'manifest.json').read_text(encoding='utf-8'))
+    if manifest['version']!=VERSION:
+        raise ValueError('player experiment requires the repaired v3 export')
     if manifest['source_export_manifest_sha256'] != core.sha256(export/'manifest.json'):
         raise ValueError('player/source manifest mismatch')
     for name,metadata in manifest['outputs'].items():
@@ -47,6 +50,7 @@ def columns_for(name,baseline):
 def fit(name,train,columns):
     selected=columns_for(name,columns)
     return {'candidate':name,'columns':selected,'models':core.fit_rates(train,selected),'adjusters':{},'rho':0.,
+            'player_feature_version':VERSION,
             'trained_through':str(train.date.max().date()),'training_matches':len(train),
             'score_contract':core.SCORE_CONTRACT_VERSION,'status':'offline_research_only'}
 
@@ -77,6 +81,9 @@ def predict(artifact,frame,baseline):
 def run(source,export,players,output):
     output.mkdir(parents=True,exist_ok=False)
     protocol={'created_at':datetime.now(UTC).isoformat(),'candidates':list(CANDIDATES),
+              'player_feature_version':VERSION,
+              'repair_contract':'finite individual [0,90] exposures; GK/outfield 90/900 budgets with explicit unknown pools; latest strictly prior observed club controls eligibility',
+              'prior_evidence':'v2 outputs retained; same candidate set, folds and hyperparameters; only confirmed defects repaired',
               'design':'fixed before evaluating any player ablation; no test-driven tuning',
               'player_manifest_sha256':core.sha256(players/'manifest.json'),
               'training':'two Poisson alpha=1 goal models; learned conditional player-feature coefficients',

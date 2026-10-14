@@ -1,8 +1,10 @@
 """Audited Opta-coordinate definitions, independent of database writes.
 
-Legacy box_entries_pass is a completed open-play pass ENDING inside the
-box; it includes within-box completions. Do not change that stored field's
-meaning without versioning and rebuilding historical observations.
+The audited legacy snapshot's box_entries_pass counts all-phase completed
+passes ENDING inside the box, including within-box completions. Its intended
+SQL open-play flag did not establish stored phase validity. The explicit
+open-play predicates below are separate, versioned contracts; do not silently
+change the legacy field without rebuilding historical observations.
 """
 from __future__ import annotations
 

@@ -1,5 +1,7 @@
 # Player-to-team strength experiment - 14 October 2026
 
+Historical v2 checkpoint: independent review subsequently confirmed infeasible individual minutes, stale club membership and scenario-validation defects. The [v3 repair report](../soccer_player_strength_v3_20261014/README.md) supersedes this implementation's validity claims. The original numerical evidence below is preserved.
+
 An offline player layer is implemented, trained and tested. Team goal models now have a research path that incorporates expected players' lagged ratings, minutes and roles, relative to the team's recent lineup. The tested proxy does not improve forecasts and is not suitable for production injury/counterfactual adjustments. No production model or historical frozen output was changed.
 
 ## Data and player lineage

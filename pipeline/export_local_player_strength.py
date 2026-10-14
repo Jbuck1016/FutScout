@@ -8,7 +8,7 @@ from export_local_soccer_features import digest, write_jsonl
 from local_player_strength import VERSION, extract_usage, build_features
 
 
-def run(source, export, output):
+def run(source, export, output, reuse_observations=None):
     output.mkdir(parents=True,exist_ok=False)
     manifest=json.loads((export/'manifest.json').read_text(encoding='utf-8'))
     snapshot=source/'artifacts/training_snapshots/top_five_2324_2526_v1.jsonl'
@@ -18,11 +18,20 @@ def run(source, export, output):
     lineage=[json.loads(s) for s in (export/'source_lineage.jsonl').read_text(encoding='utf-8').splitlines()]
     excluded={r['game_id'] for r in manifest['quarantined']}
     observations=[]; failures=[]
+    reused=None
+    if reuse_observations is not None:
+        prior=json.loads((reuse_observations/'manifest.json').read_text(encoding='utf-8'))
+        path=reuse_observations/'player_observations.jsonl'
+        if prior['snapshot_sha256']!=digest(snapshot) or prior['source_export_manifest_sha256']!=digest(export/'manifest.json') or digest(path)!=prior['outputs'][path.name]['sha256']:
+            raise ValueError('reused observation lineage mismatch')
+        observations=[json.loads(s) for s in path.read_text(encoding='utf-8').splitlines()]
+        failures=prior['failures']
+        reused={'path':str(path),'sha256':digest(path),'manifest_sha256':digest(reuse_observations/'manifest.json')}
     def missing(match,side,reason):
         return {k:match[k] for k in ('game_id','match_date','league','season')} | {
             'team':match['team'] if side=='home' else match['opponent'],'is_home':side=='home',
             'quality_status':'missing','reason':reason,'players':[]}
-    for index,item in enumerate(lineage):
+    for index,item in enumerate([] if reused else lineage):
         if item['game_id'] in excluded:
             observations.extend(missing(match_by_id[item['game_id']],side,'quarantined event feed') for side in ('home','away'))
             continue
@@ -42,7 +51,8 @@ def run(source, export, output):
              [('player_observations.jsonl',observations),('player_features.jsonl',features),('expected_players.jsonl',plans)]}
     players=[p for row in observations for p in row['players']]
     report={'version':VERSION,'source_export_manifest_sha256':digest(export/'manifest.json'),
-            'snapshot_sha256':digest(snapshot),'raw_files_rehashed':len(lineage)-len(excluded),
+            'snapshot_sha256':digest(snapshot),'raw_files_rehashed':0 if reused else len(lineage)-len(excluded),
+            'reused_immutable_observations':reused,
             'team_observations':len(observations),'complete_team_observations':sum(r['quality_status']=='complete' for r in observations),
             'player_appearances':len(players),
             'unique_players':len({p['player_id'] for p in players}),
@@ -52,7 +62,8 @@ def run(source, export, output):
             'source_timestamp_limitation':'raw historical final data, no lineup or rating publication snapshots',
             'minutes_contract':'interval from starter/substitution metadata to sub-out/red/fulltime; normalize expanded duration to 90; approximate, not official minutes',
             'rating_contract':'last provider retrospective match rating; lagged <=20 appearances, shrink 900 minutes to earlier role mean',
-            'expected_usage':'prior three completed observations weights 0.5/0.3/0.2 versus prior ten reference, each normalized to 990',
+            'expected_usage':'prior three exposure weights 0.5/0.3/0.2 versus prior ten reference; finite [0,90] per named player; no upward normalization; GK/outfield caps 90/900; explicit replacement deficits',
+            'membership':'latest strictly earlier observed club; conflicting same-date club evidence is ambiguous; remove ineligible expectation to replacement while retaining historical reference',
             'uncertainty':'recent-lineup scenario spread and approximate rating SE, not calibrated forecast intervals',
             'fallback':'no missing source in prior ten team games; at least two earlier team observations, >=80% expected rating coverage, latest usage <=60 days; else neutral delta',
             'code':{p.name:digest(p) for p in [Path(__file__),Path(__file__).with_name('local_player_strength.py')]}}
@@ -69,5 +80,6 @@ if __name__=='__main__':
     parser.add_argument('--source',type=Path,required=True)
     parser.add_argument('--export',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--reuse-observations',type=Path)
     args=parser.parse_args()
-    run(args.source,args.export,args.output)
+    run(args.source,args.export,args.output,args.reuse_observations)
