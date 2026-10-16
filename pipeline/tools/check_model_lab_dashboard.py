@@ -19,6 +19,9 @@ assert "weights are not a league table" in page
 assert "Out-of-sample family reliance" in page and "Historical table backtests" in page
 assert "Cross-season feature gate" in page and "What team strength currently means" in page
 assert "Hybrid versus tactical" in page and "A five-minute route through Model Lab" in page
+assert "Original tournament exclusions" in page and "eligible for trial" in page
+assert "Mixed-date research bundle" in page and "not a live feed" in page
+assert "newest_audit_path" in builder
 assert "parse_utc_datetime(row[\"date\"])" in builder
 assert "MIN_COMPLETE_FROZEN_WEEKENDS = 3" in history
 
@@ -40,6 +43,8 @@ if payload_path.is_file():
     assert len(tournament["summary"]) >= 8
     assert "train_2324_2425_test_2526" in tournament["folds"]
     assert tournament["unavailable_families"]["expected_threat"]
+    assert tournament["created_at"]
+    assert payload["drift"]["checked_at"]
     legitimacy = payload["legitimacy"]
     assert legitimacy["confidence"]["shooting_vs_territory_2526"]
     assert legitimacy["family_permutation"]["rows"]
@@ -55,5 +60,7 @@ if payload_path.is_file():
     }
     assert set(research["coverage"]["decision"]["trainable_now"]) == eligible
     assert research["league_coverage"]["repair_queue"] == []
+    assert research["coverage"]["created_at"] > tournament["created_at"]
+    assert len(research["league_coverage"]["groups"]) >= 20
     assert research["scoring_readiness"]["ready"] is True
 print("Model lab dashboard checks passed")

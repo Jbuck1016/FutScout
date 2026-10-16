@@ -193,6 +193,7 @@ def build_row(
         "home_score": provider_score(match, "home") if include_score else None,
         "away_score": provider_score(match, "away") if include_score else None,
         "matchday": match.get("matchday"),
+        "provider_status": match.get("status"),
         "venue": match.get("venue"),
     }
 
@@ -276,6 +277,7 @@ def main() -> int:
     selected = args.league or list(COMPETITIONS)
     all_rows: list[dict[str, Any]] = []
     completed_rows: list[dict[str, Any]] = []
+    excluded_rows: list[dict[str, Any]] = []
     provider_match_counts: dict[str, int] = {}
     now = datetime.now(UTC)
     for league in selected:
@@ -292,6 +294,12 @@ def main() -> int:
             )
         future = [match for match in matches if is_future_fixture(match, now)]
         completed = [match for match in matches if is_completed_fixture(match)]
+        included_ids = {str(match['id']) for match in future + completed}
+        excluded_rows.extend({
+            'game_id': f"fd-{match['id']}", 'league': league,
+            'provider_status': match.get('status'), 'kickoff_at': match.get('utcDate'),
+            'reason': 'not eligible as future or completed at capture',
+        } for match in matches if str(match['id']) not in included_ids)
         provider_names = {
             str(match[side]["name"])
             for match in future + completed
@@ -343,6 +351,7 @@ def main() -> int:
         "provider_match_counts": provider_match_counts,
         "fixtures": all_rows,
         "completed_fixtures": completed_rows,
+        "excluded_fixtures": excluded_rows,
     }
     rendered = json.dumps(snapshot, indent=2, sort_keys=True) + "\n"
     output.write_text(rendered, encoding="utf-8")

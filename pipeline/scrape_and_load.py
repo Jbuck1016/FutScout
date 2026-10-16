@@ -24,6 +24,7 @@ from dotenv import load_dotenv
 from supabase import Client, create_client
 
 from event_phase import event_is_open_play
+from feed_validation import validate_completed_feed
 
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
@@ -426,9 +427,10 @@ def process_match(
                 return "", 0
 
     source_game_id = str(sched_row["game_id"])
+    game_data = ensure_event_json(ws, source_game_id, league, season)
+    validate_completed_feed(game_data)
     game_id = upsert_match(sb, sched_row, league, season)
     print(f"  -> match row upserted (game_id={game_id})")
-    game_data = ensure_event_json(ws, source_game_id, league, season)
     print(f"  -> loaded raw json ({len(game_data.get('events', []))} events)")
     upsert_players_and_lineups(
         sb,

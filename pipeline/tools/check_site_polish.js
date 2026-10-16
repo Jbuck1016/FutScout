@@ -1,0 +1,20 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root=require('node:path').resolve(__dirname,'../..');
+const read=p=>fs.readFileSync(root+'/'+p,'utf8');
+const lab=read('dashboard/model-lab.html'),players=read('dashboard/players.html'),css=read('dashboard/site-polish.css');
+for(const html of [lab,players])for(const m of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g))if(m[1].trim())new vm.Script(m[1]);
+assert(lab.includes('polishLabEvidence();'));
+assert(!lab.includes('This is the answer to “why did the rich model become unstable?”'));
+assert(lab.includes('No clear winner between shots and territory'));
+assert(lab.includes('Earlier research snapshot (not the current scorecard)'));
+assert(lab.includes('D.shadow?.resolved'));
+assert(css.includes('html.dark body.lab-polished'));
+assert(css.includes('grid-template-columns:1fr 1fr'));
+const main={innerHTML:''};
+const fn=players.slice(players.indexOf('function renderPlayerStart(){'),players.indexOf('function setTab(t){'));
+vm.runInNewContext(fn+';renderPlayerStart();',{document:{getElementById:id=>{assert.equal(id,'main');return main;}}});
+for(const label of ['Search for a player','Open scouting shortlist','Explore a scatter plot','Open plot studio'])assert(main.innerHTML.includes(label));
+assert.equal((main.innerHTML.match(/<button/g)||[]).length,4);
+assert(players.includes('else {renderPlayerStart()}'));
+console.log('PASS: inline scripts, scoped themes, evidence language, count lineage, four starting actions.');
+

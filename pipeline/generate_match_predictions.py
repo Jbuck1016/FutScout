@@ -11,6 +11,29 @@ from pathlib import Path
 
 import model_artifact
 import train_match_baselines as baseline
+import frozen_slate_contract as frozen
+
+
+def validate_frozen_persistence(payload: dict) -> None:
+    """Never persist a retrospective file as a genuine Thursday call."""
+    as_of = parse_instant(str(payload["as_of"]))
+    created = parse_instant(str(payload["generated_at"]))
+    if not as_of <= created <= as_of + frozen.MAX_FREEZE_DELAY:
+        raise RuntimeError("frozen snapshot was not generated at its real Thursday cutoff")
+    manifest_path = Path(str(payload["fixture_manifest"]))
+    manifest = frozen.load_manifest(manifest_path, str(payload["season"]), as_of, strict_capture=True)
+    if frozen.sha256(manifest_path) != payload["fixture_manifest_sha256"]:
+        raise RuntimeError("frozen provider manifest has changed since prediction")
+    from freeze_shadow_tournament import canonical_digest
+    bundle = json.loads(Path(str(payload["feature_input_bundle"])).read_text(encoding="utf-8"))
+    if canonical_digest(bundle) != payload["feature_input_bundle_sha256"]:
+        raise RuntimeError("frozen feature input bundle has changed since prediction")
+    if bundle["source_provenance"]["source_rows_sha256"] != payload["source_rows_sha256"]:
+        raise RuntimeError("frozen source-row fingerprint mismatch")
+    through = parse_instant(str(payload["evaluation_through"]))
+    coverage = frozen.validate_week(manifest, list(payload["predictions"]), as_of, through)
+    if not coverage["passed"] or not coverage["expected"]:
+        raise RuntimeError(f"cannot persist an incomplete frozen provider slate: {coverage}")
 
 
 def parse_instant(value: str) -> datetime:
@@ -37,7 +60,7 @@ def parse_fixture_instant(value: str) -> datetime:
 def select_fixtures(season_matches: list[dict], as_of: datetime,
                     provider_fixture_ids: set[str] | None) -> list[dict]:
     """Select future fixtures, treating the provider snapshot as lifecycle truth."""
-    fixtures = []
+    fixtures_by_pair: dict[tuple[str, str, str, str], dict] = {}
     for row in season_matches:
         if parse_instant(row.get("kickoff_at") or f"{row['date']}T12:00:00+00:00") <= as_of:
             continue
@@ -45,8 +68,21 @@ def select_fixtures(season_matches: list[dict], as_of: datetime,
         scored_after_cutoff = row.get("home_score") is not None and row.get("away_score") is not None
         provider_row_is_known = provider_fixture_ids is None or game_id in provider_fixture_ids
         if scored_after_cutoff or not game_id.startswith("fd-") or provider_row_is_known:
-            fixtures.append(row)
-    return fixtures
+            key = (str(row["league"]), str(row["season"]),
+                   str(row["home_team"]), str(row["away_team"]))
+            previous = fixtures_by_pair.get(key)
+            def priority(candidate: dict) -> tuple[bool, bool, bool]:
+                candidate_id = str(candidate["game_id"])
+                return (
+                    provider_fixture_ids is not None and candidate_id in provider_fixture_ids,
+                    not candidate_id.startswith("fd-"),
+                    candidate.get("home_score") is not None and candidate.get("away_score") is not None,
+                )
+            if previous is None or priority(row) > priority(previous):
+                fixtures_by_pair[key] = row
+    return sorted(fixtures_by_pair.values(), key=lambda row: (
+        str(row.get("kickoff_at") or row["date"]), str(row["game_id"])
+    ))
 
 
 def provider_completion_gaps(
@@ -132,6 +168,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.execute and args.model_run_id is None:
         raise ValueError("--execute requires --model-run-id")
+    if args.execute and args.forecast_kind == "thursday_frozen" and not args.reuse_output:
+        raise RuntimeError("persist Thursday calls only from a verified same-cutoff tournament snapshot")
     as_of = parse_instant(args.as_of)
     if args.evaluation_days < 1 or args.evaluation_days > 14:
         raise ValueError("--evaluation-days must be between 1 and 14")
@@ -154,6 +192,8 @@ def main() -> int:
             raise RuntimeError("existing immutable output is empty")
         print(f"Reusing {len(rows)} immutable predictions: {args.output}")
         if args.execute:
+            if args.forecast_kind == "thursday_frozen":
+                validate_frozen_persistence(payload)
             persist_predictions(db, args, artifact, rows, as_of, evaluation_through)
         else:
             print("Dry run only; no Supabase rows written")
@@ -168,6 +208,7 @@ def main() -> int:
         provider_fixture_ids = {
             str(row["game_id"]) for row in fixture_payload.get("fixtures", [])
             if str(row.get("league")) in leagues
+            and row.get('provider_status') not in {'POSTPONED','SUSPENDED','CANCELLED'}
         }
         completed_provider = [
             row for row in fixture_payload.get("completed_fixtures", [])

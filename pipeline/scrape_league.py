@@ -162,12 +162,24 @@ def schedule_payloads(
         for row in existing
         if str(row.get("game_id", "")).startswith("fd-")
     }
+    # Domestic round-robin pairings retain identity after kickoff/date changes.
+    # Do not apply this to cups or MLS, where repeat pairings are legitimate.
+    domestic = league in {"ENG-Premier League", "ESP-La Liga", "FRA-Ligue 1", "GER-Bundesliga", "ITA-Serie A"}
+    pairings = {}
+    for prior in existing:
+        pairings.setdefault(_fixture_key(prior)[1:], []).append(prior)
     payloads: list[dict] = []
     for _, row in sched.iterrows():
         source_id = str(row.get("game_id") or "").strip()
         if not source_id:
             raise RuntimeError(f"{league} schedule contains a fixture without a game_id")
         canonical_id = reserved.get(_fixture_key(row), source_id)
+        if domestic and source_id not in by_id:
+            candidates = pairings.get(_fixture_key(row)[1:], [])
+            if len(candidates) > 1:
+                raise RuntimeError(f"ambiguous existing fixture pairing: {_fixture_key(row)[1:]}")
+            if candidates:
+                canonical_id = str(candidates[0]["game_id"])
         payload = match_payload(row, league, season, game_id=canonical_id)
         prior = by_id.get(canonical_id, {})
         # A transient partial provider response must never erase a published result.
@@ -380,9 +392,7 @@ def scrape_one_league(sb, args, league: str, season: str) -> tuple[int, int, int
         print(f"  !! could not read schedule: {e}", file=sys.stderr, flush=True)
         print("     (usually means no fixtures published for that season yet)",
               file=sys.stderr, flush=True)
-        if getattr(args, "historical", False):
-            raise RuntimeError(f"could not read historical schedule {league} {season}") from e
-        return 0, 0, 0, 0
+        raise RuntimeError(f"could not read schedule {league} {season}") from e
 
     if not getattr(args, "historical", False):
         written = upsert_full_schedule(sb, sched, league, season)
@@ -616,29 +626,15 @@ def main() -> int:
     # analytics from a mixture of old and new league coverage; the next
     # idempotent run resumes only the missing games.
     #
-    # The exit code is a separate question from that, and conflating the two was
-    # a real defect. "Is the data complete enough to publish?" gates the rebuild.
-    # "Did this process run?" is what Task Scheduler records, and it was
-    # returning 1 for a run that fetched 126 of 131 fixtures correctly, which is
-    # the same red LastTaskResult it returns for a run that died on startup.
-    # Two very different situations reported identically is how a real failure
-    # stays invisible.
-    #
-    # So: exit 0 when the run completed and made progress, exit 1 only when it
-    # made none. Completeness is carried by the heartbeat's 'partial' status and
-    # by the re-scrape queue, both of which live in the database where something
-    # can actually alert on them.
+    # A partial run must also be nonzero for Task Scheduler. The heartbeat and
+    # log counts distinguish partial progress from a startup failure.
     if total_failed > 0 or total_remaining > 0:
         print(
             "\n  analytics rebuild skipped: live-ingestion gaps remain; re-run to resume.",
             file=sys.stderr,
             flush=True,
         )
-        if total_ok == 0:
-            print("  no fixtures loaded this run; exiting nonzero.",
-                  file=sys.stderr, flush=True)
-            return 1
-        return 0
+        return 1
 
     # One rebuild after ALL leagues, not per league: the analytics layers span leagues,
     # so rebuilding per league would repeat the same expensive work N times.
@@ -677,7 +673,7 @@ def main() -> int:
             print("  data loaded fine; the scheduled enqueue picks it up within ten minutes.",
                   file=sys.stderr, flush=True)
     elif total_ok == 0:
-        print("\n  no new games -- analytics already current, skipping rebuild.", flush=True)
+        print("\n  no new games loaded; analytics publication status is tracked separately.", flush=True)
 
     return 0
 

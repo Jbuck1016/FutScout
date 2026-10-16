@@ -239,6 +239,21 @@ def fixture_row(fixture: dict[str, Any], observations: list[dict[str, Any]],
             for window in (3, 5, 10):
                 values = [float(row[metric]) for row in prior[:window] if row.get(metric) is not None]
                 record[f"{prefix}.{metric}_{window}"] = float(np.mean(values)) if values else None
+    # These four predeclared research interactions use the same frozen rolling
+    # observations as the ordinary territory and shooting inputs.
+    tilt = record["team.field_tilt_pct_5"] - record["opponent.field_tilt_pct_5"] if (
+        record["team.field_tilt_pct_5"] is not None and record["opponent.field_tilt_pct_5"] is not None
+    ) else None
+    boxes = record["team.box_entries_pass_5"] - record["opponent.box_entries_pass_5"] if (
+        record["team.box_entries_pass_5"] is not None and record["opponent.box_entries_pass_5"] is not None
+    ) else None
+    shots = record["team.shots_5"] - record["opponent.shots_5"] if (
+        record["team.shots_5"] is not None and record["opponent.shots_5"] is not None
+    ) else None
+    record["interaction.elo_x_tilt_5"] = None if tilt is None else record["elo_diff"] * tilt
+    record["interaction.elo_x_boxes_5"] = None if boxes is None else record["elo_diff"] * boxes
+    record["interaction.shots_x_tilt_5"] = None if shots is None or tilt is None else shots * tilt
+    record["interaction.shots_x_boxes_5"] = None if shots is None or boxes is None else shots * boxes
     return record
 
 
@@ -246,6 +261,8 @@ def _explanation_group(feature_name: str) -> str | None:
     name = feature_name.removeprefix("numeric__")
     if name.startswith("missingindicator_"):
         return None
+    if name.startswith("interaction."):
+        return "Tactical interactions"
     if name.startswith("elo_"):
         return "Team strength"
     if "shots_against_" in name:
@@ -290,6 +307,8 @@ def _match_explanation(artifact: dict[str, Any], model_frame: pd.DataFrame,
     home_coefficients = home_model.named_steps["model"].coef_
     away_coefficients = away_model.named_steps["model"].coef_
     away_values = dict(zip(away_prepared.get_feature_names_out(), away_transformed))
+    away_coefficient_map = dict(zip(away_prepared.get_feature_names_out(), away_coefficients))
+    feature_ledger = []
     grouped: defaultdict[str, float] = defaultdict(float)
     for name, value, home_coefficient, away_coefficient in zip(
         names, home_transformed, home_coefficients, away_coefficients
@@ -297,7 +316,22 @@ def _match_explanation(artifact: dict[str, Any], model_frame: pd.DataFrame,
         group = _explanation_group(str(name))
         if group is not None:
             away_value = away_values[str(name)]
-            grouped[group] += float(value * home_coefficient - away_value * away_coefficient)
+            away_coefficient = away_coefficient_map[str(name)]
+            effect = float(value * home_coefficient - away_value * away_coefficient)
+            grouped[group] += effect
+            original_name = str(name).split('__', 1)[-1]
+            raw_value = row.get(original_name)
+            normalized_value = model_frame.iloc[0].get(original_name)
+            feature_ledger.append({
+                'feature': original_name, 'family': group,
+                'raw_value': None if raw_value is None or pd.isna(raw_value) else float(raw_value),
+                'model_input': None if normalized_value is None or pd.isna(normalized_value) else float(normalized_value),
+                'home_transformed': float(value), 'away_transformed': float(away_value),
+                'home_coefficient': float(home_coefficient), 'away_coefficient': float(away_coefficient),
+                'home_log_rate_contribution': float(value * home_coefficient),
+                'away_log_rate_contribution': float(away_value * away_coefficient),
+                'log_rate_balance_contribution': effect,
+            })
 
     home_team, away_team = str(row["home_team"]), str(row["away_team"])
     def number(value: Any, decimals: int = 1) -> str:
@@ -306,70 +340,81 @@ def _match_explanation(artifact: dict[str, Any], model_frame: pd.DataFrame,
     def days(value: Any) -> str:
         return "not available" if pd.isna(value) else str(int(value))
 
+    def rolling_context(text: str) -> str:
+        return (
+            "The contribution combines the model's standardized 3-, 5-, and 10-match "
+            f"inputs for both teams. Last-3 context: {text}"
+        )
+
     detail = {
         "Team strength": (
             f"Pre-match rating: {home_team} {float(row['elo_home']):.0f}, "
             f"{away_team} {float(row['elo_away']):.0f}; the home adjustment is included."
         ),
-        "Shot volume": (
-            f"Last 3: {home_team} {number(row['team.shots_3'])} shots per match, "
+        "Shot volume": rolling_context(
+            f"{home_team} {number(row['team.shots_3'])} shots per match; "
             f"{away_team} {number(row['opponent.shots_3'])}."
         ),
-        "Shots allowed": (
-            f"Last 3: {home_team} allowed {number(row['team.shots_against_3'])} shots per match, "
+        "Shots allowed": rolling_context(
+            f"{home_team} allowed {number(row['team.shots_against_3'])} shots per match; "
             f"{away_team} {number(row['opponent.shots_against_3'])}."
         ),
         "Rest": (
             f"Rest before kickoff: {home_team} {days(row['context.team_rest_days'])} days, "
             f"{away_team} {days(row['context.opponent_rest_days'])} days."
         ),
-        "Field tilt": (
-            f"Last 3 territorial share: {home_team} {number(row.get('team.field_tilt_pct_3'))}%, "
+        "Field tilt": rolling_context(
+            f"territorial share was {home_team} {number(row.get('team.field_tilt_pct_3'))}%; "
             f"{away_team} {number(row.get('opponent.field_tilt_pct_3'))}%."
         ),
-        "Box entries": (
-            f"Last 3 completed pass entries into the box per match: {home_team} "
-            f"{number(row.get('team.box_entries_pass_3'))}, {away_team} "
+        "Box entries": rolling_context(
+            f"completed pass entries into the box per match were {home_team} "
+            f"{number(row.get('team.box_entries_pass_3'))}; {away_team} "
             f"{number(row.get('opponent.box_entries_pass_3'))}."
         ),
-        "Progression": (
-            f"Last 3 progressive passes per match: {home_team} "
-            f"{number(row.get('team.progressive_passes_3'))}, {away_team} "
+        "Progression": rolling_context(
+            f"progressive passes per match were {home_team} "
+            f"{number(row.get('team.progressive_passes_3'))}; {away_team} "
             f"{number(row.get('opponent.progressive_passes_3'))}."
         ),
-        "Pressing and defensive height": (
-            f"Last 3 PPDA: {home_team} {number(row.get('team.ppda_3'))}, "
+        "Pressing and defensive height": rolling_context(
+            f"PPDA was {home_team} {number(row.get('team.ppda_3'))}; "
             f"{away_team} {number(row.get('opponent.ppda_3'))}."
         ),
-        "Possession": (
-            f"Last 3 possession proxy: {home_team} "
-            f"{number(row.get('team.possession_proxy_pct_3'))}%, {away_team} "
+        "Possession": rolling_context(
+            f"possession proxy was {home_team} "
+            f"{number(row.get('team.possession_proxy_pct_3'))}%; {away_team} "
             f"{number(row.get('opponent.possession_proxy_pct_3'))}%."
         ),
-        "Chance quality": (
-            f"Last 3 non-penalty xG per match: {home_team} "
-            f"{number(row.get('team.npxg_for_3'), 2)}, {away_team} "
+        "Chance quality": rolling_context(
+            f"non-penalty xG per match was {home_team} "
+            f"{number(row.get('team.npxg_for_3'), 2)}; {away_team} "
             f"{number(row.get('opponent.npxg_for_3'), 2)}."
         ),
-        "Expected threat": (
-            f"Last 3 xT difference per match: {home_team} "
-            f"{number(row.get('team.xt_difference_3'), 2)}, {away_team} "
+        "Expected threat": rolling_context(
+            f"xT difference per match was {home_team} "
+            f"{number(row.get('team.xt_difference_3'), 2)}; {away_team} "
             f"{number(row.get('opponent.xt_difference_3'), 2)}."
         ),
-        "Final-third presence": (
-            f"Last 3 final-third touches per match: {home_team} "
-            f"{number(row.get('team.final_third_touches_3'))}, {away_team} "
+        "Final-third presence": rolling_context(
+            f"final-third touches per match were {home_team} "
+            f"{number(row.get('team.final_third_touches_3'))}; {away_team} "
             f"{number(row.get('opponent.final_third_touches_3'))}."
         ),
-        "Penalty-area presence": (
-            f"Last 3 penalty-area touches per match: {home_team} "
-            f"{number(row.get('team.penalty_area_touches_3'))}, {away_team} "
+        "Penalty-area presence": rolling_context(
+            f"penalty-area touches per match were {home_team} "
+            f"{number(row.get('team.penalty_area_touches_3'))}; {away_team} "
             f"{number(row.get('opponent.penalty_area_touches_3'))}."
         ),
-        "Possession sequences": (
-            f"Last 3 shot-ending possessions per match: {home_team} "
-            f"{number(row.get('team.shot_ending_sequences_3'))}, {away_team} "
+        "Possession sequences": rolling_context(
+            f"shot-ending possessions per match were {home_team} "
+            f"{number(row.get('team.shot_ending_sequences_3'))}; {away_team} "
             f"{number(row.get('opponent.shot_ending_sequences_3'))}."
+        ),
+        "Tactical interactions": (
+            "This research model combines five-match territory or box-entry differences "
+            "with pre-match Elo or shot-volume differences. The reported contribution is "
+            "on the standardized goal-rate equations, not a causal effect."
         ),
     }
     drivers = []
@@ -402,6 +447,9 @@ def _match_explanation(artifact: dict[str, Any], model_frame: pd.DataFrame,
             if driver_clause else f"{lead}."
         ),
         "drivers": drivers,
+        "feature_ledger": feature_ledger,
+        "contribution_units": "home-minus-away log goal rate (not goals or probability points)",
+        "explanation_schema_version": 2,
         "inputs": {
             "home_current_season_matches": int(row["context.team_current_season_matches"]),
             "away_current_season_matches": int(row["context.opponent_current_season_matches"]),
@@ -434,7 +482,8 @@ def _match_explanation(artifact: dict[str, Any], model_frame: pd.DataFrame,
         ),
         "scope": (
             "This forecast uses only the feature contract embedded in the named model artifact. "
-            "The explanation lists the inputs that materially moved its estimated goal balance."
+            "The explanation lists grouped contributions to home-minus-away log goal rate, "
+            "not literal goals or probability points. The feature ledger retains exact numeric inputs and transformations."
         ),
     }
 
@@ -450,18 +499,24 @@ def scoreline_distribution(home_xg: float, away_xg: float, maximum: int = 8) -> 
     return {score: probability / total for score, probability in values.items()}
 
 
-def predict_rows(artifact: dict[str, Any], fixtures: list[dict[str, Any]],
-                 observations: list[dict[str, Any]], matches: list[dict[str, Any]],
-                 prediction_as_of: pd.Timestamp | None = None) -> list[dict[str, Any]]:
-    frame = pd.DataFrame([
+def build_fixture_frame(fixtures: list[dict[str, Any]], observations: list[dict[str, Any]],
+                        matches: list[dict[str, Any]], prediction_as_of: pd.Timestamp | None,
+                        feature_schema_version: int) -> pd.DataFrame:
+    return pd.DataFrame([
         fixture_row(
             row, observations, matches, prediction_as_of=prediction_as_of,
-            feature_schema_version=int(artifact["feature_schema_version"]),
+            feature_schema_version=feature_schema_version,
         )
         for row in fixtures
     ])
+
+
+def predict_feature_frame(artifact: dict[str, Any], frame: pd.DataFrame,
+                          *, include_scorelines: bool = True) -> list[dict[str, Any]]:
+    """Score the exact same materialized pre-match frame with different models."""
     if frame.empty:
         return []
+    frame = frame.reset_index(drop=True)
     missing = sorted(set(artifact["numeric_columns"]) - set(frame.columns))
     if missing:
         raise RuntimeError(f"fixture builder is missing artifact fields: {missing}")
@@ -472,7 +527,7 @@ def predict_rows(artifact: dict[str, Any], fixtures: list[dict[str, Any]],
     output = []
     for index, row in frame.iterrows():
         one_row = model_frame.iloc[[index]]
-        output.append({
+        prediction = {
             "game_id": row["game_id"], "league": row["league"], "date": row["date"].isoformat(),
             "home_team": row["home_team"], "away_team": row["away_team"],
             "home_expected_goals": round(float(home[index]), 4),
@@ -480,10 +535,22 @@ def predict_rows(artifact: dict[str, Any], fixtures: list[dict[str, Any]],
             "home_win_probability": round(float(probabilities[index, 0]), 7),
             "draw_probability": round(float(probabilities[index, 1]), 7),
             "away_win_probability": round(float(probabilities[index, 2]), 7),
-            "scoreline_distribution": scoreline_distribution(float(home[index]), float(away[index])),
             "explanation": _match_explanation(artifact, one_row, row, probabilities[index]),
-        })
+        }
+        if include_scorelines:
+            prediction["scoreline_distribution"] = scoreline_distribution(float(home[index]), float(away[index]))
+        output.append(prediction)
     return output
+
+
+def predict_rows(artifact: dict[str, Any], fixtures: list[dict[str, Any]],
+                 observations: list[dict[str, Any]], matches: list[dict[str, Any]],
+                 prediction_as_of: pd.Timestamp | None = None) -> list[dict[str, Any]]:
+    frame = build_fixture_frame(
+        fixtures, observations, matches, prediction_as_of,
+        int(artifact["feature_schema_version"]),
+    )
+    return predict_feature_frame(artifact, frame)
 
 
 def metadata_json(artifact: dict[str, Any], sha256: str) -> dict[str, Any]:

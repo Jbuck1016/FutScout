@@ -158,7 +158,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .p-cmp.on{background:var(--accent-dim);border-color:var(--accent-glow);color:var(--accent)}
 
 /* Content */
-.content{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.content{flex:1;display:flex;flex-direction:column;min-width:0;overflow-x:hidden;overflow-y:auto}
 .match-essentials{display:none;flex:0 0 auto;padding:14px 18px;background:var(--bg2);border-bottom:1px solid var(--border)}
 .match-essentials.ready{display:block}
 .essentials-kicker{font:700 11px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
@@ -168,6 +168,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .essentials-metric{border-left:1px solid var(--border2);padding:3px 10px}
 .essentials-metric b{display:block;font:700 15px/1.25 var(--f-mono);font-variant-numeric:tabular-nums}
 .essentials-metric span{display:block;font:600 11px/1.3 var(--f-body);color:var(--text3);margin-top:4px}
+.match-evidence{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.evidence-heading{font:800 14px/1.2 var(--f-display);color:var(--text);margin-bottom:8px}
+.evidence-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.evidence-card{background:var(--bg);border:1px solid var(--border2);border-left:3px solid var(--gold);padding:10px;min-width:0}
+.evidence-question{font:700 11px/1.3 var(--f-body);color:var(--text)}
+.evidence-answer{font:500 11px/1.45 var(--f-body);color:var(--text2);margin-top:5px}
+.evidence-inspect{background:transparent;border:0;color:var(--gold);font:700 10px/1 var(--f-body);margin-top:9px;padding:4px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.evidence-inspect:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.xt-split{display:grid;grid-template-columns:minmax(110px,1fr) repeat(2,minmax(105px,1fr));gap:5px 8px;align-items:center;margin-top:8px;font:600 10px/1.25 var(--f-data);color:var(--text2)}
+.xt-split .xt-head{color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:.07em}
+.xt-split .xt-team{color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.xt-meter{display:flex;flex-direction:column;gap:3px;color:var(--text);font-variant-numeric:tabular-nums}
+.xt-meter i{display:block;height:4px;max-width:100%;background:var(--gold);border-radius:2px}
+.xt-meter.carry i{background:var(--blue)}
+.evidence-method{margin-top:8px;font:500 9px/1.4 var(--f-body);color:var(--text3)}
+@media(max-width:920px){.evidence-grid{grid-template-columns:1fr}.xt-split{grid-template-columns:minmax(80px,1fr) repeat(2,minmax(80px,1fr))}}
 @media(max-width:920px){.essentials-grid{grid-template-columns:repeat(3,1fr)}.essentials-result{grid-column:1/-1}.match-essentials{padding:10px 12px}}
 @media(max-width:620px){.essentials-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.essentials-metric{padding:2px 6px}.essentials-metric b{font-size:12px}}
 .view-team-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:6px 12px;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;gap:10px;min-height:0}
@@ -249,7 +265,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .tl-label{position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);font:600 6px/1 'Inter',sans-serif;color:var(--text3);white-space:nowrap}
 
 /* Pitch area */
-.pitch-area{flex:1;display:flex;flex-wrap:wrap;min-height:0;overflow:hidden;padding:8px;gap:8px;align-content:stretch;justify-content:center;align-items:stretch;position:relative;z-index:2;margin-top:0!important}
+.pitch-area{flex:0 0 auto;display:flex;flex-wrap:wrap;height:max(540px,calc(100vh - 180px));min-height:540px;overflow-y:auto;padding:8px;gap:8px;align-content:stretch;justify-content:center;align-items:stretch;position:relative;z-index:2;margin-top:0!important}
 .pitch-area[data-count="1"] .panel{width:100%;height:100%;max-height:100%;flex:0 0 100%}
 .pitch-area[data-count="2"] .panel{width:calc(50% - 4px);height:100%;max-height:100%;flex:0 0 calc(50% - 4px)}
 .pitch-area[data-count="3"] .panel{width:calc((100% - 24px)/3);height:100%;max-height:100%;flex:0 0 calc((100% - 24px)/3)}
@@ -266,6 +282,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .pitch-area[data-count="5"] .panel:nth-child(4){grid-column:2/4;grid-row:2}
 .pitch-area[data-count="5"] .panel:nth-child(5){grid-column:4/6;grid-row:2}
 .pitch-area .pitch-canvas{height:calc(100% - 56px);width:auto;max-width:100%;margin:0 auto;display:block}
+.pitch-area .panel-body .pitch-canvas{height:auto;max-height:100%;aspect-ratio:520/840;object-fit:contain}
 .pitch-area .panel-body{justify-content:center;align-items:stretch}
 .pitch-area.single-viz{justify-content:center;align-items:center;align-content:center}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -623,12 +640,12 @@ html:not(.dark) .ps-hl-card,html:not(.dark) .sb-group,html:not(.dark) .mom-chart
   .pitch-area[data-count="5"]{display:flex}
 }
 @media(max-width:760px){
-  html,body{height:auto;min-height:100%;overflow:auto}.app{height:auto;min-height:100vh}.hdr{height:auto;min-height:58px;flex-wrap:wrap;padding:10px 12px;gap:8px}.hdr-info{flex:1;min-width:0}.hdr-right{width:100%;margin-left:0;gap:5px;overflow-x:auto;padding-bottom:2px}.btn-fp,.btn-exp,.btn-report{padding:6px 8px}.main{flex-direction:column;overflow:visible}.side{width:100%;max-height:42vh;border-right:0;border-bottom:1px solid var(--border)}.viz-grid{grid-template-columns:1fr 1fr}.content{min-height:78vh;overflow:visible}.pitch-area{overflow:visible}.pitch-area[data-count] .panel{width:100%;height:min(720px,78vh);flex-basis:100%}.view-team-bar{justify-content:flex-start;overflow-x:auto}.panel{padding:10px}.panel-title{font-size:13px}.panel-orient{white-space:normal}.ps-tab.show{flex-direction:column}.ps-side{width:100%;max-height:36vh;border-right:0;border-bottom:1px solid var(--border)}.ps-main{padding:16px 12px}.ps-profile-hdr{flex-direction:column}.ps-toggle-wrap{flex-wrap:wrap}.ps-pitch-grid{display:grid;grid-template-columns:1fr}.ps-pitch-canvas{max-width:100%;height:auto}.concept-info-bar.show{display:none}
+  html,body{height:auto;min-height:100%;overflow:auto}.app{height:auto;min-height:100vh}.hdr{height:auto;min-height:58px;flex-wrap:wrap;padding:10px 12px;gap:8px}.hdr-info{flex:1;min-width:0}.hdr-right{width:100%;margin-left:0;gap:5px;overflow-x:auto;padding-bottom:2px}.btn-fp,.btn-exp,.btn-report{padding:6px 8px}.main{flex-direction:column;overflow:visible}.side{width:100%;max-height:42vh;border-right:0;border-bottom:1px solid var(--border)}.viz-grid{grid-template-columns:1fr 1fr}.content{min-height:78vh;overflow:visible}.pitch-area{height:auto;min-height:0;overflow:visible}.pitch-area[data-count] .panel{width:100%;height:min(720px,78vh);min-height:360px;flex-basis:100%}.view-team-bar{justify-content:flex-start;overflow-x:auto}.panel{padding:10px}.panel-title{font-size:13px}.panel-orient{white-space:normal}.ps-tab.show{flex-direction:column}.ps-side{width:100%;max-height:36vh;border-right:0;border-bottom:1px solid var(--border)}.ps-main{padding:16px 12px}.ps-profile-hdr{flex-direction:column}.ps-toggle-wrap{flex-wrap:wrap}.ps-pitch-grid{display:grid;grid-template-columns:1fr}.ps-pitch-canvas{max-width:100%;height:auto}.concept-info-bar.show{display:none}
 }
 </style>
 <script src="gate.js?v=20260901"></script>
 <meta name="robots" content="noindex,nofollow">
-<script src="site-tools.js" defer></script>
+<script src="site-tools.js?v=20261001-density" defer></script>
 </head>
 <body>
 <div class="app">
@@ -699,7 +716,8 @@ html:not(.dark) .ps-hl-card,html:not(.dark) .sb-group,html:not(.dark) .mom-chart
         <div class="viz-group"><div class="viz-group-label">Attacking</div><div class="viz-grid">
           <div class="viz-btn" data-viz="shots">Shots</div>
           <div class="viz-btn" data-viz="heatmap">Heatmap</div>
-          <div class="viz-btn" data-viz="xt">xT Map</div>
+          <div class="viz-btn" data-viz="xt">Pass xT</div>
+          <div class="viz-btn" data-viz="xt_carry">Carry xT</div>
         </div></div>
         <div class="viz-group"><div class="viz-group-label">Defending</div><div class="viz-grid">
           <div class="viz-btn" data-viz="defensive">Defensive</div>
@@ -854,8 +872,7 @@ async function loadTeams(){
       colorBright:c,league:LEAGUE_OF[n]||null,comps:LEAGUES};
     TEAMS[n].display=dispName(n);
   });
-  // __ALL__ is a real entry in the picker and carries no league, so it fails
-  // inComps by design. Let it stand rather than bouncing back to a club.
+  // __ALL__ is a real entry in the picker and remains valid across leagues.
   if(S.team!=='__ALL__'&&(!TEAMS[S.team]||!inComps(S.team))){
     const first=names.filter(inComps);
     S.team=first[0]||names[0];
@@ -864,13 +881,13 @@ async function loadTeams(){
 const SB='https://xrsilhiffjoulyoqhdmp.supabase.co';
 const AK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyc2lsaGlmZmpvdWx5b3FoZG1wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2Nzc5NDAsImV4cCI6MjEwMDI1Mzk0MH0.3_ccOJi0SBKOwHGxhJL3fsWCSSLoxZumzt-KH4wO8OU';
 const HD={'apikey':AK,'Authorization':'Bearer '+AK};
-const VIZ_LABELS={passes:'Pass Map',heatmap:'Touch Density',shots:'Attacking-Half Shot Map',network:'Passing Network',progressive:'Progressive Passes',final_third:'Passes Into Final Third',zone14:'Passes Into Zone 14',box_passes:'Passes Into Box',defensive:'Defensive Actions',pressure:'Defensive Density',shape:'Phase Shape Shift',passflow:'Pass Flow',keypasses:'Key Passes',xt:'xT Map',formation:'Average-Position Formation',dominance:'Zone Dominance',combos:'Pass Combos'};
-const TEAM_VIZ=new Set(['dominance','formation','passflow','shape']);
+const VIZ_LABELS={passes:'Pass Map',heatmap:'Touch Density',shots:'Attacking-Half Shot Map',network:'Passing Network',progressive:'Progressive Passes',final_third:'Passes Into Final Third',zone14:'Passes Into Zone 14',box_passes:'Passes Into Box',defensive:'Defensive Actions',pressure:'Defensive Density',shape:'Phase Shape Shift',passflow:'Pass Flow',keypasses:'Key Passes',xt:'Pass xT Map',xt_carry:'Carry xT Map',formation:'Average-Position Formation',dominance:'Zone Dominance',combos:'Pass Combos'};
+const TEAM_VIZ=new Set(['dominance','formation','passflow','shape','xt_carry']);
 function isProgPass(e){if(e.type!=='Pass'||e.x==null||e.end_x==null)return false;const g=e.end_x-e.x;if(e.x<50&&e.end_x<50)return g>=30;if(e.x<50&&e.end_x>=50)return g>=15;if(e.x>=50&&e.end_x>=50)return g>=10;return false;}
 const DEF_TYPES=['Tackle','Interception','Clearance','BallRecovery','BlockedPass','Aerial','Challenge'];
 const DEF_COLORS={Tackle:'#ef4444',Interception:'#2563eb',Clearance:'#7c3aed',BallRecovery:'#16a34a',BlockedPass:'#d4a017',Aerial:'#0891b2',Challenge:'#db2777'};
 const XT=[[.000,.000,.000,.000,.000,.000,.000,.000],[.001,.001,.001,.002,.002,.001,.001,.001],[.002,.003,.004,.005,.005,.004,.003,.002],[.004,.006,.008,.011,.011,.008,.006,.004],[.006,.009,.014,.019,.019,.014,.009,.006],[.010,.015,.022,.030,.030,.022,.015,.010],[.016,.024,.035,.048,.048,.035,.024,.016],[.025,.037,.054,.075,.075,.054,.037,.025],[.038,.056,.082,.115,.115,.082,.056,.038],[.055,.082,.122,.170,.170,.122,.082,.055],[.082,.120,.178,.250,.250,.178,.120,.082],[.120,.180,.270,.390,.390,.270,.180,.120]];
-function getXT(x,y){return XT[Math.min(11,Math.floor(x/100*12))][Math.min(7,Math.floor(y/100*8))];}
+function getXT(x,y){return XT[Math.max(0,Math.min(11,Math.floor(x/100*12)))][Math.max(0,Math.min(7,Math.floor(y/100*8)))];}
 let PASS_OK='#1a6b3a',PASS_FAIL='#c0392b';
 /* Canvas can't read CSS variables, so the palette is mirrored here and swapped
    whenever the theme changes. */
@@ -896,7 +913,7 @@ function setupHiDpiCanvas(can,logicalW,logicalH){const dpr=window.devicePixelRat
    concepts keep the team subject. The same subject is used by exports. */
 function buildPanelTitle(viz,teamOverride){const vizLabel=VIZ_LABELS[viz]||viz;const tn=T().name;const team=teamOverride||S.viewTeam||tn;const subject=(S.selPlayer&&!TEAM_VIZ.has(viz))?S.selPlayer:team;if(!S.selMatch)return subject+' '+vizLabel;const m=S.matches.find(mm=>mm.game_id==S.selMatch);if(!m)return subject+' '+vizLabel;const isTeamHome=m.home_team===team;const oppName=isTeamHome?m.away_team:m.home_team;const ha=isTeamHome?'H':'A';return subject+' '+vizLabel+' \u00B7 vs '+oppName+' \u00B7 '+ha;}
 
-let S={team:'__ALL__',matches:[],events:[],sequences:[],starters:new Set(),playerPos:{},selMatch:null,selPlayer:null,cmpPlayer:null,activeVizs:['progressive'],plotSlots:2,shapeMode:'shift',periods:new Set(),outcomes:new Set(),timeFilter:null,showJdP:false,seasonData:[],seasonComps:new Set(),seasonSort:{col:null,dir:1},seasonTrend:null,seasonCols:new Set(['final_third_passes','zone14_passes','progressive_passes','passes_into_box','defensive_actions','defensive_actions_won','shots','shots_on_target','fwd_passes','lat_passes','bwd_passes']),psPlayer:null,psAllEvents:[],psAllMatches:[],psVizs:new Set(['passes']),psMatchFilter:null,psMode:'pg',psPlayersLoaded:false,viewTeam:null,oppTeam:null,compareMode:false,posGroups:new Set(),psMatchSort:{col:'date',dir:-1},_sqStatsCache:null,_pmCache:null,canvasEvents:new Map()};
+let S={team:'__ALL__',matches:[],events:[],carries:[],carriesAvailable:false,sequences:[],starters:new Set(),playerPos:{},selMatch:null,selPlayer:null,cmpPlayer:null,activeVizs:['progressive'],plotSlots:2,shapeMode:'shift',periods:new Set(),outcomes:new Set(),timeFilter:null,showJdP:false,seasonData:[],seasonComps:new Set(),seasonSort:{col:null,dir:1},seasonTrend:null,seasonCols:new Set(['final_third_passes','zone14_passes','progressive_passes','passes_into_box','defensive_actions','defensive_actions_won','shots','shots_on_target','fwd_passes','lat_passes','bwd_passes']),psPlayer:null,psAllEvents:[],psAllMatches:[],psVizs:new Set(['passes']),psMatchFilter:null,psMode:'pg',psPlayersLoaded:false,viewTeam:null,oppTeam:null,compareMode:false,posGroups:new Set(),psMatchSort:{col:'date',dir:-1},_sqStatsCache:null,_pmCache:null,canvasEvents:new Map()};
 function T(){return TEAMS[S.team]||TEAMS.LAFC}
 function VT(){return S.viewTeam||(S.matchTeams&&S.matchTeams[0])||T().name}
 function isOppView(){return S.viewTeam&&S.viewTeam!==T().name}
@@ -925,7 +942,7 @@ async function loadMatches(){
   all.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
   S.matches=all;renderMatchSelect();
 }
-async function loadMatch(gid){const area=document.getElementById('pitchArea');area.innerHTML='<div class="loading"><div class="spinner"></div> Loading...</div>';const[evts,starters,seqs]=await Promise.all([sbAll('v_match_events',{game_id:'eq.'+gid,select:'game_id,type,x,y,end_x,end_y,player,team,period,minute,second,outcome_type,is_shot,is_goal,xg,shot_dist_m,shot_angle_deg'}),sbRpc('get_starter_names',{p_game_id:gid}),sbAll('v_league_sequences',{game_id:'eq.'+gid,select:'team,period,start_min,start_sec,dur_s,is_open_play'}).catch(()=>[])]);S.events=evts;S.sequences=Array.isArray(seqs)?seqs:[];S.starters=new Set(starters.map(s=>s.player_name));S.playerPos={};starters.forEach(s=>{S.playerPos[s.player_name]=s.player_pos});S.selMatch=gid;S.selPlayer=null;S.cmpPlayer=null;S.timeFilter=null;const m=S.matches.find(mm=>mm.game_id==gid);const tn=T().name;
+async function loadMatch(gid){const area=document.getElementById('pitchArea');area.innerHTML='<div class="loading"><div class="spinner"></div> Loading...</div>';const[evts,starters,seqs,carries]=await Promise.all([sbAll('v_match_events',{game_id:'eq.'+gid,select:'game_id,type,x,y,end_x,end_y,player,team,period,minute,second,outcome_type,is_open_play,is_shot,is_goal,xg,shot_dist_m,shot_angle_deg'}),sbRpc('get_starter_names',{p_game_id:gid}),sbAll('v_league_sequences',{game_id:'eq.'+gid,select:'team,period,start_min,start_sec,dur_s,is_open_play'}).catch(()=>[]),sbAll('v_player_carries',{game_id:'eq.'+gid,select:'game_id,team,start_x,start_y,end_x,end_y,period,minute'}).catch(e=>{console.warn('match carries unavailable',e);return null;})]);S.events=evts;S.carries=Array.isArray(carries)?carries:[];S.carriesAvailable=Array.isArray(carries)&&carries.length>0;S.sequences=Array.isArray(seqs)?seqs:[];S.starters=new Set(starters.map(s=>s.player_name));S.playerPos={};starters.forEach(s=>{S.playerPos[s.player_name]=s.player_pos});S.selMatch=gid;S.selPlayer=null;S.cmpPlayer=null;S.timeFilter=null;const m=S.matches.find(mm=>mm.game_id==gid);const tn=T().name;
   const hv=m?evName(m.home_team):null, av=m?evName(m.away_team):null;
   S.matchTeams=m?[hv,av]:[];
   const mine=(m&&(hv===tn||av===tn))?tn:hv;
@@ -955,10 +972,17 @@ function renderMatchEssentials(match,homeName,awayName){
     item.append(values,caption);grid.appendChild(item);
   });
   host.appendChild(grid);host.classList.add('ready');
+  // Keep the match workspace focused on its existing stats and plot controls.
 }
 
 function getFiltered(vizType){
   const vt=VT();let evts=S.events.filter(e=>e.team===vt);
+  if(vizType==='xt_carry'){
+    let carries=S.carries.filter(e=>e.team===vt);
+    if(S.periods.size)carries=carries.filter(e=>S.periods.has(String(e.period)));
+    if(S.timeFilter)carries=carries.filter(e=>e.minute>=S.timeFilter.s&&e.minute<S.timeFilter.e);
+    return carries;
+  }
   const teamLevelViz=['formation','dominance','shape','combos','network','passflow'];
   if(S.selPlayer&&!teamLevelViz.includes(vizType))evts=evts.filter(e=>e.player===S.selPlayer);
   if(S.posGroups.size&&!teamLevelViz.includes(vizType))evts=evts.filter(e=>passesPosFilter(e.player));
@@ -973,6 +997,7 @@ function getFiltered(vizType){
   else if(vizType==='formation')evts=evts.filter(e=>e.x!=null&&e.y!=null);
   else if(vizType==='dominance')return S.events;
   else if(vizType==='shape')return S.events;
+  if(vizType==='xt')evts=evts.filter(e=>e.outcome_type==='Successful'&&e.is_open_play===true);
   if(vizType==='progressive')evts=evts.filter(e=>isProgPass(e));
   else if(vizType==='final_third')evts=evts.filter(e=>e.end_x!=null&&e.end_x>=66);
   else if(vizType==='zone14')evts=evts.filter(e=>e.end_x!=null&&e.end_x>=66&&e.end_x<=83&&e.end_y>=21&&e.end_y<=79);
@@ -1356,7 +1381,16 @@ function renderPassFlowModern(ctx,c,evts,titleEl,legendEl){
 
 function renderKeyPasses(ctx,c,evts,titleEl,legendEl){drawPitch(ctx,c);if(S.showJdP)drawJdP(ctx,c);const kps=getKeyPasses();let succ=0,fail=0;const kpStored=[];kps.forEach(({pass:p,shot:s})=>{const ok=p.outcome_type==='Successful';drawPassLine(ctx,c,p.x,p.y,p.end_x,p.end_y,ok?PASS_OK:PASS_FAIL,ok?0.78:0.62);ok?succ++:fail++;const p2=toXY(p.end_x,p.end_y,c);kpStored.push({cx:p2.cx,cy:p2.cy,player:p.player,minute:p.minute,outcome:s.is_goal?'Assist':'Key Pass',type:'Pass',dir:passDir(p.x,p.end_x),dist:passDist(p.x,p.y,p.end_x,p.end_y)});});S.canvasEvents.set(c,kpStored);titleEl.textContent='Key Passes ('+kps.length+')';legendEl.innerHTML=passLegend(succ,fail);}
 
-function renderXTMap(ctx,c,evts,titleEl,legendEl){drawPitch(ctx,c);if(S.showJdP)drawJdP(ctx,c);const pw=c.width-2*PM,ph=c.height-2*PM;for(let r=0;r<12;r++)for(let co=0;co<8;co++){const x1=r/12,x2=(r+1)/12,y1=co/8,y2=(co+1)/8;const cx1=PM+(1-y2)*pw,cy1=PM+(1-x2)*ph,cx2=PM+(1-y1)*pw,cy2=PM+(1-x1)*ph;ctx.fillStyle=heatColor(Math.min(1,XT[r][co]*3),0.04);ctx.fillRect(cx1,cy1,cx2-cx1,cy2-cy1);}let totalXT=0,drawn=0,maxGain=0;const stored=[];evts.forEach(e=>{if(e.end_x==null||e.end_y==null)return;const gain=getXT(e.end_x,e.end_y)-getXT(e.x,e.y);if(gain<=0.02)return;if(gain>maxGain)maxGain=gain;totalXT+=gain;drawn++;});const mg=maxGain||0.1;evts.forEach(e=>{if(e.end_x==null||e.end_y==null)return;const gain=getXT(e.end_x,e.end_y)-getXT(e.x,e.y);if(gain<=0.02)return;const t=Math.min(1,gain/mg);const r2=Math.round(220+35*t),g2=Math.round(160*(1-t*0.8)),b2=Math.round(20*(1-t));const col='#'+r2.toString(16).padStart(2,'0')+g2.toString(16).padStart(2,'0')+b2.toString(16).padStart(2,'0');drawComet(ctx,c,e.x,e.y,e.end_x,e.end_y,col,0.4+0.5*t);const p2=toXY(e.end_x,e.end_y,c);stored.push({cx:p2.cx,cy:p2.cy,player:e.player,minute:e.minute,outcome:'xT +'+gain.toFixed(3),type:'Pass',dir:passDir(e.x,e.end_x),dist:passDist(e.x,e.y,e.end_x,e.end_y)});});S.canvasEvents.set(c,stored);titleEl.textContent='xT Map (Threat Added)';legendEl.innerHTML=leg('#dca014','Low xT gain')+leg('#e03000','High xT gain')+' <span class="leg">'+drawn+' passes | xT: +'+totalXT.toFixed(3)+'</span>';}
+function renderXTMap(ctx,c,evts,titleEl,legendEl){drawPitch(ctx,c);if(S.showJdP)drawJdP(ctx,c);const pw=c.width-2*PM,ph=c.height-2*PM;for(let r=0;r<12;r++)for(let co=0;co<8;co++){const x1=r/12,x2=(r+1)/12,y1=co/8,y2=(co+1)/8;const cx1=PM+(1-y2)*pw,cy1=PM+(1-x2)*ph,cx2=PM+(1-y1)*pw,cy2=PM+(1-x1)*ph;ctx.fillStyle=heatColor(Math.min(1,XT[r][co]*3),0.04);ctx.fillRect(cx1,cy1,cx2-cx1,cy2-cy1);}let totalXT=0,drawn=0,maxGain=0;const stored=[];evts.forEach(e=>{if([e.x,e.y,e.end_x,e.end_y].some(v=>!Number.isFinite(v)))return;const gain=getXT(e.end_x,e.end_y)-getXT(e.x,e.y);if(gain<=0.02)return;if(gain>maxGain)maxGain=gain;totalXT+=gain;drawn++;});const mg=maxGain||0.1;evts.forEach(e=>{if([e.x,e.y,e.end_x,e.end_y].some(v=>!Number.isFinite(v)))return;const gain=getXT(e.end_x,e.end_y)-getXT(e.x,e.y);if(gain<=0.02)return;const t=Math.min(1,gain/mg);const r2=Math.round(220+35*t),g2=Math.round(160*(1-t*0.8)),b2=Math.round(20*(1-t));const col='#'+r2.toString(16).padStart(2,'0')+g2.toString(16).padStart(2,'0')+b2.toString(16).padStart(2,'0');drawComet(ctx,c,e.x,e.y,e.end_x,e.end_y,col,0.4+0.5*t);const p2=toXY(e.end_x,e.end_y,c);stored.push({cx:p2.cx,cy:p2.cy,player:e.player,minute:e.minute,outcome:'xT +'+gain.toFixed(3),type:'Completed open-play pass',dir:passDir(e.x,e.end_x),dist:passDist(e.x,e.y,e.end_x,e.end_y)});});S.canvasEvents.set(c,stored);titleEl.textContent='Pass xT Map (Threat Added)';legendEl.innerHTML=leg('#dca014','Low xT gain')+leg('#e03000','High xT gain')+' <span class="leg">'+drawn+' completed open-play passes above +0.02 | xT: +'+totalXT.toFixed(3)+'</span>';}
+function renderCarryXTMap(ctx,c,evts,titleEl,legendEl){
+  const prepared=evts.map(e=>({...e,x:e.start_x,y:e.start_y,player:'Inferred carry'}));
+  renderXTMap(ctx,c,prepared,titleEl,legendEl);
+  titleEl.textContent='Carry xT Map (Inferred)';
+  legendEl.innerHTML=legendEl.innerHTML.replace('completed open-play passes','inferred carries');
+  if(!S.carriesAvailable)legendEl.textContent='Carry event feed unavailable for this match';
+  else if(!evts.length)legendEl.textContent='No inferred carry records for this team';
+  const stored=S.canvasEvents.get(c)||[];stored.forEach(row=>{row.type='Inferred carry';row.player='Team carry';});
+}
 
 
 function callRenderer(viz,ctx,can,evts,title,legend,pairEl){
@@ -1375,6 +1409,7 @@ function callRenderer(viz,ctx,can,evts,title,legend,pairEl){
     case'passflow':renderPassFlowModern(ctx,can,evts,title,legend);break;
     case'keypasses':renderKeyPasses(ctx,can,evts,title,legend);break;
     case'xt':renderXTMap(ctx,can,evts,title,legend);break;
+    case'xt_carry':renderCarryXTMap(ctx,can,evts,title,legend);break;
     case'formation':renderFormation(ctx,can,evts,title,legend);break;
     case'dominance':renderDominance(ctx,can,evts,title,legend);break;
     case'combos':renderCombos(ctx,can,evts,title,legend,pairEl);break;
@@ -1384,7 +1419,8 @@ function callRenderer(viz,ctx,can,evts,title,legend,pairEl){
 /* RENDER ALL PANELS */
 const CONCEPT_LEGENDS={
   progressive:'<b>Progressive passes</b> shows the observed pass vectors that materially advanced the ball toward goal. A filled endpoint is complete; an × endpoint is incomplete. Select a player or narrow the time window to reduce overlap.',
-  xt:'<b>Expected Threat (xT)</b> measures how much each pass increased the probability of scoring. Only passes with positive xT gain above 0.02 are shown. Color intensity = magnitude of threat increase.',
+  xt:'<b>Expected Threat (xT)</b> describes zone-to-zone threat gain on completed open-play passes. This borrowed 12×8 grid is not externally validated for these leagues. The map shows gains above +0.02; inferred carry xT is separate in the match evidence above.',
+  xt_carry:'<b>Carry xT</b> uses inferred carries from consecutive receipts/releases and the same borrowed 12×8 grid. Only gains above +0.02 appear. The grid is not externally validated; missing carries are shown as unavailable, never zero.',
   pressure:'<b>Defensive Density</b> shows where recorded defensive actions occurred. It uses tackles, interceptions, clearances, recoveries and related interventions; it is not a direct measure of pressure or pressing intensity.',
   dominance:'<b>Zone Dominance</b> divides the pitch into 30 zones and shows what % of touches in each zone belonged to the team. >60% = team dominant (accent color), <40% = opponent dominant (red), 40-60% = contested (neutral).',
   formation:'<b>Average-position formation estimate</b> uses the starting XI\'s touch locations and clusters their average depth into lines. It is an observed-location summary, not the submitted formation or a claim about every phase.',
@@ -2278,14 +2314,20 @@ function computeVizStats(viz){
   }
   if(viz==='xt'){
     let totalXT=0,highXT=0,shown=0;
-    passes.forEach(e=>{if(e.end_x==null||e.end_y==null)return;const gain=getXT(e.end_x,e.end_y)-getXT(e.x,e.y);if(gain<=0.02)return;shown++;totalXT+=gain;if(gain>0.05)highXT++;});
+    getFiltered('xt').forEach(e=>{if([e.x,e.y,e.end_x,e.end_y].some(v=>!Number.isFinite(v)))return;const gain=getXT(e.end_x,e.end_y)-getXT(e.x,e.y);if(gain<=0.02)return;shown++;totalXT+=gain;if(gain>0.05)highXT++;});
     const avgXT=shown?(totalXT/shown):0;
     return[['Passes Shown',shown],['Total xT Gain','+'+totalXT.toFixed(3)],['Avg xT','+'+avgXT.toFixed(3)],['High xT',highXT]];
+  }
+  if(viz==='xt_carry'){
+    if(!S.carriesAvailable)return[['Carry feed','Unavailable']];
+    const shown=getFiltered('xt_carry').map(e=>[e.start_x,e.start_y,e.end_x,e.end_y].every(Number.isFinite)?getXT(e.end_x,e.end_y)-getXT(e.start_x,e.start_y):0).filter(gain=>gain>0.02);
+    const total=shown.reduce((sum,gain)=>sum+gain,0);
+    return[['Carries shown',shown.length],['Positive xT','+'+total.toFixed(3)],['Source','Inferred']];
   }
   return[['Passes',passes.length],['Accuracy',acc+'%'],['Progressive',progAll.length],['Shots',shots.length]];
 }
 function getTeamInitials(){const d=T().display||'';const caps=d.match(/[A-Z]/g);if(caps&&caps.length>=2)return caps.join('').slice(0,4);return (T().name||'FC').substring(0,3).toUpperCase();}
-function getCompetitionLabel(){const m=S.matches.find(mm=>mm.game_id==S.selMatch);if(!m)return '2025\u201326';const compMap={'ENG-Premier League':'Premier League','INT-Champions League':'Champions League','ENG-FA Cup':'FA Cup','ENG-League Cup':'League Cup','USA-MLS':'MLS'};return '2025\u201326 \u00B7 '+(compMap[m.competition]||m.competition||'');}
+function getCompetitionLabel(){const m=S.matches.find(mm=>mm.game_id==S.selMatch);if(!m)return 'Match';const compMap={'ENG-Premier League':'Premier League','INT-Champions League':'Champions League','ENG-FA Cup':'FA Cup','ENG-League Cup':'League Cup','USA-MLS':'MLS'};const season=String(m.season||'');const seasonLabel=/^\d{4}$/.test(season)&&!season.startsWith('20')?'20'+season.slice(0,2)+'\u2013'+season.slice(2):season;return [seasonLabel,compMap[m.competition]||m.competition].filter(Boolean).join(' \u00B7 ');}
 function buildExportFilename(viewLabel,ext,pitchCanvas){const team=pitchCanvas?.dataset?.team||T().name,subject=pitchCanvas?.dataset?.subject||S.selPlayer,parts=[safeName(team),safeName(viewLabel)];if(subject)parts.push(safeName(subject));if(S.timeFilter)parts.push(S.timeFilter.s+'-'+S.timeFilter.e+'min');parts.push(fileDate());return parts.join('_')+'.'+ext;}
 
 /* ===================== UNIFIED PROFESSIONAL EXPORT SYSTEM =====================
@@ -3151,19 +3193,24 @@ function initTeamSwitcher(){
   document.getElementById('teamPick').onchange=(e)=>{
     S.team=e.target.value;
     applyTheme();initCompFilters();
-    S.selMatch=null;S.selPlayer=null;S.cmpPlayer=null;S.events=[];S.timeFilter=null;
+    S.selMatch=null;S.selPlayer=null;S.cmpPlayer=null;S.events=[];S.carries=[];S.carriesAvailable=false;S.timeFilter=null;
     S.psPlayer=null;S.psPlayersLoaded=false;S.psAllEvents=[];S.seasonData=[];
     S._sqStatsCache=null;S._pmCache=null;S.psMatchFilter=null;S.viewTeam=null;S.oppTeam=null;S.matchTeams=[];
     document.getElementById('viewTeamBar').innerHTML='';
+    renderMatchEssentials(null);
     document.getElementById('pitchArea').innerHTML='<div class="loading">Select a match</div>';
     document.getElementById('playerList').innerHTML='<div class="empty">Select a match</div>';
     const psl=document.getElementById('psList');if(psl)psl.innerHTML='<div class="empty">Loading...</div>';
     const psm=document.getElementById('psMain');if(psm)psm.innerHTML='<div class="empty" style="padding-top:80px">Select a player</div>';
     document.getElementById('timeline').classList.add('hidden');
+    document.getElementById('matchInfo').textContent='Select a match';
     resetStats();loadMatches();loadSeasonStats();
   };
 }
 function inComps(team){
+  // The aggregate picker has no league of its own; it must survive every
+  // competition toggle, including a league with no loaded team directory.
+  if(team==='__ALL__')return true;
   if(!SELCOMPS.size)return true;
   const league=LEAGUE_OF[team];
   return !!league&&SELCOMPS.has(league);
@@ -3182,11 +3229,11 @@ function initCompFilters(){
       if(!SELCOMPS.size){cb.checked=true;SELCOMPS.add(cb.value);}
       initTeamSwitcher();
       if(!inComps(S.team)){
-        const opts=Object.keys(TEAMS).filter(k=>k!=='__ALL__'&&inComps(k));
         const pick=document.getElementById('teamPick');
-        if(opts.length&&pick){
-          // reuse the existing team-change handler rather than duplicating its reset
-          pick.value=opts[0];
+        if(pick){
+          // A cross-league filter should never silently pick a club. Keep the
+          // explicitly scoped all-team fixture list until the reader chooses one.
+          pick.value='__ALL__';
           pick.dispatchEvent(new Event('change'));
           return;
         }
@@ -3195,7 +3242,25 @@ function initCompFilters(){
     };
   });
 }
-function renderMatchSelectFiltered(){const checked=new Set();document.querySelectorAll('.comp-cb:checked').forEach(cb=>checked.add(cb.value));const sel=document.getElementById('matchSel');sel.innerHTML='<option value="">\u00B7 select played match \u00B7</option>';const filtered=S.matches.filter(m=>checked.has(m.competition)&&m.home_score!=null&&m.away_score!=null);filtered.forEach(m=>{const o=document.createElement('option');o.value=m.game_id;o.textContent=fmtMatchOpt(m);sel.appendChild(o);});document.getElementById('matchCount').textContent=filtered.length+' played matches';}
+function renderMatchSelectFiltered(){
+  const checked=new Set();document.querySelectorAll('.comp-cb:checked').forEach(cb=>checked.add(cb.value));
+  const sel=document.getElementById('matchSel'),previous=sel.value||S.selMatch;
+  sel.innerHTML='<option value="">\u00B7 select played match \u00B7</option>';
+  const filtered=S.matches.filter(m=>checked.has(m.competition)&&m.home_score!=null&&m.away_score!=null);
+  filtered.forEach(m=>{const o=document.createElement('option');o.value=m.game_id;o.textContent=fmtMatchOpt(m);sel.appendChild(o);});
+  if(previous&&filtered.some(m=>String(m.game_id)===String(previous)))sel.value=String(previous);
+  else if(S.selMatch){
+    S.selMatch=null;S.events=[];S.carries=[];S.carriesAvailable=false;S.sequences=[];S.viewTeam=null;S.oppTeam=null;
+    renderMatchEssentials(null);document.getElementById('viewTeamBar').replaceChildren();
+    document.getElementById('pitchArea').innerHTML='<div class="loading">Select a match in the chosen competition</div>';
+    document.getElementById('timeline').classList.add('hidden');
+    document.getElementById('playerList').innerHTML='<div class="empty">Select a match</div>';
+    document.getElementById('matchInfo').textContent='Select a match';
+    document.getElementById('btnExpAll').style.display='none';
+    resetStats();
+  }
+  document.getElementById('matchCount').textContent=filtered.length+' played matches';
+}
 function syncVizSelectionUi(){
   document.querySelectorAll('.viz-btn').forEach(btn=>{const on=S.activeVizs.includes(btn.dataset.viz);btn.classList.toggle('on',on);btn.setAttribute('aria-pressed',on?'true':'false');});
   document.querySelectorAll('.plot-count-btn').forEach(btn=>{const on=+btn.dataset.count===S.plotSlots;btn.classList.toggle('on',on);btn.setAttribute('aria-pressed',on?'true':'false');});
@@ -3262,30 +3327,34 @@ function esc(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 /* INIT */
 async function init(){initThemeToggle();await loadTeams();applyTheme();initTeamSwitcher();initCompFilters();initVizButtons();initFilters();initTabs();document.getElementById('matchSel').onchange=e=>{if(e.target.value)loadMatch(e.target.value);};document.getElementById('btnExpAll').onclick=()=>downloadAllPDF();const btET=document.getElementById('btnExpTable');if(btET)btET.onclick=exportSeasonTableCSV;const btES=document.getElementById('btnExpSummary');if(btES)btES.onclick=exportSeasonSummaryPDF;const bGen=document.getElementById('btnGenReport');if(REPORT_ENABLED){bGen.onclick=generateMatchReport;}else if(bGen){bGen.remove();}document.getElementById('reportClose').onclick=()=>document.getElementById('reportOverlay').classList.remove('show');document.getElementById('cellClose').onclick=()=>document.getElementById('cellOverlay').classList.remove('show');document.getElementById('cellOverlay').onclick=e=>{if(e.target.id==='cellOverlay')document.getElementById('cellOverlay').classList.remove('show');};document.getElementById('reportRegen').onclick=generateMatchReport;document.getElementById('reportExport').onclick=exportReportPDF;document.getElementById('cmpClose').onclick=()=>{document.getElementById('cmpOverlay').classList.remove('show');S.cmpPlayer=null;renderPlayerList();};document.getElementById('cmpOverlay').onclick=e=>{if(e.target===document.getElementById('cmpOverlay')){document.getElementById('cmpOverlay').classList.remove('show');S.cmpPlayer=null;renderPlayerList();}};document.getElementById('psSearch').oninput=e=>{if(S.psPlayersLoaded)renderPsPlayerList(e.target.value);};window.addEventListener('resize',()=>{if(S.selMatch)renderAll();});document.addEventListener('click',e=>{if(!e.target.closest('.dl-wrap')&&!e.target.closest('.dl-menu'))closeAllDlMenus();});await loadMatches();await openDeepLink();}
 
-/* Arriving from the command bar with ?game=<id>: pick the right team so the
-   fixture is in the list, then open it. */
+/* A game link owns its competition context. A previously selected league (or
+   the default MLS checkbox) must not leave the linked match outside the list. */
 async function openDeepLink(){
   const gid=new URLSearchParams(location.search).get('game');
   if(!gid)return;
   try{
     const rows=await sbAll('v_league_matches',{game_id:'eq.'+gid,
-      select:'game_id,home_team,away_team,competition,season'});
+      select:'game_id,date,home_team,away_team,home_score,away_score,competition,season'});
     const m=rows&&rows[0]; if(!m)return;
     const hev=evName(m.home_team);
-    if(TEAMS[hev]&&S.team!==hev){
-      S.team=hev;
-      const pick=document.getElementById('teamPick');if(pick)pick.value=S.team;
-      applyTheme();initCompFilters();
+    if(!LEAGUES.some(c=>c.v===m.competition))LEAGUES.push({v:m.competition,l:m.competition,n:1});
+    TEAMS.__ALL__.comps=LEAGUES;
+    SELCOMPS=new Set([m.competition]);
+    // Cups and cross-competition links may not map to a domestic league club.
+    // In that case the all-team list is the honest context for the match.
+    S.team=TEAMS[hev]&&LEAGUE_OF[hev]===m.competition?hev:'__ALL__';
+    applyTheme();initTeamSwitcher();initCompFilters();
+    await loadMatches();
+    if(!S.matches.some(x=>String(x.game_id)===String(gid))){
+      S.team='__ALL__';
+      applyTheme();initTeamSwitcher();initCompFilters();
       await loadMatches();
     }
     if(!S.matches.some(x=>String(x.game_id)===String(gid))){
-      S.team='__ALL__';
-      const pick=document.getElementById('teamPick');if(pick)pick.value='__ALL__';
-      applyTheme();initCompFilters();
-      await loadMatches();
+      S.matches.unshift(m);renderMatchSelectFiltered();
     }
     const sel=document.getElementById('matchSel');
-    if(sel){sel.value=gid;}
+    if(sel)sel.value=String(gid);
     await loadMatch(gid);
     loadSeasonStats();
   }catch(e){console.warn('deep link failed',e)}

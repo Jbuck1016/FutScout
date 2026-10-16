@@ -83,10 +83,21 @@ def main() -> None:
         training_frame(), 1, rich_columns, "compact_territory_poisson"
     )
     rich_prediction = model_artifact.predict_rows(rich_artifact, fixtures, observations, matches)[0]
+    ledger = rich_prediction['explanation']['feature_ledger']
+    assert any(item['feature'].endswith('_10') for item in ledger)
+    for driver in rich_prediction['explanation']['drivers']:
+        effects = [item['log_rate_balance_contribution'] for item in ledger if item['family'] == driver['label']]
+        assert abs(sum(effects) - driver['goal_balance_effect']) <= 0.000051
+    assert 'log goal rate' in rich_prediction['explanation']['contribution_units']
     assert any(
         driver["label"] in {"Field tilt", "Box entries"}
         for driver in rich_prediction["explanation"]["drivers"]
     ), "rich territory inputs were not available to prediction explanations"
+    assert all(
+        "combines the model's standardized 3-, 5-, and 10-match inputs" in driver["detail"]
+        for driver in rich_prediction["explanation"]["drivers"]
+        if driver["label"] in {"Field tilt", "Box entries", "Shot volume", "Shots allowed"}
+    ), "rolling contribution explanations must not imply that last-three context is the full calculation"
     v2_artifact = model_artifact.train_poisson(
         training_frame(), 2,
         [

@@ -120,7 +120,7 @@ tbody tr:last-child td{border-bottom:none}
 .exp{display:none;margin-top:9px;padding-top:9px;border-top:1px solid var(--line);
   font-size:13px;color:var(--dim)}
 .exp.show{display:block}
-.score{position:sticky;bottom:14px;border:1px solid var(--amber-line);background:var(--panel);
+.score{position:static;border:1px solid var(--amber-line);background:var(--panel);
   border-radius:3px;padding:11px 14px;margin-top:16px;font:600 12px var(--f-mono);
   display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .score b{color:var(--amber);font-size:15px}
@@ -226,7 +226,7 @@ details p:last-child{margin-bottom:0}
   <strong><span class="lv" data-k="matches_analysed">…</span> played matches and <span class="lv" data-k="events">…</span> individual events</strong>.
   Market values, odds and forecasts use separate sources and methods, identified on their own pages.</p>
 
-  <p><b>Every formula behind every number on this site is written out in the <a href="methodology.html">full methodology reference</a></b>, including what is validated, what is merely defined, and the evidence for each.</p>
+  <p><b>The <a href="methodology.html">methodology reference</a> explains the event metrics and their limits.</b> Forecast-model diagnostics and artifact lineage live separately in the <a href="model-lab.html?tab=guide">Model Lab guide</a>.</p>
   <h3>What it is good at</h3>
   <ul>
     <li><strong>Style description.</strong> How a side builds, where they progress, how they
@@ -240,17 +240,19 @@ details p:last-child{margin-bottom:0}
 
   <div class="box" id="popBox">
   <h5>Three player counts, three different populations</h5>
-  <p>These are often confused. They are not in conflict; they count different things.</p>
+  <p>These count different source populations. An event can be a card or substitution, not necessarily a touch. A playing-minutes record is not the same as a squad listing.</p>
   <ul>
-    <li><b><span class="lv" data-k="players_touched_ball">…</span> touched the ball</b>,
-      recorded at least one event in a scraped match.</li>
-    <li><b><span class="lv" data-k="players_in_matchday_squads">…</span> named in a matchday squad</b>,
-      including <b><span class="lv" data-k="players_named_never_involved">…</span> unused
-      substitutes</b> who never touched the ball. The first two figures differ by exactly this number.</li>
+    <li><b><span class="lv" data-k="players_touched_ball">…</span> recorded in the event feed</b>,
+      with at least one event of any type, including non-touch events.</li>
+    <li><b><span class="lv" data-k="players_in_matchday_squads">…</span> in the playing-minutes population</b>,
+      drawn from the season minutes view, which excludes substitutes who never entered.
+      <b><span class="lv" data-k="players_named_never_involved">…</span></b> of these have no event-feed record;
+      that is not a count of unused substitutes.</li>
     <li><b><span class="lv" data-k="players_profiled_outfield">…</span> profiled outfield players</b>,
       those clearing the involvement and minutes thresholds, so eligible for percentiles,
       search and insights. This is the number that governs almost everything on the site.</li>
   </ul>
+  <p id="popGap">Comparing the live source totals&hellip;</p>
 </div>
 
 <div class="box warn" id="availBox">
@@ -276,8 +278,9 @@ details p:last-child{margin-bottom:0}
       who touched the ball. "Fringe" means plays rarely and late, not "end of the bench".</li>
       <li><strong>Age is a snapshot.</strong> WhoScored reports age at match time, not date of
       birth, so a player can read a year light. We store the highest age observed.</li>
-      <li><strong>One season.</strong> Roughly 17 games per side. Team style is firm at this
-      sample; individual finishing and anything rate-based on low volume is not.</li>
+      <li><strong>Uneven season phases.</strong> Domestic leagues and MLS are at different points
+      in their calendars; check each league's current match count before reading a trend.
+      Individual finishing and any rate based on low volume remain especially uncertain.</li>
     </ul>
   </div>
 
@@ -1018,6 +1021,14 @@ paintThemeBtn();
     document.querySelectorAll('.lv').forEach(function(el){
       var v=d[el.dataset.k];
       el.textContent=(v==null)?'unavailable':(+v).toLocaleString(); });
+    var gap=document.getElementById('popGap');
+    if(gap){
+      var touched=+d.players_touched_ball, squads=+d.players_in_matchday_squads;
+      gap.textContent=Number.isFinite(touched)&&Number.isFinite(squads)&&touched!==squads
+        ?'Current source totals differ by '+Math.abs(touched-squads).toLocaleString()+
+          ' player'+(Math.abs(touched-squads)===1?'':'s')+'. These populations are not equivalent. The 30 September audit traced the one-player difference to Luis Barraza (376150): a non-touch card event, with no playing-minutes row. Future differences require a fresh ID check.'
+        :'The event-feed and playing-minutes totals currently match. Equal counts do not establish identical membership.';
+    }
     var g=document.getElementById('gAsOf');
     if(g)g.textContent='as of '+d.as_of_match_date;
     var min=(lg[0]&&lg[0].min_matches_required)||6;

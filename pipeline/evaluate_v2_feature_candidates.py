@@ -12,6 +12,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 import analyze_match_feature_families as families
@@ -28,12 +29,17 @@ CANDIDATES = {
     "compact_territory_v2": ("territory",),
     "territory_v2": ("territory",),
     "expected_threat": ("expected_threat",),
+    "xt_difference_5": ("expected_threat",),
+    "xt_created_conceded_5": ("expected_threat",),
     "possession_sequences": ("possession_sequences",),
+    "box_entry_sequences_5": ("possession_sequences",),
     "territory_plus_threat": ("territory", "expected_threat"),
     "territory_threat_sequences": (
         "territory", "expected_threat", "possession_sequences",
     ),
     "chance_quality": ("chance_quality",),
+    "npxg_difference_5": ("chance_quality",),
+    "field_tilt_xt_compact": ("territory", "expected_threat"),
     "rich_attack": (
         "territory", "expected_threat", "possession_sequences",
         "chance_quality", "progression",
@@ -43,7 +49,25 @@ CANDIDATES = {
         "chance_quality", "progression", "possession",
         "pressing_defense", "availability_context",
     ),
+    "territory_threat_no_shots": ("territory", "expected_threat"),
+    "tactical_no_shots": (
+        "territory", "expected_threat", "progression", "pressing_defense",
+    ),
+    "quality_no_shots": (
+        "territory", "expected_threat", "chance_quality",
+    ),
+    "tactical_compact_no_shots": ("territory", "expected_threat"),
+    "balanced_rich_no_shots": (
+        "territory", "expected_threat", "chance_quality",
+        "possession_sequences", "progression", "pressing_defense",
+    ),
 }
+
+NO_SHOTS_CANDIDATES = {
+    "territory_threat_no_shots", "tactical_no_shots",
+    "quality_no_shots", "balanced_rich_no_shots", "tactical_compact_no_shots",
+}
+QUALITY_FAMILY_NAMES = {"expected_threat": "threat"}
 
 TERRITORY_TOKEN_FILTERS = {
     "field_tilt_box_entries": (".field_tilt_pct_", ".box_entries_pass_"),
@@ -57,6 +81,16 @@ TERRITORY_TOKEN_FILTERS = {
         ".box_entries_pass_",
         ".final_third_touch_difference_",
         ".penalty_area_touch_difference_",
+    ),
+    "xt_difference_5": (".xt_difference_5",),
+    "xt_created_conceded_5": (".xt_created_5", ".xt_conceded_5"),
+    "box_entry_sequences_5": (".box_entry_sequences_5",),
+    "npxg_difference_5": (".npxg_difference_5",),
+    "field_tilt_xt_compact": (
+        ".field_tilt_pct_5", ".box_entries_pass_5", ".xt_difference_5",
+    ),
+    "tactical_compact_no_shots": (
+        ".field_tilt_pct_5", ".box_entries_pass_5", ".xt_difference_5",
     ),
 }
 
@@ -72,6 +106,32 @@ def coverage_reports(root: Path) -> dict[str, dict]:
             raise RuntimeError(f"{season} is not release-ready for core v2 experiments")
         reports[season] = report
     return reports
+
+
+def week_blocked_delta(
+    test: pd.DataFrame,
+    probabilities: np.ndarray,
+    control_probabilities: np.ndarray,
+) -> dict[str, object]:
+    """Paired log-loss uncertainty with whole calendar weeks resampled."""
+    labels = np.asarray([baseline.CLASS_ORDER.index(value) for value in test["result"]])
+    indices = np.arange(len(test))
+    per_match = -np.log(np.clip(probabilities[indices, labels], 1e-12, 1.0)) + np.log(
+        np.clip(control_probabilities[indices, labels], 1e-12, 1.0)
+    )
+    week = test["date"].dt.to_period("W-SUN").astype(str).to_numpy()
+    blocks = sorted(set(week))
+    sums = np.asarray([per_match[week == block].sum() for block in blocks])
+    counts = np.asarray([(week == block).sum() for block in blocks])
+    rng = np.random.default_rng(20260922)
+    draws = rng.integers(0, len(blocks), size=(2000, len(blocks)))
+    sampled = sums[draws].sum(axis=1) / counts[draws].sum(axis=1)
+    low, high = np.quantile(sampled, [0.025, 0.975])
+    return {
+        "delta_log_loss": float(per_match.mean()),
+        "week_blocks": len(blocks),
+        "week_block_bootstrap_ci_95": [float(low), float(high)],
+    }
 
 
 def main() -> int:
@@ -102,15 +162,26 @@ def main() -> int:
     report = {
         "created_at": datetime.now(UTC).isoformat(),
         "feature_schema_version": 2,
+        "purpose": "Private chronological research; candidate ranking is not a promotion decision",
+        "promotion_decision": "research_only_no_lifecycle_change",
+        "evidence_limit": (
+            "Two out-of-season holdouts and many compared candidates cannot establish "
+            "a durable improvement from a tiny log-loss difference. Review paired "
+            "uncertainty, per-league results, and real frozen-slate scores before promotion."
+        ),
         "eligible_families_all_seasons": sorted(eligible_families),
         "available_numeric_features": len(numeric),
         "family_columns": grouped,
         "folds": {},
         "skipped_candidates": {},
     }
+    control_by_fold: dict[str, np.ndarray] = {}
     for candidate, requested in CANDIDATES.items():
         gated = set(requested) & {"territory", "expected_threat", "possession_sequences", "chance_quality"}
-        missing = sorted(gated - eligible_families)
+        missing = sorted(
+            family for family in gated
+            if QUALITY_FAMILY_NAMES.get(family, family) not in eligible_families
+        )
         if missing:
             report["skipped_candidates"][candidate] = {
                 "reason": "feature family failed coverage gate",
@@ -125,9 +196,16 @@ def main() -> int:
             requested_columns = {
                 column for column in requested_columns if any(token in column for token in tokens)
             }
-        columns = sorted(set(current) | requested_columns)
+        foundation = multi.select_features(combined, "core") if candidate in NO_SHOTS_CANDIDATES else current
+        columns = sorted(set(foundation) | requested_columns)
+        if candidate in NO_SHOTS_CANDIDATES and any(
+            column in grouped.get("shooting", []) for column in columns
+        ):
+            raise RuntimeError(f"{candidate} unexpectedly includes a shooting feature")
         for fold_name, train, test in folds:
-            metrics, *_ = multi.model_metrics(train, test, columns)
+            metrics, probabilities, *_ = multi.model_metrics(train, test, columns)
+            if candidate == "current_compact_control":
+                control_by_fold[fold_name] = probabilities
             report["folds"].setdefault(fold_name, {})[candidate] = {
                 "families": list(requested),
                 "columns": columns,
@@ -138,6 +216,9 @@ def main() -> int:
                 "home_goals_mae": metrics["home_goals_mae"],
                 "away_goals_mae": metrics["away_goals_mae"],
                 "by_league": metrics["by_league"],
+                "paired_vs_control": week_blocked_delta(
+                    test, probabilities, control_by_fold[fold_name],
+                ),
             }
             print(f"{fold_name} {candidate}: {metrics['log_loss']:.4f} ({len(columns)} fields)")
 

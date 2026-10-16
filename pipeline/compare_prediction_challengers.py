@@ -15,6 +15,27 @@ PROBABILITY_FIELDS = ("home_win_probability", "draw_probability", "away_win_prob
 FIXTURE_IDENTITY_FIELDS = ("game_id", "date", "league", "home_team", "away_team")
 
 
+def evidence_classification(primary: dict, challenger: dict) -> dict:
+    """Conservative label: identical outputs are not proof of a real-time freeze."""
+    reasons = []
+    for label, payload in [('primary',primary),('challenger',challenger)]:
+        if payload.get('forecast_kind') != 'thursday_frozen':
+            reasons.append(f'{label}: not a Thursday-frozen snapshot')
+        try:
+            cutoff=datetime.fromisoformat(payload['as_of'].replace('Z','+00:00'))
+            captured=datetime.fromisoformat(payload['generated_at'].replace('Z','+00:00'))
+            if cutoff.tzinfo is None or captured.tzinfo is None or not 0 <= (captured-cutoff).total_seconds() <= 1800:
+                reasons.append(f'{label}: capture not within real cutoff window')
+        except (KeyError,ValueError,TypeError):
+            reasons.append(f'{label}: missing capture provenance')
+    for field in ('fixture_manifest_sha256','source_rows_sha256','feature_input_bundle_sha256'):
+        if not primary.get(field) or primary.get(field)!=challenger.get(field):
+            reasons.append(f'{field}: missing or mismatched')
+    return {'classification':'frozen_candidate_requires_tournament_audit' if not reasons else 'exploratory_only',
+            'promotion_evidence':False,'reasons':reasons,
+            'note':'Only the verified frozen-tournament scorer can establish promotion eligibility.'}
+
+
 def index(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
     rows = {str(row["game_id"]): row for row in payload.get("predictions", [])}
     if len(rows) != len(payload.get("predictions", [])):
@@ -95,6 +116,7 @@ def main() -> int:
     rows.sort(key=lambda row: row["maximum_absolute_probability_delta"], reverse=True)
     report = {
         "report_schema_version": 1,
+        "evidence_status": evidence_classification(primary_payload,challenger_payload),
         "created_at": datetime.now(UTC).isoformat(),
         "scope": {
             **{key: primary_payload.get(key) for key in identity},

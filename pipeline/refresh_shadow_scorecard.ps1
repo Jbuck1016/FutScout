@@ -37,16 +37,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "model lab refresh failed" }
 
     if ($PublishSite) {
-        & git add -- dashboard/model-lab-data.js
-        if ($LASTEXITCODE -ne 0) { throw "scorecard staging failed" }
-        $changed = @(& git diff --cached --name-only -- dashboard/model-lab-data.js)
-        if ($changed.Count -gt 0) {
-            $stamp = [DateTimeOffset]::UtcNow.ToString("yyyyMMddTHHmmssZ")
-            & git commit --only -m "Refresh shadow scorecard $stamp" -- dashboard/model-lab-data.js
-            if ($LASTEXITCODE -ne 0) { throw "scorecard commit failed" }
-            & git push origin HEAD:main
-            if ($LASTEXITCODE -ne 0) { throw "scorecard push failed" }
-        }
+        $stamp = [DateTimeOffset]::UtcNow.ToString("yyyyMMddTHHmmssZ")
+        & $pythonExe pipeline\publish_dashboard_data.py --file dashboard/model-lab-data.js --message "Refresh shadow scorecard $stamp" --execute
+        if ($LASTEXITCODE -ne 0) { throw "isolated scorecard publication failed" }
     }
     Write-Host "Shadow scorecard refresh complete: $scorePath"
 } catch {

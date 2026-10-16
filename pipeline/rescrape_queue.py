@@ -226,14 +226,15 @@ def _last_event_minute(game_data: dict) -> int:
 def _prune_stale_events(
     client: Any, game_id: str, provider_event_ids: set[int]
 ) -> int:
-    rows = (
-        client.table("events")
-        .select("ws_id")
-        .eq("game_id", game_id)
-        .execute()
-        .data
-        or []
-    )
+    rows = []
+    offset = 0
+    while True:
+        page = (client.table("events").select("ws_id").eq("game_id", game_id)
+                .order("id").range(offset, offset + 999).execute().data or [])
+        rows.extend(page)
+        if len(page) < 1000:
+            break
+        offset += 1000
     stored_ids = {int(row["ws_id"]) for row in rows if row.get("ws_id") is not None}
     stale_ids = sorted(stored_ids - provider_event_ids)
     for offset in range(0, len(stale_ids), 200):

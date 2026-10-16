@@ -139,6 +139,21 @@ def main() -> int:
     require("Completed passes" in players and "Progressive carries" in players and
             "Interceptions" in players and "PB.pattern" in players,
             "players.html: custom event maps can combine attacking and defensive evidence")
+    require("const TABS=['Player','Rank','Scatter','Scout','Compare','Plot studio']" in players and
+            "const categoryTabs=['All'].concat(groups,p.pool==='GK'?[]:['Chain roles'])" in players and
+            "if(GRP==='Chain roles')renderChainRoles(p.player_id)" in players and
+            "select:'role,raw,pct,pool,league'" in players and "cohort.pool" in players,
+            "players.html: chain roles have one working home inside the player profile")
+    require("const owner=new Map()" in players and "owner.size+' distinct actions plotted" in players and
+            "source records match these filters" in players,
+            "players.html: overlapping pitch layers and record counts describe what is actually shown")
+    require("viewBox=arguments[5]||'-3 -3 111.5 78'" in players and
+            'viewBox="-3 -3 111.5 78"' in players and
+            "overflow-y:auto;overflow-x:hidden" in players,
+            "players.html: attack label and plot filters stay inside their bounds")
+    require("scout-result-head" in players and ".scout-results .c-pct{font-size:11px" in players and
+            "Top '+rows.length+' of '+SK.rows.length+' qualifying players" in players,
+            "players.html: Scout has readable result hierarchy and sample context")
     require("function ordinal(n)" in players and "ordinal(r.pct)+' percentile" in players,
             "players.html: percentile ordinals use correct English suffixes")
 

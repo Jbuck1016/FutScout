@@ -18,11 +18,13 @@
     ['Forecast & investigate', [
       ['Domestic forecasts', 'model-review.html'],
       ['Model laboratory', 'model-lab.html'],
+      ['Match review', 'match-review.html'],
       ['Writing lab', 'writing-lab.html']
     ]],
     ['Learn', [
       ['Field guide', 'guide.html'],
       ['Metric reference', 'glossary.html'],
+      ['Evidence definitions', 'evidence-contracts.html'],
       ['Methodology', 'methodology.html'],
       ['Validation', 'validation.html']
     ]]
@@ -40,17 +42,17 @@
     style.id = 'fsSiteToolsCss';
     style.textContent =
       '.fs-goto{position:relative;display:inline-flex;flex:0 0 auto;z-index:70}' +
-      '.fs-goto-btn,.fs-card-export button{appearance:none;border:1px solid var(--border,var(--line2,#34404f));background:var(--surface,var(--bg2,#151b24));color:var(--text,#f1f4f7);font:700 11.5px/1.2 var(--f-body,Arial,sans-serif);letter-spacing:.035em;text-transform:uppercase;border-radius:6px;padding:9px 11px;cursor:pointer;white-space:nowrap}' +
+      '.fs-goto-btn,.fs-card-export button{appearance:none;border:1px solid var(--border,var(--line2,#34404f));background:var(--surface,var(--bg2,var(--paper,#fff)));color:var(--text,var(--ink,#151922));font:700 11.5px/1.2 var(--f-body,Arial,sans-serif);letter-spacing:.035em;text-transform:uppercase;border-radius:6px;padding:9px 11px;cursor:pointer;white-space:nowrap}' +
       '.fs-goto-btn:hover,.fs-card-export button:hover{border-color:var(--accent,var(--red,#e4573d));color:var(--accent,var(--red,#e4573d))}' +
       '.fs-goto-btn:focus-visible,.fs-card-export button:focus-visible,.fs-goto-panel a:focus-visible{outline:2px solid var(--accent,var(--red,#e4573d));outline-offset:2px}' +
       '.fs-goto-btn:after{content:"";display:inline-block;margin-left:7px;vertical-align:2px;border:3.5px solid transparent;border-top-color:currentColor}' +
       '.fs-goto-btn[aria-expanded="true"]:after{transform:rotate(180deg);vertical-align:4px}' +
-      '.fs-goto-panel{display:none;position:fixed;z-index:9999;width:244px;max-height:calc(100vh - 70px);overflow:auto;padding:7px;background:var(--bg2,#101720);color:var(--text,#f1f4f7);border:1px solid var(--border2,var(--line2,#34404f));border-radius:9px;box-shadow:0 18px 48px rgba(0,0,0,.34)}' +
+      '.fs-goto-panel{display:none;position:fixed;z-index:9999;width:244px;max-height:calc(100vh - 70px);overflow:auto;padding:7px;background:var(--bg2,var(--paper,#fff));color:var(--text,var(--ink,#151922));border:1px solid var(--border2,var(--line2,#34404f));border-radius:9px;box-shadow:0 18px 48px rgba(0,0,0,.34)}' +
       '.fs-goto-panel.open{display:block}.fs-goto-group{padding:8px 9px 5px;color:var(--text3,var(--dim,#8995a5));font:800 10.5px/1.2 var(--f-body,Arial,sans-serif);letter-spacing:.1em;text-transform:uppercase}' +
-      '.fs-goto-panel a{display:block;padding:8px 9px;border-radius:6px;color:var(--text2,var(--text,#dce3ea));text-decoration:none;font:650 12px/1.15 var(--f-body,Arial,sans-serif)}' +
-      '.fs-goto-panel a:hover{background:var(--surface2,var(--bg3,#1d2632));color:var(--text,#fff)}.fs-goto-panel a[aria-current="page"]{color:var(--accent,var(--red,#e4573d));background:var(--accent-dim,rgba(228,87,61,.1))}' +
+      '.fs-goto-panel a{display:block;padding:8px 9px;border-radius:6px;color:var(--text2,var(--text,var(--ink,#151922)));text-decoration:none;font:650 12px/1.15 var(--f-body,Arial,sans-serif)}' +
+      '.fs-goto-panel a:hover,.fs-goto-panel a:focus-visible{background:#dce8f5;color:#132b43;outline:2px solid #53799d;outline-offset:-2px}html.dark .fs-goto-panel a:hover,html.dark .fs-goto-panel a:focus-visible{background:#304963;color:#ffffff}.fs-goto-panel a[aria-current="page"]{color:var(--accent,var(--red,#e4573d));background:var(--accent-dim,rgba(228,87,61,.1))}' +
       '.fs-export-bar{display:flex;justify-content:flex-end;margin:0 0 10px}.fs-card-export{display:inline-flex;gap:5px;margin-left:auto}.fs-card-export button{padding:9px 10px;font-size:10.5px}' +
-      '.fs-exporting{opacity:.62;pointer-events:none}.fs-export-stage{position:fixed;left:-20000px;top:0;width:1120px;padding:28px;background:var(--bg2,#fff);color:var(--text,#111);z-index:-1}' +
+      '.fs-exporting{opacity:.62;pointer-events:none}.fs-export-stage{position:fixed;left:-20000px;top:0;width:1120px;padding:28px;background:var(--bg2,var(--paper,#fff));color:var(--text,var(--ink,#111));z-index:-1}' +
       '@media(max-width:720px){.fs-goto-panel{width:min(244px,calc(100vw - 16px))}.fs-goto-btn{padding:7px 8px}}';
     document.head.appendChild(style);
   }
@@ -102,6 +104,7 @@
       document.querySelector('header .nav') ||
       document.querySelector('.sys-top') ||
       document.querySelector('.hdr') ||
+      document.querySelector('body > nav') ||
       document.querySelector('header');
   }
 
@@ -126,6 +129,12 @@
     else host.appendChild(wrap);
     var button = wrap.querySelector('button');
     var panel = wrap.querySelector('.fs-goto-panel');
+    // Match the actual neighbouring controls instead of imposing a larger button.
+    var peer = Array.from(host.querySelectorAll('button,.navlink')).find(function(node){return !wrap.contains(node);});
+    if (peer) {
+      var peerStyle = getComputedStyle(peer);
+      ['height','minHeight','padding','fontSize','lineHeight','borderRadius'].forEach(function(key){button.style[key]=peerStyle[key];});
+    }
 
     function place() {
       var rect = button.getBoundingClientRect();
@@ -193,8 +202,18 @@
     var stage = document.createElement('div');
     stage.className = 'fs-export-stage';
     var clone = card.cloneNode(true);
+    var sourceCanvases = card.querySelectorAll('canvas');
+    clone.querySelectorAll('canvas').forEach(function(node,index){
+      node.width=sourceCanvases[index].width; node.height=sourceCanvases[index].height;
+      node.getContext('2d').drawImage(sourceCanvases[index],0,0);
+    });
+    var context = Array.from(document.querySelectorAll('select')).filter(function(node){return node.getClientRects().length;}).map(function(node){return Array.from(node.selectedOptions).map(function(option){return option.textContent.trim();}).join(', ');}).filter(Boolean).join(' · ');
     clone.querySelectorAll('.fs-card-export,.fs-export-bar,.viz-exp,button,input,select').forEach(function (node) { node.remove(); });
     stage.appendChild(clone);
+    var footer = document.createElement('p');
+    footer.style.cssText='font:14px/1.5 sans-serif;border-top:1px solid currentColor;padding-top:12px;overflow-wrap:anywhere';
+    footer.textContent='FutScout · '+label+' · '+(context ? 'Selected context: '+context+' · ' : '')+'Source page: '+location.origin+location.pathname+' · Exported '+new Date().toISOString()+' (export time, not data freshness).';
+    stage.appendChild(footer);
     document.body.appendChild(stage);
     clone.querySelectorAll('*').forEach(function (node) {
       var style = getComputedStyle(node);
@@ -208,7 +227,25 @@
     clone.style.overflow = 'visible';
     try {
       var bg = getComputedStyle(stage).backgroundColor;
-      var canvas = await window.html2canvas(stage, {backgroundColor: bg, scale: 2, useCORS: true, windowWidth: stage.scrollWidth, height: stage.scrollHeight, windowHeight: stage.scrollHeight});
+      var canvas = await window.html2canvas(stage, {backgroundColor: bg, scale: 2, useCORS: true, windowWidth: stage.scrollWidth, height: stage.scrollHeight, windowHeight: stage.scrollHeight,
+        onclone: function(doc) {
+          // html2canvas 1.4 cannot parse modern color()/oklch() output from color-mix.
+          // Let the browser resolve those colours, then serialize an sRGB equivalent.
+          var pixel=doc.createElement('canvas'); pixel.width=pixel.height=1;
+          var ctx=pixel.getContext('2d'), cache={};
+          function rgba(value) {
+            if(cache[value]) return cache[value];
+            ctx.clearRect(0,0,1,1); ctx.fillStyle=value; ctx.fillRect(0,0,1,1);
+            var p=ctx.getImageData(0,0,1,1).data;
+            return cache[value]='rgba('+p[0]+','+p[1]+','+p[2]+','+(p[3]/255)+')';
+          }
+          doc.querySelectorAll('*').forEach(function(node){
+            var style=doc.defaultView.getComputedStyle(node);
+            ['color','backgroundColor','borderTopColor','borderRightColor','borderBottomColor','borderLeftColor','outlineColor','fill','stroke'].forEach(function(prop){
+              var value=style[prop]; if(value && /(?:color|oklch|oklab|lab|lch)\(/.test(value))node.style[prop]=rgba(value);
+            });
+          });
+        }});
       var base = safeName((document.title || 'FutScout') + '-' + label);
       if (format === 'png') {
         var anchor = document.createElement('a');
@@ -222,8 +259,16 @@
         var pdf = new jsPDF({orientation: landscape ? 'l' : 'p', unit: 'pt', format: 'a4'});
         var pw = pdf.internal.pageSize.getWidth();
         var ph = pdf.internal.pageSize.getHeight();
-        var ratio = Math.min((pw - 32) / canvas.width, (ph - 32) / canvas.height);
-        pdf.addImage(canvas.toDataURL('image/jpeg', .92), 'JPEG', (pw - canvas.width * ratio) / 2, (ph - canvas.height * ratio) / 2, canvas.width * ratio, canvas.height * ratio, undefined, 'FAST');
+        var ratio = (pw - 32) / canvas.width;
+        var sliceHeight = Math.floor((ph - 48) / ratio);
+        for (var offset=0,page=1;offset<canvas.height;offset+=sliceHeight,page++) {
+          if (offset) pdf.addPage();
+          var slice=document.createElement('canvas');
+          slice.width=canvas.width; slice.height=Math.min(sliceHeight,canvas.height-offset);
+          slice.getContext('2d').drawImage(canvas,0,offset,canvas.width,slice.height,0,0,canvas.width,slice.height);
+          pdf.addImage(slice.toDataURL('image/jpeg',.92),'JPEG',16,16,slice.width*ratio,slice.height*ratio,undefined,'FAST');
+          pdf.setFontSize(9); pdf.text('FutScout · '+page,16,ph-12);
+        }
         pdf.save(base + '.pdf');
       }
     } catch (error) {
@@ -235,12 +280,13 @@
   }
 
   function exportable(card) {
-    if (card.matches('.studio-controls,.controls') || card.querySelector('.viz-exp')) return false;
+    if (card.closest('.fs-export-stage') || card.matches('.studio-controls,.controls,[data-export-manual]') || card.querySelector('.viz-exp,[data-export]')) return false;
     return !!card.querySelector('svg,canvas,table,.pizza-shell,.rankbar');
   }
 
   function enhanceExports() {
-    document.querySelectorAll('.sect').forEach(function (card) {
+    document.querySelectorAll('.sect,.panel,[data-export-card]').forEach(function (card) {
+      if (card.querySelector('.sect,.panel,[data-export-card]')) return;
       if (!exportable(card) || card.querySelector(':scope > .fs-export-bar,:scope > .sect-h .fs-card-export')) return;
       var controls = document.createElement('div');
       controls.className = 'fs-card-export';

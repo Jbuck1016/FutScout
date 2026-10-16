@@ -23,6 +23,14 @@ def load_json(path: Path, required: bool = True) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def newest_audit_path(base: Path) -> Path:
+    """Prefer the newest dated coverage audit over a stale legacy alias."""
+    candidates = [path for path in (base, *base.parent.glob(f"{base.stem}_20*.json")) if path.is_file()]
+    if not candidates:
+        return base
+    return max(candidates, key=lambda path: (load_json(path).get("created_at", ""), str(path)))
+
+
 def parse_utc_datetime(value: Any) -> datetime:
     """Normalize provider timestamps before comparing frozen forecast windows."""
     parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
@@ -77,8 +85,8 @@ def main() -> int:
     parser.add_argument("--challenger-predictions-file", type=Path)
     parser.add_argument("--comparison-report", type=Path, default=ROOT / "artifacts" / "model_reports" / "live_challenger_comparison.json")
     parser.add_argument("--nonlinear-report", type=Path, default=ROOT / "artifacts" / "model_reports" / "nonlinear_challenger_tournament.json")
-    parser.add_argument("--coverage-report", type=Path, default=ROOT / "artifacts" / "data_quality" / "rich_feature_coverage_decision.json")
-    parser.add_argument("--league-coverage-report", type=Path, default=ROOT / "artifacts" / "data_quality" / "rich_feature_coverage_by_league.json")
+    parser.add_argument("--coverage-report", type=Path, default=newest_audit_path(ROOT / "artifacts" / "data_quality" / "rich_feature_coverage_decision.json"))
+    parser.add_argument("--league-coverage-report", type=Path, default=newest_audit_path(ROOT / "artifacts" / "data_quality" / "rich_feature_coverage_by_league.json"))
     parser.add_argument("--table-uncertainty-report", type=Path, default=ROOT / "artifacts" / "model_reports" / "table_uncertainty_calibration.json")
     parser.add_argument("--scoring-readiness-report", type=Path, default=ROOT / "artifacts" / "model_reports" / "shadow_scoring_readiness.json")
     parser.add_argument("--operations-freshness-report", type=Path, default=ROOT / "artifacts" / "data_quality" / "model_operations_freshness.json")
@@ -186,6 +194,7 @@ def main() -> int:
         "validation_folds": folds,
         "candidate_ranking": candidate_rows,
         "model_tournament": {
+            "created_at": tournament.get("created_at"),
             "purpose": tournament["purpose"],
             "winner": tournament["winner"],
             "interpretation_rule": tournament["interpretation_rule"],
@@ -219,6 +228,7 @@ def main() -> int:
             "catalog": schema_catalog.get("families", {}),
         },
         "drift": {
+            "checked_at": drift.get("checked_at"),
             "decision": drift.get("decision", "unavailable"),
             "sample_ready": drift.get("sample_ready", False),
             "current_matches": drift.get("current_matches", 0),

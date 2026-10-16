@@ -41,12 +41,13 @@
   --f-data:var(--f-mono);
   /* Plot roles stay consistent between player, team and match views. Event
      outcome still has its own shape, so colour is never its only cue. */
-  --viz-positive:#0f806d;
+  --viz-positive:#0b5f50;
   --viz-negative:#c04c3d;
   --viz-progress:#2d66b1;
   --viz-carry:#966817;
   --viz-box:#86529b;
   --viz-neutral:#596674;
+  --viz-key:#965018;
 }
 
 html.dark{
@@ -56,6 +57,7 @@ html.dark{
   --viz-carry:#e8c477;
   --viz-box:#ca9fdf;
   --viz-neutral:#aab7c6;
+  --viz-key:#f4ab67;
 }
 
 html:not(.dark){

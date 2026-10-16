@@ -46,6 +46,10 @@ try {
     if ($parsedAsOf -gt [DateTimeOffset]::UtcNow.AddMinutes(5)) {
         throw "Refusing to backfill a future frozen snapshot; run at or after its real as-of instant"
     }
+    $freezeDelay = [DateTimeOffset]::UtcNow - $parsedAsOf
+    if ($freezeDelay.TotalMinutes -lt 0 -or $freezeDelay.TotalMinutes -gt 30) {
+        throw "Thursday-frozen forecasts must actually run within 30 minutes of their cutoff; retrospective runs must not masquerade as frozen"
+    }
     $asOfUtc = $parsedAsOf.ToString("yyyy-MM-ddTHH:mm:ssZ")
     $stamp = $parsedAsOf.ToString("yyyyMMddTHHmmssZ")
     $artifactPath = (Resolve-Path -LiteralPath $Artifact).Path
@@ -57,9 +61,24 @@ try {
     $driftPath = Join-Path $repoRoot "artifacts\data_quality\model_feature_drift_${Season}.json"
     $driftReviewPath = Join-Path $repoRoot "pipeline\reviewed_model_feature_drift_policy_v2.json"
     $scorePath = Join-Path $repoRoot "artifacts\model_reports\shadow_history_${Season}.json"
+    $tournamentPath = Join-Path $repoRoot "artifacts\predictions\research\${Season}_${stamp}_tournament.json"
+    $tournamentAuditPath = Join-Path $repoRoot "artifacts\data_quality\shadow_tournament_${Season}_${stamp}.json"
 
     & $pythonExe pipeline\sync_future_fixtures.py --season $Season --output $fixturePath --execute
     if ($LASTEXITCODE -ne 0) { throw "fixture sync failed" }
+    $evaluationThrough = $parsedAsOf.AddDays(7)
+    $fixtureManifest = Get-Content -LiteralPath $fixturePath -Raw | ConvertFrom-Json
+    $evaluationFixtures = @($fixtureManifest.fixtures | Where-Object {
+        $kickoff = [DateTimeOffset]::Parse([string]$_.kickoff_at).ToUniversalTime()
+        $kickoff -gt $parsedAsOf -and $kickoff -le $evaluationThrough
+    })
+    if ($evaluationFixtures.Count -eq 0) {
+        Write-Host ("No top-five fixtures fall inside the seven-day scoring horizon " +
+            "({0} through {1}); treating this Thursday as a successful no-op." -f `
+            $parsedAsOf.ToString("yyyy-MM-dd"), $evaluationThrough.ToString("yyyy-MM-dd"))
+        Write-Host "No immutable prediction slate was created, persisted, published, or counted."
+        return
+    }
     if (Test-Path -LiteralPath $predictionPath) {
         $existingPrediction = Get-Content -LiteralPath $predictionPath -Raw | ConvertFrom-Json
         $forecastFixturePath = if ($existingPrediction.fixture_manifest) {
@@ -119,11 +138,17 @@ try {
         }
         Write-Host "Reusing immutable frozen snapshot: $predictionPath"
     } else {
-        & $pythonExe pipeline\generate_match_predictions.py `
-            --artifact $artifactPath --season $Season --as-of $asOfUtc `
-            --forecast-kind $forecastKind --fixtures-file $forecastFixturePath --output $predictionPath
-        if ($LASTEXITCODE -ne 0) { throw "local frozen prediction generation failed" }
+        & $pythonExe pipeline\freeze_shadow_tournament.py `
+            --primary-artifact $artifactPath --season $Season --as-of $asOfUtc `
+            --fixtures-file $forecastFixturePath --prediction-output $predictionPath
+        if ($LASTEXITCODE -ne 0) { throw "complete same-cutoff tournament freeze failed" }
     }
+    if (-not (Test-Path -LiteralPath $tournamentPath)) {
+        throw "frozen primary snapshot exists without a same-cutoff tournament manifest"
+    }
+    & $pythonExe pipeline\audit_frozen_tournament.py `
+        --tournament $tournamentPath --output $tournamentAuditPath
+    if ($LASTEXITCODE -ne 0) { throw "frozen tournament integrity and point-in-time audit failed" }
 
     foreach ($league in $leagues) {
         & $pythonExe pipeline\run_league_simulation.py `
@@ -180,17 +205,8 @@ try {
     }
 
     if ($PublishSite) {
-        & git add -- dashboard/model-review-data.js dashboard/model-lab-data.js
-        if ($LASTEXITCODE -ne 0) { throw "dashboard data staging failed" }
-        $changed = @(& git diff --cached --name-only -- dashboard/model-review-data.js dashboard/model-lab-data.js)
-        if ($changed.Count -gt 0) {
-            & git commit --only -m "Refresh weekly shadow forecasts $stamp" -- dashboard/model-review-data.js dashboard/model-lab-data.js
-            if ($LASTEXITCODE -ne 0) { throw "dashboard data commit failed" }
-            & git push origin HEAD:main
-            if ($LASTEXITCODE -ne 0) { throw "dashboard data push failed" }
-        } else {
-            Write-Host "Dashboard data is unchanged; no deployment commit needed"
-        }
+        & $pythonExe pipeline\publish_dashboard_data.py --file dashboard/model-review-data.js --file dashboard/model-lab-data.js --message "Refresh weekly shadow forecasts $stamp" --execute
+        if ($LASTEXITCODE -ne 0) { throw "isolated dashboard publication failed" }
     }
 
     Write-Host "Weekly shadow cycle complete: $predictionPath"

@@ -9,12 +9,31 @@ from pathlib import Path
 
 import score_prediction_snapshot as scoring
 import train_match_baselines as baseline
+import frozen_slate_contract as frozen
 
 
 # Require three genuinely complete frozen weekends, alongside the
 # 100-overall/20-per-league sample gate. A weekend discovered later to have
 # omitted completed fixtures does not count and is never backfilled.
 MIN_COMPLETE_FROZEN_WEEKENDS = 3
+
+
+def authentic_cutoff(payload: dict) -> bool:
+    """Legacy backfills may be scored but cannot satisfy the live frozen gate."""
+    try:
+        as_of = scoring.parse_utc_datetime(payload["as_of"])
+        created = scoring.parse_utc_datetime(payload["generated_at"])
+        if not as_of <= created <= as_of + frozen.MAX_FREEZE_DELAY:
+            return False
+        manifest = Path(str(payload["fixture_manifest"]))
+        if frozen.sha256(manifest) != payload["fixture_manifest_sha256"]:
+            return False
+        bundle_path = Path(str(payload["feature_input_bundle"]))
+        bundle = json.loads(bundle_path.read_text(encoding="utf-8"))
+        from freeze_shadow_tournament import canonical_digest
+        return canonical_digest(bundle) == payload["feature_input_bundle_sha256"]
+    except (KeyError, OSError, TypeError, ValueError):
+        return False
 
 
 def combine_snapshots(payloads: list[dict]) -> tuple[list[dict], int]:
@@ -59,13 +78,15 @@ def frozen_weekend_coverage(
         canonical_ids = {str(row["game_id"]) for row in canonical_rows}
         canonical_leagues = {str(row["league"]) for row in canonical_rows}
         missing_ids = sorted(canonical_ids - predicted_ids)
+        cutoff_verified = authentic_cutoff(payload)
         coverage.append({
             "as_of": as_of.isoformat(),
             "evaluation_through": through.isoformat(),
             "predicted_calls": len(predicted_ids),
             "canonical_completed_fixtures": len(canonical_ids),
             "missing_completed_fixture_ids": missing_ids,
-            "complete": not missing_ids and canonical_leagues == required_leagues,
+            "cutoff_provenance_verified": cutoff_verified,
+            "complete": not missing_ids and canonical_leagues == required_leagues and cutoff_verified,
         })
     return coverage
 

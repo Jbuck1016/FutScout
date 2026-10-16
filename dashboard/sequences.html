@@ -53,7 +53,7 @@ select option{background:var(--bg2);color:var(--text)}
 .main{flex:1;overflow-y:auto;padding:13px 18px}
 .empty{height:100%;display:grid;place-items:center;color:var(--text3);font:500 13px/1 'Inter'}
 .sect{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px 15px;box-shadow:var(--shadow)}
-.sect-h{font:700 10px/1 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
+.sect-h{font:700 10px/1.35 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .viz-eyebrow{font:700 8.5px/1 var(--f-body);letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
 .viz-title{font:700 16px/1.1 var(--f-display);letter-spacing:-.02em;color:var(--text);margin-bottom:6px}
 .viz-sub{font:500 10px/1.45 var(--f-body);color:var(--text3);margin:0 0 7px;max-width:88ch}
@@ -220,9 +220,16 @@ async function sbAll(t,p){p=p||{};const PG=1000;let all=[],off=0;
     if(!Array.isArray(d)||!d.length)break;all=all.concat(d);if(d.length<PG)break;off+=PG;}
   return all;}
 async function sbRpc(fn,body){
-  const r=await fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',
-    headers:Object.assign({},HD,{'Content-Type':'application/json'}),body:JSON.stringify(body)});
-  if(!r.ok)throw new Error(fn+' '+r.status);return await r.json();
+  for(let attempt=0;attempt<2;attempt++){
+    const r=await fetch(SB+'/rest/v1/rpc/'+fn,{method:'POST',
+      headers:Object.assign({},HD,{'Content-Type':'application/json'}),body:JSON.stringify(body)});
+    if(r.ok)return await r.json();
+    const problem=await r.json().catch(function(){return {}});
+    const timedOut=problem.code==='57014'||/statement timeout/i.test(problem.message||'');
+    const retryable=timedOut||[502,503,504].includes(r.status);
+    if(attempt===0&&retryable){await new Promise(function(resolve){setTimeout(resolve,500)});continue}
+    throw new Error(fn+' '+r.status+(timedOut?' (database timeout)':''));
+  }
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){
   return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
@@ -411,7 +418,7 @@ function renderBrowse(){
   const title=(MODE==='type')?('Top sequences \u2014 '+(TYPES.filter(function(t){return t[0]===TAG})[0]||['',''])[1])
                              :('Top sequences \u2014 '+tname(TEAMSEL));
   let h=controls()+'<div class="sect"><div class="sect-h"><span>'+esc(title)+'</span>'+
-    '<span style="color:var(--text3);font-weight:500;text-transform:none;letter-spacing:0">ranked by xT \u00B7 click one to find its nearest matches</span></div>'+
+    '<span style="color:var(--text3);font-weight:500;text-transform:none;letter-spacing:0">Sorted by xT \u00B7 select one to compare</span></div>'+
     '<div class="sgrid">';
   CANDS.forEach(function(s,i){
     h+=cardHtml(s,{action:'Find sequences similar to',onclick:'choosePick('+i+')'});

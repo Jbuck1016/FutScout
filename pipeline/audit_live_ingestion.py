@@ -180,11 +180,27 @@ def main() -> int:
             "historical_loaded_game_ids",
             {"p_league": league["league"], "p_season": league["season"]},
         ).execute().data or []
-        results.append(audit_league(
+        result = audit_league(
             league, matches, {str(row["game_id"]) for row in loaded}, today,
             provider_by_league.get(str(league["league"]), []),
             rescrape_rows,
-        ))
+        )
+        # Event existence is not completeness. Inspect the bounded current-
+        # season metric lengths too; do not describe a 25-minute feed as healthy.
+        ids = [str(row["game_id"]) for row in matches if day(row["date"]) < today]
+        short = []
+        for offset in range(0, len(ids), 100):
+            lengths = (db.table("mv_match_length").select("game_id,length_min")
+                       .in_("game_id", ids[offset:offset + 100]).lt("length_min", 80)
+                       .execute().data or [])
+            short.extend(lengths)
+        result["short_metric_feeds"] = short
+        if short:
+            result["healthy"] = False
+            result["warnings"].append(
+                f"{len(short)} settled-date metric feed(s) under 80 minutes; review completion/abandonment"
+            )
+        results.append(result)
     payload = {
         "as_of": today.isoformat(),
         "league_count": len(results),

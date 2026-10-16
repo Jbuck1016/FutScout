@@ -195,17 +195,37 @@ def markdown(report: dict[str, Any]) -> str:
         f"- Tactical evidence coverage: **{report['coverage']['tactical_matches']}/{summary['matches']}**",
         f"- Canonical completed fixtures missed by the immutable slate: **{len(report['coverage']['missing_completed_fixtures'])}**",
         "",
+    ]
+    value_summary = report.get("value_bet_summary")
+    if value_summary:
+        roi = value_summary.get("median_price_roi")
+        lines += [
+            "## Frozen value-selection research",
+            "",
+            f"- Qualifying selections: **{value_summary['selections']}**",
+            f"- Record: **{value_summary['wins']}–{value_summary['losses']}**",
+            f"- Median-price profit: **{value_summary['median_price_profit_units']:+.2f} units**",
+            f"- Median-price ROI: **{'—' if roi is None else f'{roi:.1%}'}**",
+            "- These are flat-stake retrospective exploratory results from an outcome-blind rule, not evidence of a proven betting edge.",
+            "",
+        ]
+    lines += [
         "## Largest forecast misses",
         "",
-        "| Match | Score | H / D / A | Actual p | Log loss | Diagnostic |",
-        "|---|---:|---:|---:|---:|---|",
+        "| Match | Score | H / D / A | Actual p | Log loss | Value pick | Diagnostic |",
+        "|---|---:|---:|---:|---:|---|---|",
     ]
     for row in report["largest_misses"]:
         p = row["probabilities"]
+        selection = row.get("value_bet")
+        value_pick = (
+            f"{selection['outcome']} ({selection['median_price_profit_units']:+.2f}u)"
+            if selection else "none"
+        )
         lines.append(
             f"| {row['home_team']}–{row['away_team']} | {row['home_score']}–{row['away_score']} | "
             f"{p['H']:.1%} / {p['D']:.1%} / {p['A']:.1%} | {row['actual_probability']:.1%} | "
-            f"{row['log_loss']:.3f} | {row['interpretation'].replace('_', ' ')} |"
+            f"{row['log_loss']:.3f} | {value_pick} | {row['interpretation'].replace('_', ' ')} |"
         )
     lines += ["", "## Strongest correct calls", ""]
     for row in report["strongest_correct_calls"]:
@@ -243,6 +263,7 @@ def main() -> int:
     )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--markdown-output", type=Path)
+    parser.add_argument("--value-ledger", type=Path)
     args = parser.parse_args()
 
     payload = json.loads(args.predictions_file.read_text(encoding="utf-8"))
@@ -293,6 +314,16 @@ def main() -> int:
         for row in market_payload.get("matches", []):
             market_by_game[str(row["game_id"])].append(row)
 
+    value_by_game: dict[str, dict[str, Any] | None] = {}
+    value_summary = None
+    if args.value_ledger and args.value_ledger.is_file():
+        value_payload = json.loads(args.value_ledger.read_text(encoding="utf-8"))
+        value_summary = value_payload.get("summary")
+        value_by_game = {
+            str(row["game_id"]): row.get("selection")
+            for row in value_payload.get("matches", [])
+        }
+
     rows = []
     for prediction in predictions:
         game_id = str(prediction["game_id"])
@@ -311,6 +342,7 @@ def main() -> int:
             "forecast_drivers": (prediction.get("explanation") or {}).get("drivers", []),
             **scored,
             "tactical": tactical,
+            "value_bet": value_by_game.get(game_id),
         }
         row["interpretation"] = interpretation(scored, tactical)
         row["market"] = market_context(
@@ -361,6 +393,7 @@ def main() -> int:
         "interpretation_counts": dict(Counter(row["interpretation"] for row in rows)),
         "top_driver_family_results": driver_summary,
         "market_context": market_summary,
+        "value_bet_summary": value_summary,
         "coverage": {
             "frozen_calls": len(rows),
             "canonical_completed_fixtures": len(canonical_completed),
