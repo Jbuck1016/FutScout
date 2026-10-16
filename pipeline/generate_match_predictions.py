@@ -143,7 +143,8 @@ def persist_predictions(db, args, artifact: dict, rows: list[dict], as_of: datet
     if not scored_slate:
         raise RuntimeError("no fixtures fall inside the private scoring horizon")
     db_rows = [{k: value for k, value in row.items() if k not in {
-                   "league", "date", "home_team", "away_team", "explanation"
+                   "league", "date", "home_team", "away_team", "explanation",
+                   "score_distribution_contract"
                }} |
                {"model_run_id": args.model_run_id, "forecast_kind": args.forecast_kind, "as_of": as_of.isoformat()} for row in scored_slate]
     db.table("ml_match_predictions").upsert(db_rows, on_conflict="model_run_id,game_id,forecast_kind,as_of").execute()

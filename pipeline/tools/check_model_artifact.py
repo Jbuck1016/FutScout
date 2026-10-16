@@ -90,13 +90,13 @@ def main() -> None:
         assert abs(sum(effects) - driver['goal_balance_effect']) <= 0.000051
     assert 'log goal rate' in rich_prediction['explanation']['contribution_units']
     assert any(
-        driver["label"] in {"Field tilt", "Box entries"}
+        driver["label"] in {"Field tilt", "Completed box passes"}
         for driver in rich_prediction["explanation"]["drivers"]
     ), "rich territory inputs were not available to prediction explanations"
     assert all(
         "combines the model's standardized 3-, 5-, and 10-match inputs" in driver["detail"]
         for driver in rich_prediction["explanation"]["drivers"]
-        if driver["label"] in {"Field tilt", "Box entries", "Shot volume", "Shots allowed"}
+        if driver["label"] in {"Field tilt", "Completed box passes", "Shot volume", "Shots allowed"}
     ), "rolling contribution explanations must not imply that last-three context is the full calculation"
     v2_artifact = model_artifact.train_poisson(
         training_frame(), 2,

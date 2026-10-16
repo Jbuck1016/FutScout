@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 import httpx
 from dotenv import load_dotenv
-from scipy.stats import poisson
+from score_probabilities import MINIMUM_SCORE, result_masses, score_matrix
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression, PoissonRegressor
@@ -244,14 +244,13 @@ def poisson_model(numeric: list[str]) -> Pipeline:
     ])
 
 
-def poisson_result_probabilities(home_rate: np.ndarray, away_rate: np.ndarray, maximum: int = 12) -> np.ndarray:
-    grid = np.arange(maximum + 1)
-    output = []
-    for home, away in zip(home_rate, away_rate):
-        matrix = np.outer(poisson.pmf(grid, home), poisson.pmf(grid, away))
-        matrix /= matrix.sum()
-        output.append([np.tril(matrix, -1).sum(), np.trace(matrix), np.triu(matrix, 1).sum()])
-    return np.asarray(output)
+def poisson_result_probabilities(home_rate: np.ndarray, away_rate: np.ndarray,
+                                 maximum: int = MINIMUM_SCORE) -> np.ndarray:
+    home_rate, away_rate = np.asarray(home_rate), np.asarray(away_rate)
+    if home_rate.ndim != 1 or home_rate.shape != away_rate.shape:
+        raise ValueError("home and away rates must be equal-length one-dimensional arrays")
+    return np.asarray([result_masses(score_matrix(float(h), float(a), maximum))
+                       for h, a in zip(home_rate, away_rate)]).reshape(-1, 3)
 
 
 def calibration_error(actual: np.ndarray, probabilities: np.ndarray, bins: int = 10) -> float:
