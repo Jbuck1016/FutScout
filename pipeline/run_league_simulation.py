@@ -170,9 +170,14 @@ def main() -> int:
             if match_instant(row) <= as_of or str(row["game_id"]) in prediction_ids
         ]
     else:
+        # The saved grid is the forecast's own score distribution; rebuilding
+        # it from the stored four-decimal rates would simulate a different model.
         predictions = baseline.fetch_pages(
             db.table("ml_match_predictions")
-            .select("game_id,home_expected_goals,away_expected_goals,home_win_probability,draw_probability,away_win_probability")
+            .select(
+                "game_id,home_expected_goals,away_expected_goals,home_win_probability,"
+                "draw_probability,away_win_probability,scoreline_distribution"
+            )
             .eq("model_run_id", args.model_run_id).eq("forecast_kind", args.forecast_kind).eq("as_of", as_of.isoformat())
             .order("game_id")
         )
