@@ -708,7 +708,7 @@ async function loadMatch(gid){const request=matchLoadRevision+1;try{await loadMa
 async function loadMatches(){
   const t=T(),team=S.team,request=++matchListRevision;matchLoadRevision++;let all=[];
   for(const c of t.comps){
-    const q={competition:'eq.'+c.v,select:'game_id,date,home_team,away_team,home_score,away_score,competition,season',order:'date.desc'};
+    const q={competition:'eq.'+c.v,select:'game_id,date,kickoff_at,home_team,away_team,home_score,away_score,competition,season',order:'date.desc'};
     if(t.name!=='__ALL__'){
       // values are double-quoted: names like "L.A. Galaxy" contain dots, which
       // PostgREST would otherwise read as filter syntax
@@ -746,7 +746,7 @@ function scopeWords(){
 }
 function matchWords(){
   const m=S.matches.find(mm=>mm.game_id==S.selMatch);if(!m)return '';
-  return m.home_team+' '+m.home_score+'–'+m.away_score+' '+m.away_team+' · '+calendarDate(m.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' · '+m.competition;
+  return m.home_team+' '+m.home_score+'–'+m.away_score+' '+m.away_team+' · '+matchDate(m).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' · '+m.competition;
 }
 function renderScopeLine(){
   const el=document.getElementById('matchScope');
@@ -771,7 +771,7 @@ function renderMatchEssentials(match,homeName,awayName){
   const result=document.createElement('h1');result.className='fs-identity-name match-score essentials-result';
   result.textContent=match.home_team+' '+match.home_score+'–'+match.away_score+' '+match.away_team;
   const meta=document.createElement('p');meta.className='fs-identity-meta';
-  meta.textContent=calendarDate(match.date).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+' · '+match.competition+' · Full-match event snapshot';
+  meta.textContent=matchDate(match).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+' · '+match.competition+' · Full-match event snapshot';
   const snap=document.createElement('p');snap.className='fs-identity-meta';snap.id='matchSnapshot';
   const paintSnap=()=>{snap.textContent='Data snapshot: '+snapshotWords()+' · home listed first';};
   paintSnap();[1500,5000].forEach(delay=>setTimeout(()=>{if(snap.isConnected)paintSnap();},delay));
@@ -1736,8 +1736,9 @@ function computePlayerStats(name){const t=T(),evts=S.events.filter(e=>e.team===V
 function showComparison(){if(!S.selPlayer||!S.cmpPlayer)return;document.getElementById('cmpOverlay').classList.add('show');document.getElementById('cmpA').textContent=S.selPlayer;document.getElementById('cmpB').textContent=S.cmpPlayer;const a=computePlayerStats(S.selPlayer),b=computePlayerStats(S.cmpPlayer);const bars=document.getElementById('cmpBars');bars.innerHTML='';Object.keys(a).forEach(key=>{const va=a[key],vb=b[key],max=Math.max(va,vb,1);const row=document.createElement('div');row.className='cmp-row';row.innerHTML='<div class="cmp-val">'+va+'</div><div class="cmp-bars"><div class="cmp-bar-wrap"><div class="cmp-bar a" style="width:'+Math.round(va/max*100)+'%"></div></div></div><div class="cmp-label">'+key+'</div><div class="cmp-bars"><div class="cmp-bar-wrap"><div class="cmp-bar b" style="width:'+Math.round(vb/max*100)+'%"></div></div></div><div class="cmp-val">'+vb+'</div>';bars.appendChild(row);});}
 
 /* MATCH INFO */
+function matchDate(m){return m.kickoff_at?new Date(m.kickoff_at):calendarDate(m.date);}
 function calendarDate(value){const s=String(value||'');const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s);return m?new Date(+m[1],+m[2]-1,+m[3],12):new Date(value);}
-function updateMatchInfo(){const m=S.matches.find(m=>m.game_id==S.selMatch);if(!m)return;const d=calendarDate(m.date);document.getElementById('matchInfo').textContent=m.home_team+' '+m.home_score+'\u2013'+m.away_score+' '+m.away_team+' \u00B7 '+d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+function updateMatchInfo(){const m=S.matches.find(m=>m.game_id==S.selMatch);if(!m)return;const d=matchDate(m);document.getElementById('matchInfo').textContent=m.home_team+' '+m.home_score+'\u2013'+m.away_score+' '+m.away_team+' \u00B7 '+d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
 function renderTeamViewToggle(){
   const el=document.getElementById('viewTeamBar');if(!el)return;if(!S.selMatch||!S.oppTeam){el.innerHTML='';return;}
   const pair=(S.matchTeams&&S.matchTeams.length===2)?S.matchTeams:[T().name,S.oppTeam];const tn=pair[0],opp=pair[1],vt=VT();
@@ -1750,7 +1751,7 @@ function renderTeamViewToggle(){
   el.querySelectorAll('.vt-pill-btn').forEach(btn=>{btn.onclick=()=>{const newT=btn.dataset.team;const area=document.getElementById('pitchArea');area.classList.add('swap-fade');setTimeout(()=>{S.viewTeam=newT;S.compareMode=false;S.selPlayer=null;S.cmpPlayer=null;renderTeamViewToggle();renderPlayerList();updateStats();renderAll();area.classList.remove('swap-fade');},200);};});
   document.getElementById('vtCmpBtn').onclick=()=>{const area=document.getElementById('pitchArea');area.classList.add('swap-fade');setTimeout(()=>{S.compareMode=!S.compareMode;if(S.compareMode){S.selPlayer=null;S.cmpPlayer=null;}renderTeamViewToggle();renderPlayerList();updateStats();renderAll();area.classList.remove('swap-fade');},200);};
 }
-function fmtMatchOpt(m){const d=calendarDate(m.date);const day=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});return day+' \u00B7 '+dispName(evName(m.home_team))+' '+m.home_score+'\u2013'+m.away_score+' '+dispName(evName(m.away_team));}
+function fmtMatchOpt(m){const d=matchDate(m);const day=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});return day+' \u00B7 '+dispName(evName(m.home_team))+' '+m.home_score+'\u2013'+m.away_score+' '+dispName(evName(m.away_team));}
 function renderMatchSelect(){renderMatchSelectFiltered();}
 
 /* SEASON STATS */
@@ -1790,7 +1791,7 @@ function renderSeasonTrend(colKey){
   const colDef=SEASON_COLS.find(c=>c.key===colKey);if(!colDef){wrap.innerHTML='';return;}
   const data=getFilteredSeasonData();
   // Sort by match date via S.matches lookup
-  const rows=data.map(r=>{let date=null,dateStr='',res='D';const m=S.matches.find(mm=>mm.game_id==r.game_id)||S.matches.find(mm=>mm.home_team===r.opponent||mm.away_team===r.opponent);if(m){date=calendarDate(m.date).getTime();dateStr=calendarDate(m.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}const s=r.team_score,o=r.opp_score;res=s>o?'W':s<o?'L':'D';return{date:date||0,dateStr,opp:r.opponent,res,v:r[colKey]==null?null:+r[colKey],scoreStr:s+'-'+o};}).filter(r=>r.date>0&&r.v!=null).sort((a,b)=>a.date-b.date);
+  const rows=data.map(r=>{let date=null,dateStr='',res='D';const m=S.matches.find(mm=>mm.game_id==r.game_id)||S.matches.find(mm=>mm.home_team===r.opponent||mm.away_team===r.opponent);if(m){date=matchDate(m).getTime();dateStr=matchDate(m).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}const s=r.team_score,o=r.opp_score;res=s>o?'W':s<o?'L':'D';return{date:date||0,dateStr,opp:r.opponent,res,v:r[colKey]==null?null:+r[colKey],scoreStr:s+'-'+o};}).filter(r=>r.date>0&&r.v!=null).sort((a,b)=>a.date-b.date);
   if(!rows.length){wrap.innerHTML='';return;}
   const t=T();const W=wrap.clientWidth||700,H=260,padL=40,padR=20,padT=20,padB=40;const innerW=W-padL-padR,innerH=H-padT-padB;
   const maxV=Math.max(...rows.map(r=>r.v),1),minV=Math.min(0,...rows.map(r=>r.v));
@@ -1918,7 +1919,7 @@ function renderPlayerProfile(){
   const sortC=S.psMatchSort.col,sortD=S.psMatchSort.dir;
   const headCells=mCols.map(c=>{let cls='';if(sortC===c.k)cls=sortD===1?' asc':' desc';return'<th data-col="'+c.k+'" class="'+cls+'">'+c.l+'</th>';}).join('');
   html+='<div class="tbl-wrap" style="max-height:340px"><table class="stbl" id="psMatchTbl"><thead><tr>'+headCells+'</tr></thead><tbody id="psMatchBody">';
-  const mRows=[];matchIds.forEach(gid=>{const match=S.matches.find(m=>m.game_id==gid);const mEvts=evts.filter(e=>e.game_id==gid);const mP=mEvts.filter(e=>e.type==='Pass'),mS=mP.filter(e=>e.outcome_type==='Successful'),mPr=mP.filter(e=>isProgPass(e)),mSh=mEvts.filter(e=>e.is_shot),mG=mEvts.filter(e=>e.is_goal),mD=mEvts.filter(e=>DEF_TYPES.includes(e.type));let dateStr='\u2014',opp='Match '+gid,ha='',resStr='\u2014',resCls='',dateTs=0;if(match){const isH=match.home_team===t.name;opp=isH?match.away_team:match.home_team;ha=isH?'H':'A';const s=match.home_score,o=match.away_score,r=isH?(s>o?'W':s<o?'L':'D'):(o>s?'W':o<s?'L':'D');resCls='res-'+r.toLowerCase();resStr=s+'\u2013'+o+' ('+r+')';dateStr=calendarDate(match.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'});dateTs=calendarDate(match.date).getTime();}const accN=mP.length?Math.round(mS.length/mP.length*100):0;const mMins=getPlayerMatchMins(gid,name);mRows.push({gid,date:dateTs,dateStr,opp,ha,result:resStr,resCls,resStr,mins:mMins,p:mP.length,acc:pct(mS.length,mP.length),accN,sh:mSh.length,g:mG.length,pr:mPr.length,d:mD.length});});
+  const mRows=[];matchIds.forEach(gid=>{const match=S.matches.find(m=>m.game_id==gid);const mEvts=evts.filter(e=>e.game_id==gid);const mP=mEvts.filter(e=>e.type==='Pass'),mS=mP.filter(e=>e.outcome_type==='Successful'),mPr=mP.filter(e=>isProgPass(e)),mSh=mEvts.filter(e=>e.is_shot),mG=mEvts.filter(e=>e.is_goal),mD=mEvts.filter(e=>DEF_TYPES.includes(e.type));let dateStr='\u2014',opp='Match '+gid,ha='',resStr='\u2014',resCls='',dateTs=0;if(match){const isH=match.home_team===t.name;opp=isH?match.away_team:match.home_team;ha=isH?'H':'A';const s=match.home_score,o=match.away_score,r=isH?(s>o?'W':s<o?'L':'D'):(o>s?'W':o<s?'L':'D');resCls='res-'+r.toLowerCase();resStr=s+'\u2013'+o+' ('+r+')';dateStr=matchDate(match).toLocaleDateString('en-GB',{day:'numeric',month:'short'});dateTs=matchDate(match).getTime();}const accN=mP.length?Math.round(mS.length/mP.length*100):0;const mMins=getPlayerMatchMins(gid,name);mRows.push({gid,date:dateTs,dateStr,opp,ha,result:resStr,resCls,resStr,mins:mMins,p:mP.length,acc:pct(mS.length,mP.length),accN,sh:mSh.length,g:mG.length,pr:mPr.length,d:mD.length});});
   mRows.sort((a,b)=>{let va=a[sortC],vb=b[sortC];if(typeof va==='string')return va.localeCompare(vb)*sortD;return((va||0)-(vb||0))*sortD;});
   const mRanges={};['p','sh','g','pr','d'].forEach(k=>{const vals=mRows.map(r=>r[k]);mRanges[k]={min:Math.min(...vals),max:Math.max(...vals)};});
   mRows.forEach(r=>{const selCls=S.psMatchFilter===r.gid?' sel':'';html+='<tr data-gid="'+r.gid+'" class="ps-match-row'+selCls+'"><td>'+r.dateStr+'</td><td>'+esc(r.opp)+'</td><td><span class="ha-b '+(r.ha==='H'?'ha-h':'ha-a')+'">'+r.ha+'</span></td><td class="'+r.resCls+'" style="'+resultTint(r.resCls)+'">'+r.resStr+'</td><td>'+r.mins+"'</td><td style=\""+cellTint(r.p,mRanges.p.min,mRanges.p.max)+'">'+r.p+'</td><td>'+r.acc+'</td><td style="'+cellTint(r.sh,mRanges.sh.min,mRanges.sh.max)+'">'+r.sh+'</td><td style="'+cellTint(r.g,mRanges.g.min,mRanges.g.max)+'">'+r.g+'</td><td style="'+cellTint(r.pr,mRanges.pr.min,mRanges.pr.max)+'">'+r.pr+'</td><td style="'+cellTint(r.d,mRanges.d.min,mRanges.d.max)+'">'+r.d+'</td></tr>';});
@@ -1942,14 +1943,14 @@ function renderPlayerProfile(){
 }
 
 function psFilenameSuffix(){
-  const t=T();if(S.psMatchFilter){const m=S.matches.find(mm=>mm.game_id==S.psMatchFilter);if(m){const opp=m.home_team===t.name?m.away_team:m.home_team;const d=calendarDate(m.date);const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');return '_vs_'+safeName(opp)+'_'+ds;}}return '_FullSeason';
+  const t=T();if(S.psMatchFilter){const m=S.matches.find(mm=>mm.game_id==S.psMatchFilter);if(m){const opp=m.home_team===t.name?m.away_team:m.home_team;const d=matchDate(m);const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');return '_vs_'+safeName(opp)+'_'+ds;}}return '_FullSeason';
 }
 function renderPsPitches(){
   const grid=document.getElementById('psPitchGrid');if(!grid)return;grid.innerHTML='';
   const t=T(),name=S.psPlayer;
   let evts=S.psAllEvents.filter(e=>e.team===t.name&&e.player===name);
   const banner=document.getElementById('psFilterBanner');
-  if(S.psMatchFilter){evts=evts.filter(e=>e.game_id==S.psMatchFilter);const m=S.matches.find(mm=>mm.game_id==S.psMatchFilter);if(banner){if(m){const isH=m.home_team===t.name;const opp=isH?m.away_team:m.home_team;const d=calendarDate(m.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});banner.innerHTML='<div class="ps-filter-banner">\uD83D\uDCC5 <b>'+esc(opp)+'</b> \u00B7 '+d+' \u00B7 click row again to show full season</div>';}else{banner.innerHTML='<div class="ps-filter-banner">Showing match '+S.psMatchFilter+'</div>';}}}else if(banner){banner.innerHTML='';}
+  if(S.psMatchFilter){evts=evts.filter(e=>e.game_id==S.psMatchFilter);const m=S.matches.find(mm=>mm.game_id==S.psMatchFilter);if(banner){if(m){const isH=m.home_team===t.name;const opp=isH?m.away_team:m.home_team;const d=matchDate(m).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});banner.innerHTML='<div class="ps-filter-banner">\uD83D\uDCC5 <b>'+esc(opp)+'</b> \u00B7 '+d+' \u00B7 click row again to show full season</div>';}else{banner.innerHTML='<div class="ps-filter-banner">Showing match '+S.psMatchFilter+'</div>';}}}else if(banner){banner.innerHTML='';}
   const toShow=['heatmap',...[...S.psVizs].filter(v=>v!=='heatmap')];
   const unique=[...new Set(toShow)];
   unique.forEach(viz=>{
@@ -1978,7 +1979,7 @@ function renderPsPitches(){
     // Dynamic title: prefix with team+viz and match info when a match filter is active
     const tn=T().name;const vLabelFull=VIZ_LABELS[viz]||viz;
     const pTitle=S.psPlayer||tn;
-    if(S.psMatchFilter){const m=S.matches.find(mm=>mm.game_id==S.psMatchFilter);if(m){const isH=m.home_team===tn;const opp=isH?m.away_team:m.home_team;const ha=isH?'H':'A';const d=calendarDate(m.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});title.textContent=pTitle+' '+vLabelFull+' \u00B7 vs '+opp+' \u00B7 '+ha+' \u00B7 '+d;}}else{title.textContent=pTitle+' '+vLabelFull;}
+    if(S.psMatchFilter){const m=S.matches.find(mm=>mm.game_id==S.psMatchFilter);if(m){const isH=m.home_team===tn;const opp=isH?m.away_team:m.home_team;const ha=isH?'H':'A';const d=matchDate(m).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});title.textContent=pTitle+' '+vLabelFull+' \u00B7 vs '+opp+' \u00B7 '+ha+' \u00B7 '+d;}}else{title.textContent=pTitle+' '+vLabelFull;}
     can.setAttribute('aria-label',title.textContent+'. Attack is bottom to top.');
     // Export menu
     const vLabel=VIZ_LABELS[viz]||viz;const suffix=psFilenameSuffix();
@@ -1991,7 +1992,7 @@ function renderPsPitches(){
   });
 }
 function _psContextLine(){
-  const t=T();if(S.psMatchFilter){const m=S.matches.find(mm=>mm.game_id==S.psMatchFilter);if(m){const opp=m.home_team===t.name?m.away_team:m.home_team;const d=calendarDate(m.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});return 'vs '+opp+' \u00B7 '+d;}}return 'Full Season 2025\u201326';
+  const t=T();if(S.psMatchFilter){const m=S.matches.find(mm=>mm.game_id==S.psMatchFilter);if(m){const opp=m.home_team===t.name?m.away_team:m.home_team;const d=matchDate(m).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});return 'vs '+opp+' \u00B7 '+d;}}return 'Full Season 2025\u201326';
 }
 function downloadPlayerPitchPDF(can,vLabel,suffix){
   const origPlayer=S.selPlayer;S.selPlayer=S.psPlayer||S.selPlayer;
@@ -2063,7 +2064,7 @@ async function openCellMatchModal(gid,oppName,colKey){
   const overlay=document.getElementById('cellOverlay');const body=document.getElementById('cellBody');const title=document.getElementById('cellTitle');const sub=document.getElementById('cellSub');
   const request=String(Number(overlay.dataset.request||0)+1);overlay.dataset.request=request;
   overlay.classList.add('show');
-  const t=T();const m=S.matches.find(mm=>mm.game_id==gid);let matchLabel='';if(m)matchLabel=m.home_team+' '+m.home_score+'\u2013'+m.away_score+' '+m.away_team+' \u00B7 '+calendarDate(m.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  const t=T();const m=S.matches.find(mm=>mm.game_id==gid);let matchLabel='';if(m)matchLabel=m.home_team+' '+m.home_score+'\u2013'+m.away_score+' '+m.away_team+' \u00B7 '+matchDate(m).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
   const colDef=SEASON_COLS.find(c=>c.key===colKey);
   title.textContent=(colDef?colDef.label:colKey)+' \u00B7 '+oppName;
   sub.textContent=matchLabel||'Match view';
@@ -2168,7 +2169,7 @@ function exportReportPDF(){
 
 /* PDF / EXPORT HELPERS */
 function getAccentRGB(){return rgbOf(T().color);}
-function getMatchLine(){const m=S.matches.find(mm=>mm.game_id==S.selMatch);if(!m)return '';const d=calendarDate(m.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});return m.home_team+' '+m.home_score+'\u2013'+m.away_score+' '+m.away_team+'  \u00B7  '+d;}
+function getMatchLine(){const m=S.matches.find(mm=>mm.game_id==S.selMatch);if(!m)return '';const d=matchDate(m).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});return m.home_team+' '+m.home_score+'\u2013'+m.away_score+' '+m.away_team+'  \u00B7  '+d;}
 function getOppName(){const m=S.matches.find(mm=>mm.game_id==S.selMatch);if(!m)return '';return evName(m.home_team)===VT()?m.away_team:m.home_team;}
 function currentDateStr(){return new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
 function exportTimeWords(){return new Date().toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})+' (export time, not data freshness)';}
@@ -2312,7 +2313,7 @@ function buildExportConfig(pitchCanvas,viewLabel,opts){
   opts=opts||{};const t=T();const m=S.matches.find(mm=>mm.game_id==S.selMatch),canvasTeam=pitchCanvas?.dataset?.team||t.name,canvasColor=pitchCanvas?.dataset?.teamColor||t.color,canvasSubject=pitchCanvas?.dataset?.subject||null;
   let matchDesc='',opponent='',ha='',competition='';
   if(m){
-    const d=calendarDate(m.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    const d=matchDate(m).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
     matchDesc=m.home_team+' '+m.home_score+'\u2013'+m.away_score+' '+m.away_team+' \u00B7 '+d;
     const isHome=evName(m.home_team)===canvasTeam;
     opponent=isHome?m.away_team:m.home_team;ha=isHome?'H':'A';
@@ -3092,7 +3093,7 @@ function _buildSeasonCellConfig(gameId,vizType,rowData){
   const m=S.matches.find(mm=>mm.game_id==gameId);
   let matchDesc='',ha='',opponent='',competition='';
   if(m){
-    const d=calendarDate(m.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    const d=matchDate(m).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
     matchDesc=m.home_team+' '+m.home_score+'\u2013'+m.away_score+' '+m.away_team+' \u00B7 '+d;
     const isHome=m.home_team===t.name;
     opponent=isHome?m.away_team:m.home_team;ha=isHome?'H':'A';
@@ -3289,11 +3290,11 @@ async function init(){initThemeToggle();await loadTeams();applyTheme();initTeamS
 async function openDeepLink(){
   const request=++deepLinkRevision;matchLoadRevision++;matchListRevision++;const params=new URLSearchParams(location.search),gid=params.get('game');
   if(!gid){S.selMatch=null;S.events=[];S.carries=[];S.sequences=[];S.viewTeam=null;S.oppTeam=null;S.matchTeams=[];S.selPlayer=null;S.timeFilter=null;S.periods=new Set();S.outcomes=new Set();S.posGroups=new Set();S.activeVizs=['progressive'];S.compareMode=false;syncVizSelectionUi();renderMatchEssentials(null);document.getElementById('pitchArea').innerHTML='<div class="empty">Select a fixture to inspect its plots.</div>';return;}
-  if(!/^\d+$/.test(gid)){S.selMatch=null;S.events=[];S.carries=[];S.sequences=[];renderMatchEssentials(null);document.getElementById('pitchArea').innerHTML='<div class="empty">Invalid match link. Select a fixture from the match list.</div>';return;}
+  if(!/^(?:fd-)?\d+$/.test(gid)){S.selMatch=null;S.events=[];S.carries=[];S.sequences=[];renderMatchEssentials(null);document.getElementById('pitchArea').innerHTML='<div class="empty">Invalid match link. Select a fixture from the match list.</div>';return;}
   restoringMatchURL=true;
   try{
     const rows=await sbAll('v_league_matches',{game_id:'eq.'+gid,
-      select:'game_id,date,home_team,away_team,home_score,away_score,competition,season'});
+      select:'game_id,date,kickoff_at,home_team,away_team,home_score,away_score,competition,season'});
     if(request!==deepLinkRevision)return;const m=rows&&rows[0];if(!m){S.selMatch=null;S.events=[];renderMatchEssentials(null);document.getElementById('pitchArea').innerHTML='<div class="empty" role="status">Match not found. Select a fixture from the match list.</div>';return;}
     const hev=evName(m.home_team);
     if(!LEAGUES.some(c=>c.v===m.competition))LEAGUES.push({v:m.competition,l:m.competition,n:1});

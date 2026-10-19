@@ -321,7 +321,7 @@
     if (s.stale) {
       els.shell.querySelector('#fsStaleText').textContent = 'Snapshot ' + s.text + ', ' + s.age + '. ' +
         (s.rule === 'source' ? 'The source marks this rebuild as stale.' : 'Older than the provisional ' + (STALE_FALLBACK_HOURS / 24) + '-day threshold.') +
-        ' Newer matches may be missing; everything shown is still the last verified rebuild.';
+        ' Data coverage is still updating. The date above is the last successful verification; newer matches may be missing.';
     }
   }
   function setFreshness(row, fromPage) {
