@@ -337,7 +337,7 @@
   function loadSharedFreshness() {
     if (freshness) return;
     var cached = store('session', 'fsSnapshot');
-    if (cached) { try { freshness = JSON.parse(cached); freshnessFromPage = false; renderFreshness(); return; } catch (e) {} }
+    if (cached) { try { freshness = JSON.parse(cached); freshnessFromPage = false; renderFreshness(); } catch (e) {} }
     /* The same read the player and team pages already make. */
     fetch(SB + '/rest/v1/v_analytics_as_of?select=*', {headers: HD})
       .then(function (r) { return r.ok ? r.json() : null; })
